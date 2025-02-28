@@ -1,19 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:projectmanagementstmiktime/screen/view/splashscreen/splashscreen.dart';
+import 'package:projectmanagementstmiktime/screen/view/signin_signup/signscreen.dart';
+import 'package:projectmanagementstmiktime/screen/view_model/sign_in_sign_up/view_model_signin.dart';
+import 'package:provider/provider.dart';
+// import 'package:projectmanagementstmiktime/screen/view/splashscreen/splashscreen.dart';
 
 void main() {
   runApp(const MyApp());
 }
-class MyApp extends StatelessWidget {
+
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const SplashScreen(),
-    );
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => SignInViewModel()),
+        ],
+        child: MaterialApp(
+          theme: ThemeData(
+            useMaterial3: false,
+            brightness: Brightness.light,
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Color(0xFF293066),
+            ),
+          ),
+          debugShowCheckedModeBanner: false,
+          home: const SignInScreen(),
+        ));
   }
 }

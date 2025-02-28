@@ -5,6 +5,7 @@ Widget customButton(
     Color? bgColor,
     Color? fntColor,
     Color? brdrColor,
+    double? fntSize,
     double? height,
     double? width,
     VoidCallback? onPressed,
@@ -27,7 +28,7 @@ Widget customButton(
           text ?? "",
           style: TextStyle(
               color: fntColor,
-              fontSize: 20,
+              fontSize: fntSize ?? 20,
               fontWeight: FontWeight.w500,
               fontFamily: "Inter"),
         ))),

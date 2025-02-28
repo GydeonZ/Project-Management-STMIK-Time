@@ -25,9 +25,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset(
-                "assets/logostmik.png",
-              ),
+              SvgPicture.asset("assets/logostmik.svg"),
               SizedBox(
                 height: size.height * 0.02,
               ),
