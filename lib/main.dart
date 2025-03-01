@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:projectmanagementstmiktime/screen/view/signin_signup/signscreen.dart';
+import 'package:projectmanagementstmiktime/screen/view/splashscreen/splashscreen.dart';
 import 'package:projectmanagementstmiktime/screen/view_model/sign_in_sign_up/view_model_signin.dart';
+import 'package:projectmanagementstmiktime/screen/view_model/sign_in_sign_up/view_model_signup.dart';
 import 'package:provider/provider.dart';
 // import 'package:projectmanagementstmiktime/screen/view/splashscreen/splashscreen.dart';
 
@@ -22,6 +23,7 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => SignInViewModel()),
+          ChangeNotifierProvider(create: (_) => SignUpViewModel()),
         ],
         child: MaterialApp(
           theme: ThemeData(
@@ -32,7 +34,7 @@ class _MyAppState extends State<MyApp> {
             ),
           ),
           debugShowCheckedModeBanner: false,
-          home: const SignInScreen(),
+          home: const SplashScreen(),
         ));
   }
 }
