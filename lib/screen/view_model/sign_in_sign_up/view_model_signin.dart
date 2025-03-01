@@ -200,10 +200,10 @@ class SignInViewModel with ChangeNotifier {
   //   return token;
   // }
 
-  void clearSignInForm() {
-    email.clear();
-    password.clear();
-  }
+  // void clearSignInForm() {
+  //   email.clear();
+  //   password.clear();
+  // }
 
   void updateFoto({required String updatefoto, required String updateName}) {
     fotoSharedPreference = updatefoto;

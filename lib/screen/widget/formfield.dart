@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 Widget customTextFormField({
   required TextEditingController controller,
   Widget? prefixIcon,
+  String? titleText,
   Widget? suffixIcon,
   String? labelText,
   bool? obscureText,
@@ -12,46 +13,65 @@ Widget customTextFormField({
   String? Function(String?)? validator,
   TextCapitalization textCapitalization = TextCapitalization.none,
 }) {
-  return TextFormField(
-    textCapitalization: textCapitalization,
-    keyboardType: keyboardType,
-    inputFormatters: inputFormatters,
-    controller: controller,
-    obscureText: obscureText ?? false,
-    decoration: InputDecoration(
-      contentPadding: const EdgeInsets.only(top: 8, left: 8, right: 8),
-      filled: true,
-      fillColor: Color(0xFFECECEC),
-      hintText: labelText,
-      hintStyle: const TextStyle(
-        color: Color(0xFFB0B0B0),
-      ),
-      labelStyle: const TextStyle(
-        color: Color(0xffBFBFBF),
-        fontFamily: "Inter",
-      ),
-      prefixIcon: prefixIcon,
-      suffixIcon: suffixIcon,
-      border: InputBorder.none,
-      enabledBorder: const OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(5)),
-        borderSide: BorderSide(
-          color: Colors.white,
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Padding(
+        padding: const EdgeInsets.only(left: 5),
+        child: Text(
+          titleText!,
+          style: const TextStyle(
+            fontFamily: "Inter",
+            fontSize: 14,
+          ),
         ),
       ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(5),
-        borderSide: const BorderSide(
-          color: Color(0xffECECEC),
+      const SizedBox(height: 5),
+      TextFormField(
+        textCapitalization: textCapitalization,
+        keyboardType: keyboardType,
+        inputFormatters: inputFormatters,
+        controller: controller,
+        obscureText: obscureText ?? false,
+        decoration: InputDecoration(
+          contentPadding: const EdgeInsets.only(top: 8, left: 20, right: 8),
+          filled: true,
+          fillColor: const Color(0xFFECECEC),
+          hintText: labelText,
+          hintStyle: const TextStyle(
+            fontFamily: "Inter",
+            fontSize: 14,
+            color: Color(0xFFB0B0B0),
+          ),
+          labelStyle: const TextStyle(
+            color: Color(0xffBFBFBF),
+            fontFamily: "Inter",
+          ),
+          prefixIcon: prefixIcon,
+          suffixIcon: suffixIcon,
+          border: InputBorder.none,
+          enabledBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+            borderSide: BorderSide(
+              color: Colors.white,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(5),
+            borderSide: const BorderSide(
+              color: Color(0xffECECEC),
+            ),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(5),
+            borderSide: const BorderSide(
+              color: Color(0xffFF0000),
+            ),
+          ),
         ),
+        validator: validator,
       ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(5),
-        borderSide: const BorderSide(
-          color: Color(0xffFF0000),
-        ),
-      ),
-    ),
-    validator: validator,
+      const SizedBox(height: 18),
+    ],
   );
 }

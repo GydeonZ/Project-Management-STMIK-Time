@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:projectmanagementstmiktime/screen/view/signin_signup/signscreen.dart';
+import 'package:projectmanagementstmiktime/screen/view/signin_signup/signupscreen.dart';
 import 'package:projectmanagementstmiktime/screen/widget/button.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -65,7 +67,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 bgColor: const Color(0xFFE5E5E5),
                 fntColor: const Color(0xFF3853A4),
                 onPressed: () {
-                  Navigator.pushNamed(context, "/signin");
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SignInScreen(),
+                    ),
+                  );
                 },
                 text: "Masuk",
               ),
@@ -80,7 +87,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 fntColor: const Color(0xFFFFFFFF),
                 brdrColor: const Color(0xFFFFFFFF),
                 onPressed: () {
-                  Navigator.pushNamed(context, "/signin");
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SignUpScreen(),
+                    ),
+                  );
                 },
                 text: "Daftar Sekarang",
               ),
