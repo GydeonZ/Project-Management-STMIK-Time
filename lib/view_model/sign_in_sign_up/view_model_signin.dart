@@ -53,7 +53,7 @@ Future signIn() async {
         debugPrint('Login gagal: dataLogin null');
       }
     } catch (e) {
-      if (e is DioError) {
+      if (e is DioException) {
         debugPrint("Login gagal dengan error: ${e.response?.data}");
         isSuksesLogin = false;
       } else {

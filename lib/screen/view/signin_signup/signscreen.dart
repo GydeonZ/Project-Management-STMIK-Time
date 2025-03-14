@@ -111,21 +111,31 @@ class _SignInScreenState extends State<SignInScreen> {
                                   ],
                                 ),
                               ),
-                              SizedBox(height: size.height * 0.02),
                               Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Checkbox(
-                                    value: viewModel.rememberMe,
-                                    onChanged: (bool? value) {
-                                      viewModel.setRememberMe(value!);
-                                    },
-                                    activeColor: viewModel.rememberMe
-                                        ? const Color(0xFF484F88)
-                                        : null,
-                                  ),
-                                  const Text(
-                                    "Ingat saya",
-                                    style: TextStyle(fontFamily: 'Helvetica'),
+                                  Row(
+                                    children: [
+                                      Consumer<SignInViewModel>(
+                                        builder: (context, model, child) {
+                                          return Checkbox(
+                                            value: viewModel.rememberMe,
+                                            onChanged: (bool? value) {
+                                              viewModel.setRememberMe(value!);
+                                            },
+                                            activeColor: viewModel.rememberMe
+                                                ? const Color(0xFF484F88)
+                                                : null,
+                                          );
+                                        },
+                                      ),
+                                      const Text(
+                                        "Ingat saya",
+                                        style:
+                                            TextStyle(fontFamily: 'Helvetica'),
+                                      ),
+                                    ],
                                   ),
                                   const Align(
                                     alignment: Alignment(1, 0),
@@ -150,33 +160,19 @@ class _SignInScreenState extends State<SignInScreen> {
                                       if (viewModel.formKeySignin.currentState!
                                           .validate()) {
                                         await viewModel.signIn();
-
-                                        debugPrint(
-                                            "Nilai isSuksesLogin setelah signIn: ${viewModel.isSuksesLogin}");
-
                                         if (viewModel.isSuksesLogin == true) {
-                                          debugPrint(
-                                              "Navigasi ke BottomNavigationBarWidget...");
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const BoardScreen(),
+                                            ),
+                                          );
 
-                                          // Delay navigasi agar memastikan state diperbarui
-                                          Future.delayed(
-                                              const Duration(milliseconds: 300),
-                                              () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const BoardScreen(),
-                                              ),
-                                            );
-
-                                            viewModel.email.clear();
-                                            viewModel.password.clear();
-                                            viewModel.isSuksesLogin = false;
-                                          });
+                                          viewModel.email.clear();
+                                          viewModel.password.clear();
+                                          viewModel.isSuksesLogin = false;
                                         } else {
-                                          debugPrint(
-                                              "Menampilkan customAlert karena login gagal.");
                                           customAlert(
                                             context: context,
                                             alertType: QuickAlertType.error,
@@ -184,10 +180,8 @@ class _SignInScreenState extends State<SignInScreen> {
                                                 'Gagal login, mohon periksa email atau kata sandi Anda.',
                                           );
                                         }
-
                                         await viewModel
                                             .saveDataSharedPreferences();
-
                                         if (viewModel.rememberMe) {
                                           viewModel.logindata
                                               .setBool('login', true);
