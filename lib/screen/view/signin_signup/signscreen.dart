@@ -161,14 +161,14 @@ class _SignInScreenState extends State<SignInScreen> {
                                           .validate()) {
                                         await viewModel.signIn();
                                         if (viewModel.isSuksesLogin == true) {
-                                          Navigator.push(
+                                          Navigator.pushAndRemoveUntil(
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) =>
                                                   const BoardScreen(),
                                             ),
+                                            (Route<dynamic> route) => false,
                                           );
-
                                           viewModel.email.clear();
                                           viewModel.password.clear();
                                           viewModel.isSuksesLogin = false;
