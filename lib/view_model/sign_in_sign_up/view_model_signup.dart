@@ -86,8 +86,6 @@ class SignUpViewModel with ChangeNotifier {
       return 'NIM tidak boleh kosong';
     } else if (value.length < 7) {
       return 'NIM harus memiliki 7 karakter';
-    } else if (!value.startsWith("214")) {
-      return 'NIM harus diawali dengan 214';
     }
     return null;
   }

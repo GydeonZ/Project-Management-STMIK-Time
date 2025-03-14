@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:projectmanagementstmiktime/screen/view/splashscreen/splashscreen.dart';
-import 'package:projectmanagementstmiktime/screen/view_model/sign_in_sign_up/view_model_signin.dart';
-import 'package:projectmanagementstmiktime/screen/view_model/sign_in_sign_up/view_model_signup.dart';
+import 'package:projectmanagementstmiktime/view_model/board/view_model_board.dart';
+import 'package:projectmanagementstmiktime/view_model/navigation/view_model_navigation.dart';
+import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signin.dart';
+import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signup.dart';
 import 'package:provider/provider.dart';
-// import 'package:projectmanagementstmiktime/screen/view/splashscreen/splashscreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,6 +25,8 @@ class _MyAppState extends State<MyApp> {
         providers: [
           ChangeNotifierProvider(create: (_) => SignInViewModel()),
           ChangeNotifierProvider(create: (_) => SignUpViewModel()),
+          ChangeNotifierProvider(create: (_) => BoardViewModel()),
+          ChangeNotifierProvider(create: (_) => NavigationProvider()),
         ],
         child: MaterialApp(
           theme: ThemeData(

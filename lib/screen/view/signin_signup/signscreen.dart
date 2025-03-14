@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:projectmanagementstmiktime/screen/view/board/board.dart';
 import 'package:projectmanagementstmiktime/screen/view/signin_signup/signupscreen.dart';
-import 'package:projectmanagementstmiktime/screen/view_model/sign_in_sign_up/view_model_signin.dart';
+import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
+import 'package:projectmanagementstmiktime/view_model/navigation/view_model_navigation.dart';
+import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signin.dart';
 import 'package:projectmanagementstmiktime/screen/widget/button.dart';
 import 'package:projectmanagementstmiktime/screen/widget/formfield.dart';
 import 'package:provider/provider.dart';
+import 'package:quickalert/models/quickalert_type.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -15,6 +19,7 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   late SignInViewModel viewModel;
+  late NavigationProvider navigator;
 
   @override
   void initState() {
@@ -107,37 +112,86 @@ class _SignInScreenState extends State<SignInScreen> {
                                 ),
                               ),
                               SizedBox(height: size.height * 0.02),
-                              const Align(
-                                alignment: Alignment(1, 0),
-                                child: Text(
-                                  "Lupa Password?",
-                                  style: TextStyle(
-                                    color: Color(0xff0088D1),
-                                    fontWeight: FontWeight.w600,
-                                    fontFamily: "Inter",
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: viewModel.rememberMe,
+                                    onChanged: (bool? value) {
+                                      viewModel.setRememberMe(value!);
+                                    },
+                                    activeColor: viewModel.rememberMe
+                                        ? const Color(0xFF484F88)
+                                        : null,
                                   ),
-                                ),
+                                  const Text(
+                                    "Ingat saya",
+                                    style: TextStyle(fontFamily: 'Helvetica'),
+                                  ),
+                                  const Align(
+                                    alignment: Alignment(1, 0),
+                                    child: Text(
+                                      "Lupa Password?",
+                                      style: TextStyle(
+                                        color: Color(0xff0088D1),
+                                        fontWeight: FontWeight.w600,
+                                        fontFamily: "Inter",
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                               SizedBox(height: size.height * 0.04),
                               Consumer<SignInViewModel>(
-                                builder: (context, viewMode, child) {
+                                builder: (context, viewModel, child) {
                                   return customButton(
-                                    height: size.height * 0.055,
                                     text: "Masuk",
-                                    fntSize: 16,
-                                    bgColor: const Color(0xff3853A4),
+                                    bgColor: const Color(0xFF484F88),
                                     onPressed: () async {
-                                      if (!viewModel.formKeySignin.currentState!
+                                      if (viewModel.formKeySignin.currentState!
                                           .validate()) {
-                                        setState(() {
-                                          viewModel.showErrorMessage =
-                                              true; // Show error message
-                                        });
-                                      } else {
-                                        setState(() {
-                                          viewModel.showErrorMessage = false;
-                                        });
-                                        // Continue with login
+                                        await viewModel.signIn();
+
+                                        debugPrint(
+                                            "Nilai isSuksesLogin setelah signIn: ${viewModel.isSuksesLogin}");
+
+                                        if (viewModel.isSuksesLogin == true) {
+                                          debugPrint(
+                                              "Navigasi ke BottomNavigationBarWidget...");
+
+                                          // Delay navigasi agar memastikan state diperbarui
+                                          Future.delayed(
+                                              const Duration(milliseconds: 300),
+                                              () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const BoardScreen(),
+                                              ),
+                                            );
+
+                                            viewModel.email.clear();
+                                            viewModel.password.clear();
+                                            viewModel.isSuksesLogin = false;
+                                          });
+                                        } else {
+                                          debugPrint(
+                                              "Menampilkan customAlert karena login gagal.");
+                                          customAlert(
+                                            context: context,
+                                            alertType: QuickAlertType.error,
+                                            text:
+                                                'Gagal login, mohon periksa email atau kata sandi Anda.',
+                                          );
+                                        }
+
+                                        await viewModel
+                                            .saveDataSharedPreferences();
+
+                                        if (viewModel.rememberMe) {
+                                          viewModel.logindata
+                                              .setBool('login', true);
+                                        }
                                       }
                                     },
                                   );

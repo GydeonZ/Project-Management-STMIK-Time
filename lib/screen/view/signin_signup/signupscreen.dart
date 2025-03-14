@@ -1,8 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:projectmanagementstmiktime/screen/view/signin_signup/signscreen.dart';
-import 'package:projectmanagementstmiktime/screen/view_model/sign_in_sign_up/view_model_signup.dart';
+import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signup.dart';
 import 'package:projectmanagementstmiktime/screen/widget/button.dart';
 import 'package:projectmanagementstmiktime/screen/widget/formfield.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +32,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
-              physics: const NeverScrollableScrollPhysics(),
+              // physics: const NeverScrollableScrollPhysics(),
               padding: EdgeInsetsDirectional.only(
                 top: size.height * 0.02,
                 bottom: size.height * 0.06,
