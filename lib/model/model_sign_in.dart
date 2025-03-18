@@ -1,35 +1,38 @@
 import 'dart:convert';
 
-ModelSignIn modelSignInFromJson(Map<String, dynamic> str) =>
-    ModelSignIn.fromJson((str));
+ModelSignIn modelSignInFromJson(Map <String, dynamic> str) =>
+    ModelSignIn.fromJson(str);
 
 String modelSignInToJson(ModelSignIn data) => json.encode(data.toJson());
 
 class ModelSignIn {
   String message;
   User user;
+  String token;
 
   ModelSignIn({
     required this.message,
     required this.user,
+    required this.token,
   });
 
   factory ModelSignIn.fromJson(Map<String, dynamic> json) => ModelSignIn(
         message: json["message"],
         user: User.fromJson(json["user"]),
+        token: json["token"],
       );
 
   Map<String, dynamic> toJson() => {
         "message": message,
         "user": user.toJson(),
+        "token": token,
       };
 }
 
 class User {
-  int id;
+  String id;
   String name;
   String email;
-  dynamic emailVerifiedAt;
   String role;
   dynamic nim;
   dynamic nidn;
@@ -40,7 +43,6 @@ class User {
     required this.id,
     required this.name,
     required this.email,
-    required this.emailVerifiedAt,
     required this.role,
     required this.nim,
     required this.nidn,
@@ -52,7 +54,6 @@ class User {
         id: json["id"],
         name: json["name"],
         email: json["email"],
-        emailVerifiedAt: json["email_verified_at"],
         role: json["role"],
         nim: json["nim"],
         nidn: json["nidn"],
@@ -64,7 +65,6 @@ class User {
         "id": id,
         "name": name,
         "email": email,
-        "email_verified_at": emailVerifiedAt,
         "role": role,
         "nim": nim,
         "nidn": nidn,

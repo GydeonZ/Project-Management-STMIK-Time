@@ -2,7 +2,7 @@
 
 import 'package:dio/dio.dart';
 import 'package:projectmanagementstmiktime/model/model_sign_in.dart';
-import 'package:projectmanagementstmiktime/utils/utils.dart';
+import '../utils/utils.dart';
 
 class SignInService {
   final Dio _dio = Dio();

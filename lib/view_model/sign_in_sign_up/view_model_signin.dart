@@ -22,8 +22,10 @@ class SignInViewModel with ChangeNotifier {
   late bool newUser;
   String nameSharedPreference = '';
   String emailSharedPreference = '';
+  String roleSharedPreference = '';
   String nimSharedPreference = '';
   String nidnSharedPreference = '';
+  String tokenSharedPreference = '';
   bool isPasswordVisible = false;
   bool isSudahLogin = false;
   bool isSuksesLogin = false;
@@ -33,25 +35,19 @@ class SignInViewModel with ChangeNotifier {
     checkSharedPreferences();
   }
 
-Future signIn() async {
+  Future signIn() async {
     try {
       dataLogin = await service.signInAccount(
         email: email.text,
         password: password.text,
       );
-      // Pastikan dataLogin tidak null sebelum mengambil nilainya
-      if (dataLogin != null) {
-        nameSharedPreference = dataLogin!.user.name;
-        emailSharedPreference = dataLogin!.user.email;
-        nimSharedPreference = dataLogin!.user.nim ?? "";
-        nidnSharedPreference = dataLogin!.user.nidn ?? "";
-
-        isSuksesLogin = true;
-        debugPrint('Login berhasil, isSuksesLogin: $isSuksesLogin');
-      } else {
-        isSuksesLogin = false;
-        debugPrint('Login gagal: dataLogin null');
-      }
+      nameSharedPreference = dataLogin!.user.name;
+      emailSharedPreference = dataLogin!.user.email;
+      roleSharedPreference = dataLogin!.user.role;
+      nimSharedPreference = dataLogin!.user.nim ?? "";
+      nidnSharedPreference = dataLogin!.user.nidn ?? "";
+      tokenSharedPreference = dataLogin!.token;
+      isSuksesLogin = true;
     } catch (e) {
       if (e is DioException) {
         debugPrint("Login gagal dengan error: ${e.response?.data}");
@@ -61,10 +57,37 @@ Future signIn() async {
         isSuksesLogin = false;
       }
     }
-
     notifyListeners();
   }
 
+  Future<void> saveDataSharedPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('name', nameSharedPreference);
+    await prefs.setString('email', emailSharedPreference);
+    await prefs.setString('role', roleSharedPreference);
+    await prefs.setString('nim', nimSharedPreference);
+    await prefs.setString('nidn', nidnSharedPreference);
+    await prefs.setString('token', tokenSharedPreference);
+    notifyListeners();
+  }
+
+  Future<void> checkSharedPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    final storedFullName = prefs.getString('name');
+    final storedEmail = prefs.getString('email');
+    final storedRole = prefs.getString('role');
+    final storedNim = prefs.getString('nim');
+    final storedNidn = prefs.getString('nidn');
+    final storedToken = prefs.getString('token');
+
+    nameSharedPreference = storedFullName!;
+    emailSharedPreference = storedEmail!;
+    roleSharedPreference = storedRole!;
+    nimSharedPreference = storedNim!;
+    nidnSharedPreference = storedNidn!;
+    tokenSharedPreference = storedToken!;
+    notifyListeners();
+  }
 
   void toggleError(bool value) {
     showErrorMessage = value;
@@ -76,21 +99,12 @@ Future signIn() async {
     notifyListeners();
   }
 
-  Future<void> saveDataSharedPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('name', nameSharedPreference);
-    await prefs.setString('email', emailSharedPreference);
-    notifyListeners();
-  }
-
-  Future<void> checkSharedPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    final storedFullName = prefs.getString('name');
-    final storedEmail = prefs.getString('email');
-
-    nameSharedPreference = storedFullName!;
-    emailSharedPreference = storedEmail!;
-    notifyListeners();
+  void setSudahLogin() {
+    if (tokenSharedPreference != '') {
+      isSudahLogin = true;
+    } else {
+      isSudahLogin = false;
+    }
   }
 
   String? validateEmail(String value) {
@@ -151,17 +165,11 @@ Future signIn() async {
       });
     }
   }
-
   Future<void> keluar() async {
     nameSharedPreference = '';
     emailSharedPreference = '';
     isSuksesLogin = false;
     // saveDataSharedPreferences();
     notifyListeners();
-  }
-
-  void updateFoto({required String updateEmail, required String updateName}) {
-    emailSharedPreference = updateEmail;
-    nameSharedPreference = updateName;
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:projectmanagementstmiktime/view_model/navigation/view_model_navigation.dart';
 import 'package:provider/provider.dart';
-import '../../../model/bottomnavbar.dart';
+import '../../../model/model_bottomnavbar.dart';
 
 class BottomNavgationBarWidget extends StatefulWidget {
   const BottomNavgationBarWidget({super.key});

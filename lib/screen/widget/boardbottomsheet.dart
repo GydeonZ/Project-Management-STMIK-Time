@@ -1,0 +1,280 @@
+// ignore_for_file: library_private_types_in_public_api, prefer_collection_literals, invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
+
+import 'package:flutter/material.dart';
+import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
+import 'package:projectmanagementstmiktime/screen/widget/alert_success.dart';
+import 'package:projectmanagementstmiktime/screen/widget/formfield.dart';
+import 'package:projectmanagementstmiktime/view_model/board/view_model_addboard.dart';
+import 'package:projectmanagementstmiktime/view_model/board/view_model_board.dart';
+import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signin.dart';
+import 'package:provider/provider.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+
+class CreateBoardBottomSheet extends StatefulWidget {
+  const CreateBoardBottomSheet({super.key});
+
+  @override
+  CreateBoardrBottomSheetState createState() => CreateBoardrBottomSheetState();
+}
+
+class CreateBoardrBottomSheetState extends State<CreateBoardBottomSheet> {
+  late AddBoardViewModel addBoardViewModel;
+  late SignInViewModel sp;
+  Set<String> selectedOptions = Set<String>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      sp = Provider.of<SignInViewModel>(context, listen: false);
+      sp.setSudahLogin();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    addBoardViewModel = Provider.of<AddBoardViewModel>(context);
+    bool isSaveButtonVisible = addBoardViewModel.boardName.text.isNotEmpty &&
+        addBoardViewModel.selectedVisibility.text.isNotEmpty;
+    Size size = MediaQuery.of(context).size;
+    return SizedBox(
+      child: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Bagian Header BottomSheet
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(left: size.width * 0.295),
+                    child: const Text(
+                      'Tambah Board',
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16.0),
+              _buildCreateBoard('Nama Board'),
+              const SizedBox(height: 16.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Visibilitas',
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      _showVisibilitySelection(
+                          context); // Buka bottom sheet untuk memilih visibilitas
+                    },
+                    child: Consumer<BoardViewModel>(
+                      builder: (context, boardViewModel, child) {
+                        return Padding(
+                          padding: EdgeInsets.only(left: size.width * 0.5),
+                          child: Text(
+                            addBoardViewModel.selectedVisibility.text.isEmpty
+                                ? "Public" // Default jika kosong
+                                : addBoardViewModel.selectedVisibility.text,
+                            style: const TextStyle(
+                              fontSize: 16.0,
+                              color: Color(0xff939393),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const Icon(
+                    Icons.arrow_forward_ios_rounded,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16.0),
+              // Tombol Simpan (jika ada perubahan)
+              Visibility(
+                visible: isSaveButtonVisible,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    await addBoardViewModel.addBoardList(
+                      token: sp.tokenSharedPreference,
+                    );
+                    if (addBoardViewModel.isSukses == true) {
+                      showCustomDialog(context, size);
+                      addBoardViewModel.clearAll();
+                    } else {
+                      customAlert(
+                        context: context,
+                        alertType: QuickAlertType.error,
+                        text: 'Terjadi kesalahan mohon coba lagi',
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 100.0),
+                    backgroundColor: const Color(0xFF293066),
+                  ),
+                  child: const Text('Tambah Board'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Widget untuk input Nama Board
+  Widget _buildCreateBoard(String title) {
+    return Consumer<BoardViewModel>(
+      builder: (context, boardModel, child) {
+        return customTextFormField(
+            titleText: "Nama Board",
+            controller: addBoardViewModel.boardName,
+            labelText: "Masukkan Nama Dashbor",
+            validator: (value) => addBoardViewModel.validateBoardName(value!));
+      },
+    );
+  }
+
+  // Menampilkan BottomSheet untuk memilih visibilitas
+  void _showVisibilitySelection(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: const Text("Public"),
+                onTap: () {
+                  setState(() {
+                    addBoardViewModel.selectedVisibility.text = "Public";
+                  });
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: const Text("Group"),
+                onTap: () {
+                  setState(() {
+                    addBoardViewModel.selectedVisibility.text = "Group";
+                  });
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: const Text("Private"),
+                onTap: () {
+                  setState(() {
+                    addBoardViewModel.selectedVisibility.text = "Private";
+                  });
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+
+  Widget _buildFilterOption(String title, List<String> options) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+          horizontal:
+              26.0), // Sesuaikan dengan kebutuhan ruang di atas dan di bawah
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16.0,
+              color: Color(0xFF293066), // Warna biru untuk judul
+            ),
+          ),
+          const SizedBox(height: 4.0),
+          Row(
+            children: [
+              Expanded(
+                child: Wrap(
+                  spacing: 8.0,
+                  runSpacing: 4.0,
+                  children: options.map((option) {
+                    return ChoiceChip(
+                      label: Text(option),
+                      selected: selectedOptions.contains(option),
+                      onSelected: (bool selected) {},
+                      labelStyle: TextStyle(
+                        color: selectedOptions.contains(option)
+                            ? const Color(0xFF293066)
+                            : Colors.grey,
+                      ),
+                      backgroundColor: Colors.white,
+                      selectedColor: const Color(0xFF293066).withOpacity(0.2),
+                      shape: StadiumBorder(
+                        side: BorderSide(
+                          color: selectedOptions.contains(option)
+                              ? const Color(0xFF293066)
+                              : Colors.grey.withOpacity(0.5),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16.0),
+        ],
+      ),
+    );
+  }
+}
+
+// Menampilkan BottomSheet utama untuk menambahkan Board
+void showCreateBoardBottomSheet(BuildContext context) {
+  showModalBottomSheet(
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(30),
+        topRight: Radius.circular(30),
+      ),
+    ),
+    context: context,
+    isScrollControlled: true,
+    builder: (BuildContext context) {
+      return SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          height: MediaQuery.of(context).size.height * 0.7,
+          child: const CreateBoardBottomSheet(),
+        ),
+      );
+    },
+  );
+}

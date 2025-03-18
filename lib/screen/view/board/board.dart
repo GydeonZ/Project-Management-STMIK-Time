@@ -1,5 +1,9 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:projectmanagementstmiktime/screen/widget/boardbottomsheet.dart';
+import 'package:projectmanagementstmiktime/screen/widget/card_board.dart';
 import 'package:projectmanagementstmiktime/view_model/board/view_model_board.dart';
+import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signin.dart';
 import 'package:provider/provider.dart';
 
 class BoardScreen extends StatefulWidget {
@@ -10,74 +14,113 @@ class BoardScreen extends StatefulWidget {
 }
 
 class _BoardScreenState extends State<BoardScreen> {
-  late BoardViewModel viewModel;
+  late BoardViewModel boardViewModel;
+  late SignInViewModel sp;
 
   @override
   void initState() {
-    viewModel = Provider.of<BoardViewModel>(context, listen: false);
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      sp = Provider.of<SignInViewModel>(context, listen: false);
+      boardViewModel = Provider.of<BoardViewModel>(context, listen: false);
+
+      sp.setSudahLogin();
+      boardViewModel.getBoardList(
+        token: sp.tokenSharedPreference,
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => BoardViewModel(),
-      child: Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          title: const Text(
-            "Hello Kenny!",
-            style: TextStyle(
-                fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-          ),
-          actions: const [
-            CircleAvatar(
-              backgroundColor: Colors.blue,
-              child: Text(
-                "KH",
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-            ),
-            SizedBox(width: 16),
-          ],
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        title: Consumer<BoardViewModel>(
+          builder: (context, boardViewModel, child) {
+            return Text(
+              "Hello ${boardViewModel.nameSharedPreference}!",
+              style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
+            );
+          },
         ),
-        body: Padding(
+        actions: [
+          Consumer<BoardViewModel>(
+            builder: (context, boardViewModel, child) {
+              String initials = boardViewModel.nameSharedPreference.isNotEmpty
+                  ? boardViewModel.nameSharedPreference
+                      .substring(0, 2)
+                      .toUpperCase()
+                  : "??"; // Default jika kosong
+
+              return CircleAvatar(
+                backgroundColor: Colors.blue,
+                child: Text(
+                  initials,
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              );
+            },
+          ),
+          const SizedBox(width: 16),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await boardViewModel.getBoardList(token: sp.tokenSharedPreference);
+        },
+        child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "Tugas Anda pada hari ${viewModel.tanggalTerformat}",
-                style: const TextStyle(fontSize: 14, color: Colors.grey),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                decoration: InputDecoration(
-                  hintText: "Pencarian",
-                  prefixIcon: const Icon(Icons.search),
-                  filled: true,
-                  fillColor: Colors.grey[200],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
+              Consumer<BoardViewModel>(
+                  builder: (context, boardViewModel, child) {
+                return Text(
+                  "Tugas Anda pada hari ${boardViewModel.tanggalTerformat}",
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                );
+              }),
               const SizedBox(height: 16),
               Expanded(
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  children: [
-                    _buildTaskCard("Skripsi", "5 tugas", Colors.blue),
-                    _buildTaskCard("Everything", "57 tasks", Colors.orange),
-                    _buildTaskCard("Skripsi", "5 tugas", Colors.blue),
-                    _buildTaskCard("Everything", "57 tasks", Colors.orange),
-                    _buildAddBoardCard(),
-                  ],
+                child: Consumer<BoardViewModel>(
+                  builder: (context, boardViewModel, child) {
+                    if (boardViewModel.isLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    final boards = boardViewModel.modelBoard?.data ?? [];
+
+                    return GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        childAspectRatio: 1.2,
+                      ),
+                      itemCount: boards.length + 1, // +1 for "Add Board"
+                      itemBuilder: (context, index) {
+                        if (index == boards.length) {
+                          return _buildAddBoardCard(); // "Tambah Board" at the end
+                        }
+                        final board = boards[index];
+                        return customCardBoard(
+                          title: board.name,
+                          subtitle: board.user.name,
+                          color: Colors.primaries[
+                              Random().nextInt(Colors.primaries.length)],
+                          nickname: board.user.name.substring(0, 2),
+                        );
+                      },
+                    );
+                  },
                 ),
               ),
             ],
@@ -86,49 +129,41 @@ class _BoardScreenState extends State<BoardScreen> {
       ),
     );
   }
-}
 
-Widget _buildTaskCard(String title, String subtitle, Color color) {
-  return Card(
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-    child: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircleAvatar(
-            backgroundColor: color,
-            child: const Text(
-              "KH",
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-          const SizedBox(height: 4),
-          Text(subtitle, style: const TextStyle(color: Colors.grey)),
-        ],
+  void _showCreateBoardBottomSheet() {
+    showModalBottomSheet(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
       ),
-    ),
-  );
-}
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return const CreateBoardBottomSheet();
+      },
+    );
+  }
 
-Widget _buildAddBoardCard() {
-  return Card(
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-    child: const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.add, color: Colors.grey, size: 32),
-          SizedBox(height: 8),
-          Text("Buat board", style: TextStyle(color: Colors.grey)),
-        ],
+  Widget _buildAddBoardCard() {
+    return GestureDetector(
+      onTap: () {
+        _showCreateBoardBottomSheet();
+      },
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        child: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.add, color: Colors.grey, size: 32),
+              SizedBox(height: 8),
+              Text("Buat Board", style: TextStyle(color: Colors.grey)),
+            ],
+          ),
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
