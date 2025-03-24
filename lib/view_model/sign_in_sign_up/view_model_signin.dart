@@ -1,10 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
-
-import 'package:dio/dio.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:projectmanagementstmiktime/model/model_sign_in.dart';
-import 'package:projectmanagementstmiktime/screen/view/navigation/navigation.dart';
+import 'package:projectmanagementstmiktime/screen/view/board/board.dart';
 import 'package:projectmanagementstmiktime/screen/view/onboarding/onboarding.dart';
 import 'package:projectmanagementstmiktime/services/services_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,36 +27,64 @@ class SignInViewModel with ChangeNotifier {
   bool isPasswordVisible = false;
   bool isSudahLogin = false;
   bool isSuksesLogin = false;
-  String fcm = "";
+  bool isLoading = false;
 
   SignInViewModel() {
     checkSharedPreferences();
   }
 
-  Future signIn() async {
+  Future<int> signIn() async {
     try {
+      isLoading = true;
+      notifyListeners();
+
       dataLogin = await service.signInAccount(
         email: email.text,
         password: password.text,
       );
-      nameSharedPreference = dataLogin!.user.name;
-      emailSharedPreference = dataLogin!.user.email;
-      roleSharedPreference = dataLogin!.user.role;
-      nimSharedPreference = dataLogin!.user.nim ?? "";
-      nidnSharedPreference = dataLogin!.user.nidn ?? "";
-      tokenSharedPreference = dataLogin!.token;
-      isSuksesLogin = true;
-    } catch (e) {
-      if (e is DioException) {
-        debugPrint("Login gagal dengan error: ${e.response?.data}");
-        isSuksesLogin = false;
+
+      isLoading = false;
+
+      if (dataLogin != null) {
+        // ✅ Simpan data ke SharedPreferences
+        nameSharedPreference = dataLogin!.user.name;
+        emailSharedPreference = dataLogin!.user.email;
+        roleSharedPreference = dataLogin!.user.role;
+        nimSharedPreference = dataLogin!.user.nim ?? "";
+        nidnSharedPreference = dataLogin!.user.nidn ?? "";
+        tokenSharedPreference = dataLogin!.token;
+        isSuksesLogin = true;
+
+        await saveDataSharedPreferences();
+
+        isLoading = false;
+        notifyListeners();
+        return 200; // ✅ Sukses login
       } else {
-        debugPrint("Error tidak terduga: $e");
         isSuksesLogin = false;
+        isLoading = false;
+        notifyListeners();
+        return 400; // ❌ Gagal login
+      }
+    } catch (e) {
+      isLoading = false;
+      notifyListeners();
+
+      // ✅ Tangani error berdasarkan pesan exception
+      if (e.toString().contains("401")) {
+        print("❌ Password salah");
+        return 401;
+      } else if (e.toString().contains("403")) {
+        print("❌ Email belum diverifikasi");
+        return 403;
+      } else {
+        print("⚠️ Error tidak terduga: $e");
+        return 500; // ❌ Kesalahan server atau lainnya
       }
     }
-    notifyListeners();
   }
+
+
 
   Future<void> saveDataSharedPreferences() async {
     final prefs = await SharedPreferences.getInstance();
@@ -73,19 +99,12 @@ class SignInViewModel with ChangeNotifier {
 
   Future<void> checkSharedPreferences() async {
     final prefs = await SharedPreferences.getInstance();
-    final storedFullName = prefs.getString('name');
-    final storedEmail = prefs.getString('email');
-    final storedRole = prefs.getString('role');
-    final storedNim = prefs.getString('nim');
-    final storedNidn = prefs.getString('nidn');
-    final storedToken = prefs.getString('token');
-
-    nameSharedPreference = storedFullName!;
-    emailSharedPreference = storedEmail!;
-    roleSharedPreference = storedRole!;
-    nimSharedPreference = storedNim!;
-    nidnSharedPreference = storedNidn!;
-    tokenSharedPreference = storedToken!;
+    nameSharedPreference = prefs.getString('name') ?? "";
+    emailSharedPreference = prefs.getString('email') ?? "";
+    roleSharedPreference = prefs.getString('role') ?? "";
+    nimSharedPreference = prefs.getString('nim') ?? "";
+    nidnSharedPreference = prefs.getString('nidn') ?? "";
+    tokenSharedPreference = prefs.getString('token') ?? "";
     notifyListeners();
   }
 
@@ -151,7 +170,7 @@ class SignInViewModel with ChangeNotifier {
       Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
-            builder: (context) => const BottomNavgationBarWidget(),
+            builder: (context) => const BoardScreen(),
           ),
           (route) => false);
     } else {
@@ -165,11 +184,15 @@ class SignInViewModel with ChangeNotifier {
       });
     }
   }
+  /// ✅ **Fungsi logout: Hapus data login**
   Future<void> keluar() async {
+    tokenSharedPreference = '';
     nameSharedPreference = '';
     emailSharedPreference = '';
+    roleSharedPreference = '';
+    nimSharedPreference = '';
+    nidnSharedPreference = '';
     isSuksesLogin = false;
-    // saveDataSharedPreferences();
     notifyListeners();
   }
 }

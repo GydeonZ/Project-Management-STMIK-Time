@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:projectmanagementstmiktime/screen/view/board/board.dart';
@@ -24,7 +26,7 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   void initState() {
     viewModel = Provider.of<SignInViewModel>(context, listen: false);
-    // viewModel.clearSignInForm();
+    viewModel.clearSignInForm();
     viewModel.formKeySignin = GlobalKey<FormState>();
 
     super.initState();
@@ -154,41 +156,87 @@ class _SignInScreenState extends State<SignInScreen> {
                               Consumer<SignInViewModel>(
                                 builder: (context, viewModel, child) {
                                   return customButton(
-                                    text: "Masuk",
-                                    bgColor: const Color(0xFF484F88),
-                                    onPressed: () async {
-                                      if (viewModel.formKeySignin.currentState!
-                                          .validate()) {
-                                        await viewModel.signIn();
-                                        if (viewModel.isSuksesLogin == true) {
-                                          Navigator.pushAndRemoveUntil(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const BoardScreen(),
-                                            ),
-                                            (Route<dynamic> route) => false,
-                                          );
-                                          viewModel.email.clear();
-                                          viewModel.password.clear();
-                                          viewModel.isSuksesLogin = false;
-                                        } else {
+                                      text: "Masuk",
+                                      bgColor: const Color(0xFF484F88),
+                                      onPressed: () async {
+                                        if (viewModel
+                                            .formKeySignin.currentState!
+                                            .validate()) {
+                                          // ✅ Tampilkan loading alert sebelum login
                                           customAlert(
                                             context: context,
-                                            alertType: QuickAlertType.error,
-                                            text:
-                                                'Gagal login, mohon periksa email atau kata sandi Anda.',
+                                            alertType: QuickAlertType.loading,
+                                            text: "Mohon tunggu...",
                                           );
+
+                                          try {
+                                            final response =
+                                                await viewModel.signIn();
+
+                                            Navigator.pop(
+                                                context); // ✅ Tutup loading alert
+
+                                            if (response == 200) {
+                                              customAlert(
+                                                context: context,
+                                                alertType:
+                                                    QuickAlertType.success,
+                                                title: 'Login Berhasil',
+                                                afterDelay: () {
+                                                  Navigator.pushAndRemoveUntil(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const BoardScreen(),
+                                                    ),
+                                                    (Route<dynamic> route) =>
+                                                        false,
+                                                  );
+                                                },
+                                              );
+                                              viewModel.clearSignInForm();
+                                              viewModel.rememberMe = false;
+                                            } else if (response == 401) {
+                                              customAlert(
+                                                context: context,
+                                                alertType: QuickAlertType.error,
+                                                text:
+                                                    'Email atau password salah. Silakan coba lagi.',
+                                              );
+                                            } else if (response == 403) {
+                                              customAlert(
+                                                context: context,
+                                                alertType: QuickAlertType.error,
+                                                text:
+                                                    'Anda Belum MemVerifikasi Email Anda',
+                                              );
+                                            } else {
+                                              customAlert(
+                                                context: context,
+                                                alertType: QuickAlertType.error,
+                                                text:
+                                                    'Terjadi kesalahan. Coba lagi nanti.',
+                                              );
+                                            }
+                                          } on SocketException catch (_) {
+                                            Navigator.pop(context);
+                                            customAlert(
+                                              context: context,
+                                              alertType: QuickAlertType.warning,
+                                              text:
+                                                  'Tidak ada koneksi internet. Periksa jaringan Anda.',
+                                            );
+                                          } catch (e) {
+                                            Navigator.pop(context);
+                                            customAlert(
+                                              context: context,
+                                              alertType: QuickAlertType.error,
+                                              text:
+                                                  'Terjadi kesalahan: ${e.toString()}',
+                                            );
+                                          }
                                         }
-                                        await viewModel
-                                            .saveDataSharedPreferences();
-                                        if (viewModel.rememberMe) {
-                                          viewModel.logindata
-                                              .setBool('login', true);
-                                        }
-                                      }
-                                    },
-                                  );
+                                      });
                                 },
                               ),
                               SizedBox(height: size.height * 0.04),

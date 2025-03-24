@@ -1,10 +1,12 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:projectmanagementstmiktime/screen/view/onboarding/onboarding.dart';
 import 'package:projectmanagementstmiktime/screen/widget/boardbottomsheet.dart';
 import 'package:projectmanagementstmiktime/screen/widget/card_board.dart';
 import 'package:projectmanagementstmiktime/view_model/board/view_model_board.dart';
 import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signin.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BoardScreen extends StatefulWidget {
   const BoardScreen({super.key});
@@ -16,20 +18,25 @@ class BoardScreen extends StatefulWidget {
 class _BoardScreenState extends State<BoardScreen> {
   late BoardViewModel boardViewModel;
   late SignInViewModel sp;
+  late SharedPreferences logindata;
 
   @override
   void initState() {
     super.initState();
-
+    initial();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       sp = Provider.of<SignInViewModel>(context, listen: false);
+      final token = sp.tokenSharedPreference;
       boardViewModel = Provider.of<BoardViewModel>(context, listen: false);
-
       sp.setSudahLogin();
       boardViewModel.getBoardList(
-        token: sp.tokenSharedPreference,
+        token: token,
       );
     });
+  }
+
+  void initial() async {
+    logindata = await SharedPreferences.getInstance();
   }
 
   @override
@@ -38,10 +45,10 @@ class _BoardScreenState extends State<BoardScreen> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        title: Consumer<BoardViewModel>(
-          builder: (context, boardViewModel, child) {
+        title: Consumer<SignInViewModel>(
+          builder: (context, contactModel, child) {
             return Text(
-              "Hello ${boardViewModel.nameSharedPreference}!",
+              "Hello ${contactModel.nameSharedPreference}!",
               style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -50,10 +57,10 @@ class _BoardScreenState extends State<BoardScreen> {
           },
         ),
         actions: [
-          Consumer<BoardViewModel>(
-            builder: (context, boardViewModel, child) {
-              String initials = boardViewModel.nameSharedPreference.isNotEmpty
-                  ? boardViewModel.nameSharedPreference
+          Consumer<SignInViewModel>(
+            builder: (context, contactModel, child) {
+              String initials = contactModel.nameSharedPreference.isNotEmpty
+                  ? contactModel.nameSharedPreference
                       .substring(0, 2)
                       .toUpperCase()
                   : "??"; // Default jika kosong
@@ -123,6 +130,21 @@ class _BoardScreenState extends State<BoardScreen> {
                   },
                 ),
               ),
+              Consumer<SignInViewModel>(builder: (context, model, child) {
+                return FloatingActionButton(
+                  onPressed: () {
+                    logindata.setBool('login', true);
+                    model.keluar();
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (context) => const OnboardingScreen(),
+                      ),
+                      (route) => false,
+                    );
+                  },
+                  child: const Icon(Icons.refresh),
+                );
+              })
             ],
           ),
         ),

@@ -1,82 +1,105 @@
-// import 'package:dio/dio.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter_raih_peduli/model/model_otp.dart';
-// import '../../services/service_sign_up.dart';
+import 'package:projectmanagementstmiktime/services/service_sign_up.dart';
 
 class SignUpViewModel with ChangeNotifier {
   final formKey = GlobalKey<FormState>();
   final TextEditingController fullname = TextEditingController();
-  final TextEditingController username = TextEditingController();
-  final TextEditingController nim = TextEditingController();
   final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
   final TextEditingController cnfrmPassword = TextEditingController();
-  final TextEditingController phone = TextEditingController();
-  final TextEditingController address = TextEditingController();
-  bool showErrorMessage = false;
-  bool isResponseSuccess = false;
-  String kodeOtp = "";
-  // final service = SignUpService();
-  // ModelOtp? otp;
-  bool isPasswordVisible = false;
-  bool heightContainer = false;
+  final TextEditingController nim = TextEditingController();
+  final TextEditingController nidn = TextEditingController();
 
-  void toggleError(bool value) {
-    showErrorMessage = value;
+  bool isSukses = false;
+  bool isLoading = false;
+  final signUpService = SignUpService();
+
+  final List<String> roleList = [
+    'Pilih Role Antara Dosen Atau Mahasiswa',
+    'Mahasiswa',
+    'Dosen',
+  ];
+  String selectedRole = 'Pilih Role Antara Dosen Atau Mahasiswa';
+  bool isPasswordVisible = false;
+  bool isConfirmPasswordVisible = false;
+  Map<String, String> errorMessages = {};
+
+  /// 📌 Fungsi untuk menangani proses registrasi
+  Future<int> signUp() async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      final response = await signUpService.signUpAccount(
+        nameUser: fullname.text,
+        emailUser: email.text,
+        passwordUser: password.text,
+        passwordConfirmationUser: cnfrmPassword.text,
+        roleUser: selectedRole,
+        nimUser: nim.text,
+        nidnUser: nidn.text,
+      );
+
+      isLoading = false;
+
+      if (response != null) {
+        isSukses = true;
+        notifyListeners();
+        return 200;
+      } else {
+        isSukses = false;
+        notifyListeners();
+        return 400;
+      }
+    } catch (e) {
+      isLoading = false;
+      notifyListeners();
+
+      if (e.toString().contains("422")) {
+        // ✅ Parsing error validasi
+        errorMessages.clear();
+        final errors = (e as Exception).toString().split("\n");
+        for (var err in errors) {
+          if (err.contains("Email:")) {
+            errorMessages["email"] = err.replaceAll("• Email: ", "");
+          } else if (err.contains("NIM:")) {
+            errorMessages["nim"] = err.replaceAll("• NIM: ", "");
+          } else if (err.contains("NIDN:")) {
+            errorMessages["nidn"] = err.replaceAll("• NIDN: ", "");
+          }
+        }
+        return 422;
+      }
+
+      return 500;
+    }
+  }
+
+  /// 🔑 Toggle visibilitas password
+  void togglePasswordVisibility() {
+    isPasswordVisible = !isPasswordVisible;
     notifyListeners();
   }
 
-  // Future<void> signUp() async {
-  //   final nameUser = fullname.text;
-  //   final emailUser = email.text;
-  //   final passwordUser = password.text;
-  //   final addressUser = address.text;
-  //   final phoneUser = phone.text;
-  //   final genderUser = selectedGender;
-  // //   service.signUpAccount(
-  // //       nameUser, emailUser, passwordUser, addressUser, phoneUser, genderUser);
-  // // }
+  /// 🔑 Toggle visibilitas konfirmasi password
+  void toggleConfirmPasswordVisibility() {
+    isConfirmPasswordVisible = !isConfirmPasswordVisible;
+    notifyListeners();
+  }
 
-  // Future verifikasi({
-  //   required String kodeOtp,
-  // }) async {
-  //   try {
-  //     otp = await service.verifikasiOtp(
-  //       otp: kodeOtp,
-  //     );
+  /// 📌 Fungsi untuk mengatur ulang role
+  void onRoleChanged(String? value) {
+    if (value != null && value != "Select Role") {
+      selectedRole = value;
+      notifyListeners();
+    }
+  }
 
-  //     isResponseSuccess = true;
-  //     fullname.clear();
-  //     email.clear();
-  //     selectedGender = 'Select Gender';
-  //     address.clear();
-  //     phone.clear();
-  //     password.clear();
-  //     notifyListeners();
-  //   } catch (e) {
-  //     // ignore: deprecated_member_use
-  //     if (e is DioError) {
-  //       isResponseSuccess = false;
-  //       e.response!.statusCode;
-  //     }
-  //   }
-  // }
-
-  // Future<void> reSendOtp() async {
-  //   service.fecthNewOtp(email.text);
-  // }
-
+  /// 📌 Validasi Input
   String? validateName(String value) {
     if (value.isEmpty) {
       return 'Nama tidak boleh kosong';
-    }
-    return null;
-  }
-
-  String? validateUsename(String value) {
-    if (value.isEmpty) {
-      return 'Username tidak boleh kosong';
     }
     return null;
   }
@@ -86,6 +109,15 @@ class SignUpViewModel with ChangeNotifier {
       return 'NIM tidak boleh kosong';
     } else if (value.length < 7) {
       return 'NIM harus memiliki 7 karakter';
+    }
+    return null;
+  }
+
+  String? validateNIDN(String value) {
+    if (value.isEmpty) {
+      return 'NIDN tidak boleh kosong';
+    } else if (value.length < 10) {
+      return 'NIDN harus memiliki 10 karakter';
     }
     return null;
   }
@@ -112,8 +144,25 @@ class SignUpViewModel with ChangeNotifier {
     return null;
   }
 
-  void togglePasswordVisibility() {
-    isPasswordVisible = !isPasswordVisible;
-    notifyListeners();
+  /// 🔄 Mengatur ulang semua input form
+  void clearSignUpForm() {
+    fullname.clear();
+    email.clear();
+    password.clear();
+    cnfrmPassword.clear();
+    selectedRole = 'Pilih Role Antara Dosen Atau Mahasiswa';
+    nim.clear();
+    nidn.clear();
+  }
+
+  void setUlangRole() {
+    selectedRole = 'Pilih Role Antara Dosen Atau Mahasiswa';
+  }
+
+  String? validateRole(String value) {
+    if (value.isEmpty || value == 'Pilih Role Antara Dosen Atau Mahasiswa') {
+      return 'Role tidak boleh kosong';
+    }
+    return null;
   }
 }

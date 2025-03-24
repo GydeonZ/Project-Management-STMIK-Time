@@ -8,6 +8,7 @@ Future customAlert({
   required QuickAlertType alertType,
   String? customAsset,
   String? text,
+  String? title,
   VoidCallback? afterDelay,
 }) async {
   QuickAlert.show(
@@ -16,6 +17,7 @@ Future customAlert({
     animType: QuickAlertAnimType.slideInDown,
     backgroundColor: Colors.white,
     context: context,
+    title: title ?? '',
     type: alertType,
     customAsset: customAsset,
     text: text,
