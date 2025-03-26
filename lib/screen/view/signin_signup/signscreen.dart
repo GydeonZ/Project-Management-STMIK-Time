@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:projectmanagementstmiktime/screen/view/board/board.dart';
+import 'package:projectmanagementstmiktime/screen/view/forgotpassword/forgot_password_screen.dart';
 import 'package:projectmanagementstmiktime/screen/view/signin_signup/signupscreen.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
 import 'package:projectmanagementstmiktime/view_model/navigation/view_model_navigation.dart';
@@ -139,14 +141,29 @@ class _SignInScreenState extends State<SignInScreen> {
                                       ),
                                     ],
                                   ),
-                                  const Align(
-                                    alignment: Alignment(1, 0),
-                                    child: Text(
-                                      "Lupa Password?",
-                                      style: TextStyle(
-                                        color: Color(0xff0088D1),
-                                        fontWeight: FontWeight.w600,
-                                        fontFamily: "Inter",
+                                  Align(
+                                    alignment: const Alignment(1, 0),
+                                    child: RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: 'Lupa Password?',
+                                            style: const TextStyle(
+                                              color: Color(0xff0088D1),
+                                              fontWeight: FontWeight.w600,
+                                              fontFamily: "Inter",
+                                            ),
+                                            recognizer: TapGestureRecognizer()
+                                              ..onTap = () {
+                                                Navigator.of(context).push(
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const ForgotPasswordScreen(),
+                                                  ),
+                                                );
+                                              },
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
@@ -252,12 +269,13 @@ class _SignInScreenState extends State<SignInScreen> {
                                   ),
                                   GestureDetector(
                                     onTap: () {
-                                      Navigator.push(
+                                      Navigator.pushAndRemoveUntil(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) =>
                                               const SignUpScreen(),
                                         ),
+                                        (Route<dynamic> route) => false,
                                       );
                                     },
                                     child: const Text(

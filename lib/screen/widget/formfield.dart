@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 Widget customTextFormField({
   required TextEditingController controller,
+  bool? status,
   Widget? prefixIcon,
   String? titleText,
   Widget? suffixIcon,
@@ -28,6 +29,7 @@ Widget customTextFormField({
       ),
       const SizedBox(height: 5),
       TextFormField(
+        enabled: status ?? true,
         textCapitalization: textCapitalization,
         keyboardType: keyboardType,
         inputFormatters: inputFormatters,

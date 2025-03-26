@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:projectmanagementstmiktime/screen/view/signin_signup/signscreen.dart';
 import 'package:projectmanagementstmiktime/screen/view/splashscreen/splashscreen.dart';
 import 'package:projectmanagementstmiktime/view_model/board/view_model_addboard.dart';
 import 'package:projectmanagementstmiktime/view_model/board/view_model_board.dart';
+import 'package:projectmanagementstmiktime/view_model/forgot_password/view_model_change_password.dart';
+import 'package:projectmanagementstmiktime/view_model/forgot_password/view_model_forgot_password.dart';
 import 'package:projectmanagementstmiktime/view_model/navigation/view_model_navigation.dart';
 import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signin.dart';
 import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signup.dart';
@@ -30,6 +31,8 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (_) => BoardViewModel()),
           ChangeNotifierProvider(create: (_) => NavigationProvider()),
           ChangeNotifierProvider(create: (_) => AddBoardViewModel()),
+          ChangeNotifierProvider(create: (_) => ForgotPasswordViewModel()),
+          ChangeNotifierProvider(create: (_) => ResetPasswordViewModel()),
         ],
         child: MaterialApp(
           theme: ThemeData(
