@@ -29,6 +29,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     final widthMediaQuery = MediaQuery.of(context).size.width;
     final heightMediaQuery = MediaQuery.of(context).size.height;
+    final Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -68,18 +69,18 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         ),
                         Center(
                           child: SvgPicture.asset(
-                            "assets/logostmik2.svg",
-                            width: 100,
-                            height: 100,
+                            "assets/logo_no_title.svg",
+                            width: size.width * 0.3,
+                            height: size.width * 0.3,
                             fit: BoxFit.fill,
                           ),
                         ),
-                        const Padding(
-                          padding: EdgeInsets.all(20),
+                        Padding(
+                          padding: const EdgeInsets.all(20),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              const Text(
                                 'Lupa Kata Sandi',
                                 style: TextStyle(
                                   color: Colors.white,
@@ -87,12 +88,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              Text(
-                                'Silakan Masukkan Alamat Email Anda untuk Menerima Link Verifikasi',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w400,
+                              SizedBox(
+                                height: size.height * 0.01,
+                              ),
+                              Padding(
+                                padding:
+                                    EdgeInsets.only(right: size.width * 0.2),
+                                child: const Text(
+                                  'Masukkan email Anda dan kami akan mengirimkan kode OTP ke email Anda.',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                  ),
                                 ),
                               ),
                             ],
@@ -153,27 +161,27 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                                         try {
                                           final statusCode = await viewModel
-                                              .sendReqForgotPassword();
+                                              .sendReqOtp();
                                           Navigator.pop(
                                               context); // Tutup loading alert
 
                                           if (statusCode == 200) {
                                             customAlert(
-                                              context: context,
-                                              alertType: QuickAlertType.success,
-                                              title: "Email Terkirim!",
-                                              text: viewModel.successMessage ??
-                                                  "Link reset password telah dikirim!",
-                                              afterDelay: () {
+                                                context: context,
+                                                alertType:
+                                                    QuickAlertType.success,
+                                                title: "Email Terkirim!",
+                                                text: viewModel
+                                                        .successMessage ??
+                                                    "Link reset password telah dikirim!",
+                                                afterDelay: () {
                                                   Navigator.pushReplacement(
                                                     context,
                                                     MaterialPageRoute(
                                                         builder: (_) =>
                                                             const OnboardingScreen()),
                                                   );
-                                  
-                                              }
-                                            );
+                                                });
                                           } else if (statusCode == 400) {
                                             customAlert(
                                               context: context,

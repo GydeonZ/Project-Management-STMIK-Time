@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:projectmanagementstmiktime/screen/view/onboarding/onboarding.dart';
+import 'package:projectmanagementstmiktime/screen/view/profile/profile_screen.dart';
 import 'package:projectmanagementstmiktime/screen/widget/boardbottomsheet.dart';
 import 'package:projectmanagementstmiktime/screen/widget/card_board.dart';
 import 'package:projectmanagementstmiktime/view_model/board/view_model_board.dart';
@@ -65,12 +66,22 @@ class _BoardScreenState extends State<BoardScreen> {
                       .toUpperCase()
                   : "??"; // Default jika kosong
 
-              return CircleAvatar(
-                backgroundColor: Colors.blue,
-                child: Text(
-                  initials,
-                  style: const TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
+              return GestureDetector(
+                onTap: (){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ProfileScreen(),
+                    ),
+                  );
+                },
+                child: CircleAvatar(
+                  backgroundColor: Colors.blue,
+                  child: Text(
+                    initials,
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
                 ),
               );
             },
@@ -130,21 +141,6 @@ class _BoardScreenState extends State<BoardScreen> {
                   },
                 ),
               ),
-              Consumer<SignInViewModel>(builder: (context, model, child) {
-                return FloatingActionButton(
-                  onPressed: () {
-                    logindata.setBool('login', true);
-                    model.keluar();
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                        builder: (context) => const OnboardingScreen(),
-                      ),
-                      (route) => false,
-                    );
-                  },
-                  child: const Icon(Icons.refresh),
-                );
-              })
             ],
           ),
         ),

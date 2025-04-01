@@ -23,7 +23,7 @@ Future customAlert({
     text: text,
     widget: const SizedBox(),
   );
-  await Future.delayed(const Duration(seconds: 4));
+  await Future.delayed(const Duration(seconds: 3));
   if (afterDelay != null) {
     afterDelay();
   }

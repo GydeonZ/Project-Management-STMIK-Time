@@ -252,7 +252,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 customAlert(
                                   context: context,
                                   alertType: QuickAlertType.success,
-                                  text: 'Berhasil mendaftar!',
+                                  text: 'Daftar berhasil! Silakan verifikasi email Anda.',
                                   afterDelay: () {
                                     Navigator.pushReplacement(
                                       context,

@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:projectmanagementstmiktime/services/service_forgot_password.dart';
-import 'package:projectmanagementstmiktime/services/service_reset_password.dart';
 
 class ForgotPasswordViewModel with ChangeNotifier {
   final formKeyEmailForgetPassword = GlobalKey<FormState>();
@@ -11,7 +10,6 @@ class ForgotPasswordViewModel with ChangeNotifier {
   final TextEditingController password = TextEditingController();
   final TextEditingController konfirmasiPassword = TextEditingController();
   final service = ForgotPasswordService();
-  final resetService = ResetPasswordService();
   bool isResponseSuccess = false;
   bool heightContainer = false;
   bool isPasswordVisible = false;
@@ -30,12 +28,12 @@ class ForgotPasswordViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<int> sendReqForgotPassword() async {
+  Future<int> sendReqOtp() async {
     try {
       isLoading = true;
       notifyListeners();
 
-      final response = await service.forgotPasswordUser(emailUser: email.text);
+      final response = await service.requestOTP(emailUser: email.text);
       isLoading = false;
 
       if (response != null) {
@@ -60,32 +58,6 @@ class ForgotPasswordViewModel with ChangeNotifier {
       }
 
       errorMessages = "Terjadi kesalahan: ${e.message}";
-      return 500;
-    }
-  }
-
-  Future<int> fetchNewPassword({required String token}) async {
-    try {
-      isLoading = true;
-      notifyListeners();
-
-      final response = await resetService.resetPasswordUser(
-        tokenLink: token, // Gunakan token dari deep link
-        emailUser: email.text,
-        passwordUser: password.text,
-        cnfrmpasswordUser: konfirmasiPassword.text,
-      );
-      isLoading = false;
-
-      if (response != null) {
-        successMessage = response.message;
-        notifyListeners();
-        return 200;
-      }
-      return 500;
-    } catch (e) {
-      errorMessages = "Terjadi kesalahan: ${e.toString()}";
-      notifyListeners();
       return 500;
     }
   }

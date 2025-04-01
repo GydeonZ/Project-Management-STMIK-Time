@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:projectmanagementstmiktime/screen/view/splashscreen/splashscreen.dart';
 import 'package:projectmanagementstmiktime/view_model/board/view_model_addboard.dart';
 import 'package:projectmanagementstmiktime/view_model/board/view_model_board.dart';
-import 'package:projectmanagementstmiktime/view_model/forgot_password/view_model_change_password.dart';
+import 'package:projectmanagementstmiktime/view_model/forgot_password/view_model_reset_password.dart';
 import 'package:projectmanagementstmiktime/view_model/forgot_password/view_model_forgot_password.dart';
 import 'package:projectmanagementstmiktime/view_model/navigation/view_model_navigation.dart';
+import 'package:projectmanagementstmiktime/view_model/profile/view_model_ganti_password.dart';
+import 'package:projectmanagementstmiktime/view_model/profile/view_model_profile.dart';
 import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signin.dart';
 import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signup.dart';
 import 'package:provider/provider.dart';
@@ -33,6 +35,8 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (_) => AddBoardViewModel()),
           ChangeNotifierProvider(create: (_) => ForgotPasswordViewModel()),
           ChangeNotifierProvider(create: (_) => ResetPasswordViewModel()),
+          ChangeNotifierProvider(create: (_) => ProfileViewModel()),
+          ChangeNotifierProvider(create: (_) => GantiPasswordViewModel()),
         ],
         child: MaterialApp(
           theme: ThemeData(

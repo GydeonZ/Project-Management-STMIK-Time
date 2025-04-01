@@ -4,6 +4,7 @@ class Urls {
   static const String register = "/api/register";
   static const String board = "/api/boards";
   static const String fetchUser = "/api/users";
-  static const String forgotPassowrd = "/api/forgot-password";
-  static const String resetPassowrd = "/api/reset-password";
+  static const String reqOTP = "/api/send-otp";
+  static const String resetPassword = "/api/reset-password";
+  static const String gantiPasswordProfile = "/api/update-password";
 }

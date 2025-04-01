@@ -4,27 +4,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:projectmanagementstmiktime/screen/widget/button.dart';
 import 'package:projectmanagementstmiktime/screen/widget/formfield.dart';
-import 'package:projectmanagementstmiktime/view_model/forgot_password/view_model_forgot_password.dart';
+import 'package:projectmanagementstmiktime/view_model/forgot_password/view_model_reset_password.dart';
 import 'package:provider/provider.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  final String token;
-  final String email;
+  final String resetUrl;
 
   const ResetPasswordScreen(
-      {super.key, required this.token, required this.email});
+      {super.key, required this.resetUrl});
 
   @override
   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
 }
 
 class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
-  late ForgotPasswordViewModel viewModel;
+  late ResetPasswordViewModel viewModel;
+  
   @override
   void initState() {
-    viewModel = Provider.of<ForgotPasswordViewModel>(context, listen: false);
+    viewModel = Provider.of<ResetPasswordViewModel>(context, listen: false);
     viewModel.setUlang();
-    viewModel.email.text = widget.email;
+    // Simpan token & email yang diterima dari deep link
+    // viewModel.tokenLink.text = widget.token;
+    // viewModel.emailLink.text = widget.email;
     super.initState();
   }
 
@@ -96,7 +98,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   top: heightMediaQuery / 2.9,
                   left: widthMediaQuery / 15,
                   right: widthMediaQuery / 15,
-                  child: Consumer<ForgotPasswordViewModel>(
+                  child: Consumer<ResetPasswordViewModel>(
                     builder: (context, contactModel, child) {
                       return Container(
                         height: viewModel.heightContainer
@@ -116,17 +118,17 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Consumer<ForgotPasswordViewModel>(
+                                Consumer<ResetPasswordViewModel>(
                                   builder: (context, contactModel, child) {
                                     return Form(
-                                      key: viewModel.formKeyUbahPassword,
+                                      key: viewModel.formKey,
                                       child: Column(
                                         children: [
                                           customTextFormField(
-                                            controller: viewModel.email,
+                                            controller: viewModel.emailLink,
                                             titleText: 'Email',
                                             status: false,
-                                            labelText: viewModel.email.text,
+                                            labelText: viewModel.emailLink.text,
                                           ),
                                           const SizedBox(height: 5),
                                           customTextFormField(
@@ -134,17 +136,17 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                             titleText: 'Password',
                                             labelText: "Masukkan password anda",
                                             obscureText:
-                                                !viewModel.isPasswordVisible1,
+                                                !viewModel.isPasswordVisiblePasswordBaru,
                                             suffixIcon: IconButton(
                                               icon: Icon(
-                                                viewModel.isPasswordVisible1
+                                                viewModel.isPasswordVisiblePasswordBaru
                                                     ? Icons.visibility
                                                     : Icons.visibility_off,
                                                 color: const Color(0xFF484F88),
                                               ),
                                               onPressed: () {
                                                 viewModel
-                                                    .togglePasswordVisibility1();
+                                                    .togglePasswordVisibilityPasswordBaru();
                                               },
                                             ),
                                             validator: (value) => viewModel
@@ -153,15 +155,15 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                           const SizedBox(height: 5),
                                           customTextFormField(
                                               controller:
-                                                  viewModel.konfirmasiPassword,
+                                                  viewModel.cnfrmPassword,
                                               titleText: "Konfirmasi Pasword",
                                               labelText:
                                                   "Ketik Ulang password anda",
                                               obscureText:
-                                                  !viewModel.isPasswordVisible,
+                                                  !viewModel.isPasswordVisiblePasswordLama,
                                               suffixIcon: IconButton(
                                                 icon: Icon(
-                                                  viewModel.isPasswordVisible
+                                                  viewModel.isPasswordVisiblePasswordLama
                                                       ? Icons.visibility
                                                       : Icons.visibility_off,
                                                   color:
@@ -169,11 +171,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                                 ),
                                                 onPressed: () {
                                                   viewModel
-                                                      .togglePasswordVisibility();
+                                                      .togglePasswordVisibilityPasswordLama();
                                                 },
                                               ),
                                               validator: (value) => viewModel
-                                                  .validateKonfirmasiPassword(
+                                                  .validatePasswordLama(
                                                       value!)),
                                         ],
                                       ),
@@ -184,23 +186,23 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                   text: "Simpan",
                                   bgColor: const Color(0xFF484F88),
                                   onPressed: () async {
-                                    if (viewModel
-                                        .formKeyUbahPassword.currentState!
-                                        .validate()) {
-                                      int response =
-                                          await viewModel.fetchNewPassword(
-                                        token: widget
-                                            .token, // Gunakan token dari deep link
-                                      );
-                                      if (response == 200) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                              content: Text(
-                                                  "Password berhasil direset")),
-                                        );
-                                      }
-                                    }
+                                    // if (viewModel
+                                    //     .formKey.currentState!
+                                    //     .validate()) {
+                                    //   int response =
+                                    //       await viewModel.fetchNewPassword(
+                                    //     token: widget
+                                    //         .token, // Gunakan token dari deep link
+                                    //   );
+                                    //   if (response == 200) {
+                                    //     ScaffoldMessenger.of(context)
+                                    //         .showSnackBar(
+                                    //       const SnackBar(
+                                    //           content: Text(
+                                    //               "Password berhasil direset")),
+                                    //     );
+                                    //   }
+                                    // }
                                   },
                                 ),
                               ],

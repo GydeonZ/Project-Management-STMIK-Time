@@ -13,19 +13,24 @@ class ResetPasswordService {
   ));
 
   Future<ModelResetPassword?> resetPasswordUser({
-    required String tokenLink,
-    required String emailUser,
+    required String tokenLink, // ✅ Gunakan token dari URL
+    required String emailLink, // ✅ Gunakan email dari URL
     required String passwordUser,
     required String cnfrmpasswordUser,
   }) async {
     try {
       final formData = FormData.fromMap({
+        'token': tokenLink, // ✅ Token dari URL
+        'email': emailLink, // ✅ Email dari URL
         'password': passwordUser,
         'password_confirmation': cnfrmpasswordUser,
       });
 
+      final String url =
+          '${Urls.baseUrls}${Urls.resetPassword}/$tokenLink?email=$emailLink';
+
       final response = await _dio.post(
-        "${Urls.resetPassowrd}/$tokenLink?email=$emailUser", // ✅ Token & email dalam URL
+        url, // ✅ Token & email dalam URL
         data: formData,
       );
 
@@ -63,7 +68,7 @@ class ResetPasswordService {
         throw e; // Lempar kembali error untuk ditangani di ViewModel
       }
       throw DioException(
-        requestOptions: RequestOptions(path: Urls.forgotPassowrd),
+        requestOptions: RequestOptions(path: Urls.resetPassword),
         message: "Kesalahan jaringan: ${e.message}",
         type: DioExceptionType.connectionError,
       );
