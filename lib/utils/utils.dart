@@ -7,4 +7,6 @@ class Urls {
   static const String reqOTP = "/api/send-otp";
   static const String resetPassword = "/api/reset-password";
   static const String gantiPasswordProfile = "/api/update-password";
+  static const String verifikasiOTP = "/api/verify-otp";
+  static const String gantiPassword = "/api/reset-password";
 }

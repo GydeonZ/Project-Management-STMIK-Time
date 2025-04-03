@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:projectmanagementstmiktime/screen/view/onboarding/onboarding.dart';
 import 'package:projectmanagementstmiktime/screen/view/profile/profile_screen.dart';
 import 'package:projectmanagementstmiktime/screen/widget/boardbottomsheet.dart';
 import 'package:projectmanagementstmiktime/screen/widget/card_board.dart';

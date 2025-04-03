@@ -1,8 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:projectmanagementstmiktime/screen/view/onboarding/onboarding.dart';
+import 'package:projectmanagementstmiktime/screen/view/forgotpassword/verifikasi_otp_screen.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
 import 'package:projectmanagementstmiktime/screen/widget/button.dart';
 import 'package:projectmanagementstmiktime/screen/widget/formfield.dart';
@@ -19,6 +20,7 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   late ForgotPasswordViewModel viewModel;
+  final GlobalKey<FormState> formKeyUbahPassword = GlobalKey<FormState>();
   @override
   void initState() {
     viewModel = Provider.of<ForgotPasswordViewModel>(context, listen: false);
@@ -130,7 +132,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           child: Padding(
                             padding: const EdgeInsets.all(12),
                             child: Form(
-                              key: viewModel.formKeyEmailForgetPassword,
+                              key: formKeyUbahPassword,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -150,7 +152,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                     text: "Kirim",
                                     bgColor: const Color(0xFF484F88),
                                     onPressed: () async {
-                                      if (viewModel.formKeyEmailForgetPassword
+                                      if (formKeyUbahPassword
                                           .currentState!
                                           .validate()) {
                                         customAlert(
@@ -170,16 +172,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                                 context: context,
                                                 alertType:
                                                     QuickAlertType.success,
-                                                title: "Email Terkirim!",
+                                                title: "Kode OTP Dikirim!",
                                                 text: viewModel
                                                         .successMessage ??
-                                                    "Link reset password telah dikirim!",
+                                                    "Kode OTP telah kami kirim! Silahkan cek email Anda.",
                                                 afterDelay: () {
                                                   Navigator.pushReplacement(
                                                     context,
                                                     MaterialPageRoute(
                                                         builder: (_) =>
-                                                            const OnboardingScreen()),
+                                                            const VerifikasiOtpScreen()),
                                                   );
                                                 });
                                           } else if (statusCode == 400) {
@@ -190,6 +192,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                               text: viewModel.errorMessages ??
                                                   "Email tidak ditemukan.",
                                             );
+                                          } else if (statusCode == 429) {
+                                            customAlert(
+                                              context: context,
+                                              alertType: QuickAlertType.warning,
+                                              title: "Terlalu Banyak Permintaan!\n",
+                                              text: viewModel.errorMessages ??
+                                                  "Terlalu banyak permintaan OTP. Coba lagi dalam beberapa menit.",
+                                            );
                                           } else {
                                             customAlert(
                                               context: context,
@@ -199,7 +209,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                             );
                                           }
                                         } on SocketException {
-                                          Navigator.pop(context);
                                           customAlert(
                                             context: context,
                                             alertType: QuickAlertType.warning,
@@ -207,7 +216,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                                 'Tidak ada koneksi internet. Periksa jaringan Anda.',
                                           );
                                         } catch (e) {
-                                          Navigator.pop(context);
                                           customAlert(
                                             context: context,
                                             alertType: QuickAlertType.error,

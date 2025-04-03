@@ -161,6 +161,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                                         const ForgotPasswordScreen(),
                                                   ),
                                                 );
+                                                viewModel.clearSignInForm();
                                               },
                                           ),
                                         ],

@@ -1,15 +1,18 @@
 import 'package:dio/dio.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:projectmanagementstmiktime/model/model_verifikasi_otp.dart';
 import 'package:projectmanagementstmiktime/services/service_forgot_password.dart';
 
 class ForgotPasswordViewModel with ChangeNotifier {
-  final formKeyEmailForgetPassword = GlobalKey<FormState>();
-  final formKeyUbahPassword = GlobalKey<FormState>();
   final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
   final TextEditingController konfirmasiPassword = TextEditingController();
   final service = ForgotPasswordService();
+  ModelVerifikasiOtp? dataOtp;
+  String kodeOtp = "";
+  String savedEmail = "";
+  String? savedToken;
   bool isResponseSuccess = false;
   bool heightContainer = false;
   bool isPasswordVisible = false;
@@ -39,7 +42,123 @@ class ForgotPasswordViewModel with ChangeNotifier {
       if (response != null) {
         successMessage = response.message;
         errorMessages = null; // Reset error jika sebelumnya ada
+        savedEmail = email.text;
         email.clear();
+        isResponseSuccess = true;
+        notifyListeners();
+        return 200;
+      } else {
+        isResponseSuccess = false;
+        notifyListeners();
+        return 500;
+      }
+    } on DioException catch (e) {
+      isLoading = false;
+      notifyListeners();
+
+      if (e.response != null && e.response!.statusCode == 400) {
+        errorMessages = e.message; // ✅ Ambil langsung message dari DioException
+        return 400;
+      } else if (e.response != null && e.response!.statusCode == 429) {
+        errorMessages = e.message; // ✅ Ambil langsung message dari DioException
+        return 429;
+      }
+
+      errorMessages = "Terjadi kesalahan: ${e.message}";
+      return 500;
+    }
+  }
+
+  Future<int> resendReqOTP() async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      final response = await service.requestOTP(emailUser: savedEmail);
+      isLoading = false;
+
+      if (response != null) {
+        successMessage = response.message;
+        errorMessages = null; // Reset error jika sebelumnya ada
+        email.clear();
+        isResponseSuccess = true;
+        notifyListeners();
+        return 200;
+      } else {
+        isResponseSuccess = false;
+        notifyListeners();
+        return 500;
+      }
+    } on DioException catch (e) {
+      isLoading = false;
+      notifyListeners();
+
+      if (e.response != null && e.response!.statusCode == 400) {
+        errorMessages = e.message; // ✅ Ambil langsung message dari DioException
+        return 400;
+      }
+
+      errorMessages = "Terjadi kesalahan: ${e.message}";
+      return 500;
+    }
+  }
+
+  Future<int> checkVerifikasiOTP({
+    required String kodeOtp,
+  }) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      final response = await service.hitVerifikasiOTP(
+          emailUser: savedEmail, kodeOTP: kodeOtp);
+      isLoading = false;
+
+      if (response != null) {
+        successMessage = response.message;
+        errorMessages = null; // Reset error jika sebelumnya ada
+        savedToken = response.token; // Simpan token di ViewModel
+        isResponseSuccess = true;
+        notifyListeners();
+        return 200;
+      } else {
+        isResponseSuccess = false;
+        notifyListeners();
+        return 500;
+      }
+    } on DioException catch (e) {
+      isLoading = false;
+      notifyListeners();
+
+      if (e.response != null && e.response!.statusCode == 422) {
+        errorMessages = e.message; // ✅ Ambil langsung message dari DioException
+        return 422;
+      }
+
+      errorMessages = "Terjadi kesalahan: ${e.message}";
+      return 500;
+    }
+  }
+
+  Future<int> ubahPassword() async {
+    final newPassword = password.text;
+    final confirmPassword = konfirmasiPassword.text;
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      final response = await service.hitUbahPassword(
+          emailUser: savedEmail,
+          password: newPassword,
+          cnfrmPassword: confirmPassword,
+          token: savedToken!);
+      isLoading = false;
+
+      if (response != null) {
+        successMessage = response.message;
+        errorMessages = null; // Reset error jika sebelumnya ada
+        savedEmail = '';
+        savedToken = '';
         isResponseSuccess = true;
         notifyListeners();
         return 200;
@@ -73,7 +192,7 @@ class ForgotPasswordViewModel with ChangeNotifier {
 
   String? validatePasswordBaru(String value) {
     if (value.isEmpty) {
-      heightContainer = true;
+      heightContainer = true; // Jika ada error, tinggi container bertambah
       notifyListeners();
       return 'Password tidak boleh kosong';
     } else if (value.length < 8) {
@@ -85,7 +204,7 @@ class ForgotPasswordViewModel with ChangeNotifier {
       notifyListeners();
       return 'Password harus berupa kombinasi huruf dan angka';
     }
-    heightContainer = false;
+    heightContainer = false; // Jika tidak ada error, tinggi kembali normal
     notifyListeners();
     return null;
   }
