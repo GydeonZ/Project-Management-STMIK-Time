@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:projectmanagementstmiktime/screen/view/splashscreen/splashscreen.dart';
 import 'package:projectmanagementstmiktime/view_model/board/view_model_addboard.dart';
 import 'package:projectmanagementstmiktime/view_model/board/view_model_board.dart';
+import 'package:projectmanagementstmiktime/view_model/cardtugas/view_model_card_tugas.dart';
 import 'package:projectmanagementstmiktime/view_model/forgot_password/view_model_reset_password.dart';
 import 'package:projectmanagementstmiktime/view_model/forgot_password/view_model_forgot_password.dart';
 import 'package:projectmanagementstmiktime/view_model/navigation/view_model_navigation.dart';
@@ -37,6 +38,7 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (_) => ResetPasswordViewModel()),
           ChangeNotifierProvider(create: (_) => ProfileViewModel()),
           ChangeNotifierProvider(create: (_) => GantiPasswordViewModel()),
+          ChangeNotifierProvider(create: (_) => CardTugasViewModel()),
         ],
         child: MaterialApp(
           theme: ThemeData(

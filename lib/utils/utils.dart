@@ -9,4 +9,6 @@ class Urls {
   static const String gantiPasswordProfile = "/api/update-password";
   static const String verifikasiOTP = "/api/verify-otp";
   static const String gantiPassword = "/api/reset-password";
+  static const String updateProfile = "/api/update-profile";
+  static const String fetchCardList = "/api/cards";
 }

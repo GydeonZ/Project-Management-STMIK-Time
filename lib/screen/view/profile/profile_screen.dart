@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:projectmanagementstmiktime/screen/view/board/board.dart';
 import 'package:projectmanagementstmiktime/screen/view/onboarding/onboarding.dart';
 import 'package:projectmanagementstmiktime/screen/view/profile/profile_change_password_screen.dart';
-import 'package:projectmanagementstmiktime/screen/widget/notifikasi/banner.dart';
+import 'package:projectmanagementstmiktime/screen/widget/settings/banner.dart';
 import 'package:projectmanagementstmiktime/view_model/navigation/view_model_navigation.dart';
 import 'package:projectmanagementstmiktime/view_model/profile/view_model_profile.dart';
 import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signin.dart';
@@ -44,7 +45,17 @@ class ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Scaffold(
+    return PopScope(
+      canPop: false, // Mencegah pop otomatis, hanya memungkinkan pop manual
+      onPopInvokedWithResult:(didPop, result) {
+        if (!didPop) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const BoardScreen()),
+          );
+        }
+      },
+    child: Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         centerTitle: true,
@@ -90,6 +101,93 @@ class ProfileScreenState extends State<ProfileScreen> {
                           fontWeight: FontWeight.bold,
                           fontFamily: 'Helvetica',
                           color: Color(0xff293066),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const GantiPasswordScreen()),
+                          );
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(
+                              color: const Color(0xff293066),
+                              width: 1,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                              size.width * 0.04,
+                              0,
+                              0,
+                              0,
+                            ),
+                            child: Row(
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/pencil.svg',
+                                  width: size.width * 0.05,
+                                  height: size.height * 0.02,
+                                ),
+                                SizedBox(width: size.width * 0.04),
+                                const Text(
+                                  'Ubah Kata Sandi',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontFamily: 'Helvetica',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      GestureDetector(
+                        onTap: () {},
+                        child: Container(
+                          width: double.infinity,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(
+                              color: const Color(0xff293066),
+                              width: 1,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                              size.width * 0.04,
+                              0,
+                              0,
+                              0,
+                            ),
+                            child: Row(
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/Phone.svg',
+                                  width: size.width * 0.05,
+                                  height: size.height * 0.02,
+                                ),
+                                SizedBox(width: size.width * 0.04),
+                                const Text(
+                                  'Layanan Bantuan',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontFamily: 'Helvetica',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -153,9 +251,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                             ),
                                           ),
                                           child: ElevatedButton(
-                                            onPressed: () {
-                                              
-                                            },
+                                            onPressed: () {},
                                             style: ButtonStyle(
                                               backgroundColor:
                                                   MaterialStateProperty.all(
@@ -236,53 +332,26 @@ class ProfileScreenState extends State<ProfileScreen> {
                           child: Padding(
                             padding: EdgeInsetsDirectional.fromSTEB(
                               size.width * 0.04,
-                              size.height * 0.014,
                               0,
-                              0,
-                            ),
-                            child: Text(
-                              'Keluar',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontFamily: 'Helvetica',
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const GantiPasswordScreen()),
-                          );
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(
-                              color: const Color(0xff293066),
-                              width: 1,
-                            ),
-                          ),
-                          child: Padding(
-                            padding:
-                                EdgeInsetsDirectional.fromSTEB(
-                              size.width * 0.04,
-                              size.height * 0.014,
                               0,
                               0,
                             ),
-                            child: const Text(
-                              'Ubah Kata Sandi',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontFamily: 'Helvetica',
-                              ),
+                            child: Row(
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/logout.svg',
+                                  width: size.width * 0.05,
+                                  height: size.height * 0.02,
+                                ),
+                                SizedBox(width: size.width * 0.04),
+                                const Text(
+                                  'Keluar',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontFamily: 'Helvetica',
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -295,6 +364,7 @@ class ProfileScreenState extends State<ProfileScreen> {
           );
         },
       ),
+    ),
     );
   }
 }

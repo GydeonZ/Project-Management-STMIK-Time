@@ -1,106 +1,72 @@
 // ignore_for_file: unnecessary_null_comparison
 
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:projectmanagementstmiktime/services/service_update_profile.dart';
+import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signin.dart';
 
 class ProfileViewModel with ChangeNotifier {
-  final formKey = GlobalKey<FormState>();
   // ModelProfile? modelProfile;
   // final service = ProfileService();
   bool isLoading = false;
   final TextEditingController fullNameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController telpController = TextEditingController();
-  final TextEditingController alamatController = TextEditingController();
-  final TextEditingController nikController = TextEditingController();
   bool isCheckNik = true;
   bool isEdit = false;
   File? imageFile = File('');
   String? imagePath;
   bool fotoLebihLimaMB = false;
+  final service = UpdateProfileService();
+  String? errorMessages;
+  String? successMessage;
+  bool isResponseSuccess = false;
 
-  // Future fetchProfile({
-  //   required String accessToken,
-  //   required String refreshToken,
-  // }) async {
-  //   try {
-  //     isLoading = true;
-  //     modelProfile = await service.hitProfile(token: accessToken);
-  //     isLoading = false;
-  //   } catch (e) {
-  //     // ignore: deprecated_member_use
-  //     if (e is DioError) {
-  //       isLoading = true;
-  //       modelProfile = await service.hitProfile(token: refreshToken);
-  //       isLoading = false;
-  //       e.response!.statusCode;
-  //     }
-  //   }
-  //   notifyListeners();
-  // }
+  Future<int> changeProfile({
+    required String token,
+    required SignInViewModel
+        signInViewModel, // Tambahkan parameter SignInViewModel
+  }) async {
+    try {
+      isLoading = true;
+      notifyListeners();
 
-  // Future fetchProfileTanpaLoading({
-  //   required String accessToken,
-  //   required String refreshToken,
-  // }) async {
-  //   try {
-  //     modelProfile = await service.hitProfile(token: accessToken);
-  //   } catch (e) {
-  //     // ignore: deprecated_member_use
-  //     if (e is DioError) {
-  //       modelProfile = await service.hitProfile(token: refreshToken);
-  //       e.response!.statusCode;
-  //     }
-  //   }
-  //   notifyListeners();
-  // }
+      final response = await service.hitUpdateProfile(
+        token: token,
+        nameUser: fullNameController.text,
+      );
 
-  // Future fetchNik({
-  //   required String accessToken,
-  //   required String refreshToken,
-  //   required String email,
-  // }) async {
-  //   String fullName = fullNameController.text.isEmpty
-  //       ? modelProfile!.data.fullname
-  //       : fullNameController.text;
-  //   String phone = telpController.text.isEmpty
-  //       ? modelProfile!.data.phoneNumber
-  //       : telpController.text;
-  //   String alamat = alamatController.text.isEmpty
-  //       ? modelProfile!.data.address
-  //       : alamatController.text;
-  //   String nik = nikController.text.isEmpty
-  //       ? modelProfile!.data.nik
-  //       : nikController.text;
-  //   try {
-  //     await service.hitUpdateProfile(
-  //       token: accessToken,
-  //       fullname: fullName,
-  //       email: email,
-  //       nik: nik,
-  //       phone: phone,
-  //       address: alamat,
-  //       foto: imageFile,
-  //       photo: modelProfile!.data.profilePicture,
-  //     );
-  //   } catch (e) {
-  //     // ignore: deprecated_member_use
-  //     if (e is DioError) {
-  //       await service.hitUpdateProfile(
-  //         token: refreshToken,
-  //         fullname: fullName,
-  //         email: email,
-  //         nik: nik,
-  //         phone: phone,
-  //         address: alamat,
-  //         foto: imageFile,
-  //         photo: modelProfile!.data.profilePicture,
-  //       );
-  //       e.response!.statusCode;
-  //     }
-  //   }
-  //   notifyListeners();
-  // }
+      isLoading = false;
+
+      if (response != null) {
+        successMessage = response.message;
+        errorMessages = null;
+        isResponseSuccess = true;
+
+        // ✅ Update nameSharedPreference di SignInViewModel
+        signInViewModel.updateUserName(fullNameController.text);
+
+        fullNameController.clear();
+        notifyListeners();
+        return 200;
+      } else {
+        isResponseSuccess = false;
+        notifyListeners();
+        return 500;
+      }
+    } on DioException catch (e) {
+      isLoading = false;
+      notifyListeners();
+
+      if (e.response != null && e.response!.statusCode == 400) {
+        errorMessages = e.message;
+        return 400;
+      }
+
+      errorMessages = "Terjadi kesalahan: ${e.message}";
+      return 500;
+    }
+  }
+
 
   // void setSudahLogin() {
   //   if (modelProfile!.data.nik == '') {
@@ -117,17 +83,6 @@ class ProfileViewModel with ChangeNotifier {
 
   void awal() {
     isEdit = false;
-  }
-
-  void clearAll() {
-    fullNameController.clear();
-    emailController.clear();
-    telpController.clear();
-    alamatController.clear();
-    nikController.clear();
-    imageFile = null;
-    imagePath = null;
-    fotoLebihLimaMB = false;
   }
 
   String? validateNik(String value) {

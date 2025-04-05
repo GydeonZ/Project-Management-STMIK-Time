@@ -1,6 +1,7 @@
 // ignore_for_file: camel_case_types, prefer_typing_uninitialized_variables, use_super_parameters
 
 import 'package:flutter/material.dart';
+import 'package:projectmanagementstmiktime/screen/view/profile/edit_profile_screen.dart';
 import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signin.dart';
 import 'package:provider/provider.dart';
 
@@ -91,8 +92,8 @@ class _BannerSettingState extends State<BannerSetting> {
                   Padding(
                     padding: const EdgeInsets.only(top: 10),
                     child: Container(
-                      width: 110,
-                      height: 34,
+                      width: size.width * 0.3,
+                      height: size.height * 0.045,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(
@@ -101,7 +102,14 @@ class _BannerSettingState extends State<BannerSetting> {
                         ),
                       ),
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const ProfileEdit(),
+                            ),
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           shadowColor: Colors.transparent,
@@ -111,7 +119,7 @@ class _BannerSettingState extends State<BannerSetting> {
                           ),
                         ),
                         child: const Text(
-                          'Ubah Profil',
+                          'Ubah Profile',
                           style: TextStyle(
                             color: Color(0xffA3A4A5),
                             fontFamily: 'Helvetica',

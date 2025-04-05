@@ -33,6 +33,13 @@ class SignInViewModel with ChangeNotifier {
     checkSharedPreferences();
   }
 
+  void updateUserName(String newName) async {
+    nameSharedPreference = newName;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('name', newName);
+    notifyListeners(); // Memberitahu UI untuk memperbarui tampilan
+  }
+
   Future<int> signIn() async {
     try {
       isLoading = true;
@@ -84,8 +91,6 @@ class SignInViewModel with ChangeNotifier {
     }
   }
 
-
-
   Future<void> saveDataSharedPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('name', nameSharedPreference);
@@ -94,8 +99,10 @@ class SignInViewModel with ChangeNotifier {
     await prefs.setString('nim', nimSharedPreference);
     await prefs.setString('nidn', nidnSharedPreference);
     await prefs.setString('token', tokenSharedPreference);
+    await prefs.setBool('rememberMe', rememberMe); // ✅ Simpan RememberMe
     notifyListeners();
   }
+
 
   Future<void> checkSharedPreferences() async {
     final prefs = await SharedPreferences.getInstance();
@@ -105,16 +112,20 @@ class SignInViewModel with ChangeNotifier {
     nimSharedPreference = prefs.getString('nim') ?? "";
     nidnSharedPreference = prefs.getString('nidn') ?? "";
     tokenSharedPreference = prefs.getString('token') ?? "";
+    rememberMe = prefs.getBool('rememberMe') ?? false; // ✅ Cek RememberMe
     notifyListeners();
   }
+
 
   void toggleError(bool value) {
     showErrorMessage = value;
     notifyListeners();
   }
 
-  void setRememberMe(bool value) {
+  void setRememberMe(bool value) async {
     rememberMe = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('rememberMe', value); // ✅ Simpan "Ingat Saya"
     notifyListeners();
   }
 
@@ -164,35 +175,36 @@ class SignInViewModel with ChangeNotifier {
 
   void checkLogin(BuildContext context) async {
     logindata = await SharedPreferences.getInstance();
-    newUser = logindata.getBool('login') ?? true;
+    bool isRemembered = logindata.getBool('rememberMe') ?? false;
+    String? token = logindata.getString('token'); // ✅ Cek token login
 
-    if (newUser == false) {
-      Navigator.pushAndRemoveUntil(
+    if (isRemembered && token != null && token.isNotEmpty) {
+      // ✅ Jika Remember Me aktif & token ada, langsung ke BoardScreen
+      Future.delayed(Duration.zero, () {
+        Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(
-            builder: (context) => const BoardScreen(),
-          ),
-          (route) => false);
+          MaterialPageRoute(builder: (context) => const BoardScreen()),
+          (route) => false,
+        );
+      });
     } else {
+      // ❌ Jika Remember Me tidak aktif atau token kosong, arahkan ke SignInScreen
       Future.delayed(const Duration(seconds: 3), () {
         Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const OnboardingScreen(),
-            ),
-            (route) => false);
+          context,
+          MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+          (route) => false,
+        );
       });
     }
   }
+
+
   /// ✅ **Fungsi logout: Hapus data login**
   Future<void> keluar() async {
-    tokenSharedPreference = '';
-    nameSharedPreference = '';
-    emailSharedPreference = '';
-    roleSharedPreference = '';
-    nimSharedPreference = '';
-    nidnSharedPreference = '';
-    isSuksesLogin = false;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); // ❌ Hapus semua data login
+    rememberMe = false; // ❌ Reset Remember Me
     notifyListeners();
   }
 }

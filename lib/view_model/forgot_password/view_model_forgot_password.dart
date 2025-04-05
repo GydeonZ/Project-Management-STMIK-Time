@@ -96,6 +96,9 @@ class ForgotPasswordViewModel with ChangeNotifier {
       if (e.response != null && e.response!.statusCode == 400) {
         errorMessages = e.message; // ✅ Ambil langsung message dari DioException
         return 400;
+      } else if (e.response != null && e.response!.statusCode == 429) {
+        errorMessages = e.message; // ✅ Ambil langsung message dari DioException
+        return 429;
       }
 
       errorMessages = "Terjadi kesalahan: ${e.message}";

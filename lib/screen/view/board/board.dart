@@ -1,12 +1,15 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:projectmanagementstmiktime/screen/view/cardtugas/card_tugas_screen.dart';
 import 'package:projectmanagementstmiktime/screen/view/profile/profile_screen.dart';
 import 'package:projectmanagementstmiktime/screen/widget/boardbottomsheet.dart';
-import 'package:projectmanagementstmiktime/screen/widget/card_board.dart';
+import 'package:projectmanagementstmiktime/screen/widget/board/card_board.dart';
 import 'package:projectmanagementstmiktime/view_model/board/view_model_board.dart';
 import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signin.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class BoardScreen extends StatefulWidget {
   const BoardScreen({super.key});
@@ -41,106 +44,155 @@ class _BoardScreenState extends State<BoardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        title: Consumer<SignInViewModel>(
-          builder: (context, contactModel, child) {
-            return Text(
-              "Hello ${contactModel.nameSharedPreference}!",
-              style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black),
-            );
-          },
-        ),
-        actions: [
-          Consumer<SignInViewModel>(
-            builder: (context, contactModel, child) {
-              String initials = contactModel.nameSharedPreference.isNotEmpty
-                  ? contactModel.nameSharedPreference
-                      .substring(0, 2)
-                      .toUpperCase()
-                  : "??"; // Default jika kosong
+    Size size = MediaQuery.of(context).size;
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return; // ✅ Pastikan tidak double pop
+        if (!mounted) return; // ✅ Pastikan widget masih terpasang sebelum aksi
 
-              return GestureDetector(
-                onTap: (){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ProfileScreen(),
-                    ),
-                  );
-                },
-                child: CircleAvatar(
-                  backgroundColor: Colors.blue,
-                  child: Text(
-                    initials,
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
+        // ✅ Gunakan SystemNavigator.pop() untuk keluar dari aplikasi
+        Future.delayed(Duration.zero, () {
+          if (mounted) {
+            SystemNavigator.pop(); // 🚀 Keluar dari aplikasi tanpa error
+          }
+        });
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          title: Consumer<SignInViewModel>(
+            builder: (context, contactModel, child) {
+              return Padding(
+                padding: EdgeInsets.only(top: size.height * 0.02),
+                child: Text(
+                  "Hello ${contactModel.nameSharedPreference}!",
+                  style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
                 ),
               );
             },
           ),
-          const SizedBox(width: 16),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await boardViewModel.getBoardList(token: sp.tokenSharedPreference);
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Consumer<BoardViewModel>(
-                  builder: (context, boardViewModel, child) {
-                return Text(
-                  "Tugas Anda pada hari ${boardViewModel.tanggalTerformat}",
-                  style: const TextStyle(fontSize: 14, color: Colors.grey),
-                );
-              }),
-              const SizedBox(height: 16),
-              Expanded(
-                child: Consumer<BoardViewModel>(
-                  builder: (context, boardViewModel, child) {
-                    if (boardViewModel.isLoading) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+          actions: [
+            Consumer<SignInViewModel>(
+              builder: (context, contactModel, child) {
+                String initials = contactModel.nameSharedPreference.isNotEmpty
+                    ? contactModel.nameSharedPreference
+                        .substring(0, 2)
+                        .toUpperCase()
+                    : "??"; // Default jika kosong
 
-                    final boards = boardViewModel.modelBoard?.data ?? [];
-
-                    return GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                        childAspectRatio: 1.2,
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProfileScreen(),
                       ),
-                      itemCount: boards.length + 1, // +1 for "Add Board"
-                      itemBuilder: (context, index) {
-                        if (index == boards.length) {
-                          return _buildAddBoardCard(); // "Tambah Board" at the end
-                        }
-                        final board = boards[index];
-                        return customCardBoard(
-                          title: board.name,
-                          subtitle: board.user.name,
-                          color: Colors.primaries[
-                              Random().nextInt(Colors.primaries.length)],
-                          nickname: board.user.name.substring(0, 2),
-                        );
-                      },
                     );
                   },
+                  child: Padding(
+                    padding: EdgeInsets.only(top: size.height * 0.02),
+                    child: CircleAvatar(
+                      backgroundColor: Colors.blue,
+                      child: Text(
+                        initials,
+                        style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(width: 16),
+          ],
+        ),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            await boardViewModel.getBoardList(token: sp.tokenSharedPreference);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Consumer<BoardViewModel>(
+                    builder: (context, boardViewModel, child) {
+                  return Text(
+                    "Tugas Anda pada hari ${boardViewModel.tanggalTerformat}",
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  );
+                }),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: Consumer<BoardViewModel>(
+                    builder: (context, boardViewModel, child) {
+                      if (boardViewModel.isLoading) {
+                        return Skeletonizer(
+                            enabled: boardViewModel.isLoading,
+                            child: GridView.builder(
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                childAspectRatio: 1.2,
+                              ),
+                              itemCount: 7, // +1 for "Add Board"
+                              itemBuilder: (context, index) {
+                                return customCardBoard(
+                                  title: 'Item number $index as title',
+                                  subtitle: 'Subtitle here',
+                                  color: Colors.grey,
+                                  nickname: 'AA',
+                                );
+                              },
+                            ));
+                      }
+
+                      final boards = boardViewModel.modelBoard?.data ?? [];
+
+                      return GridView.builder(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          childAspectRatio: 1.2,
+                        ),
+                        itemCount: boards.length + 1, // +1 for "Add Board"
+                        itemBuilder: (context, index) {
+                          if (index == boards.length) {
+                            return _buildAddBoardCard(); // "Tambah Board" at the end
+                          }
+                          final board = boards[index];
+                          return GestureDetector(
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => CardTugasScreen(
+                                    boardId: board.id), // <-- kirim ID
+                              ),
+                            ),
+                            child: customCardBoard(
+                              title: board.name,
+                              subtitle: board.user.name,
+                              color: Colors.primaries[
+                                  Random().nextInt(Colors.primaries.length)],
+                              nickname: board.user.name.substring(0, 2),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

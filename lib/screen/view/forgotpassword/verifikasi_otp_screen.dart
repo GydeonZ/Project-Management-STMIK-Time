@@ -188,6 +188,17 @@ class _VerifikasiOtpScreenState extends State<VerifikasiOtpScreen> {
                                                             .errorMessages ??
                                                         "Email tidak ditemukan.",
                                                   );
+                                                } else if (statusCode == 429) {
+                                                  customAlert(
+                                                    context: context,
+                                                    alertType:
+                                                        QuickAlertType.warning,
+                                                    title:
+                                                        "Terlalu Banyak Permintaan!\n",
+                                                    text: viewModel
+                                                            .errorMessages ??
+                                                        "Terlalu banyak permintaan OTP. Coba lagi dalam beberapa menit.",
+                                                  );
                                                 } else {
                                                   customAlert(
                                                     context: context,
