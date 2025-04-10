@@ -238,7 +238,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           if (viewModel.formKey.currentState!.validate()) {
                             // ✅ Tampilkan loading alert
                             customAlert(
-                              context: context,
                               alertType: QuickAlertType.loading,
                               text: "Mohon tunggu...",
                             );
@@ -250,7 +249,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               if (statusCode == 200) {
                                 // ✅ Registrasi sukses
                                 customAlert(
-                                  context: context,
                                   alertType: QuickAlertType.success,
                                   text: 'Daftar berhasil! Silakan verifikasi email Anda.',
                                   afterDelay: () {
@@ -283,7 +281,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 }
 
                                 customAlert(
-                                  context: context,
                                   alertType: QuickAlertType.error,
                                   title: "❗️ Pendaftaran Gagal\n",
                                   text: errorMessage,
@@ -291,7 +288,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               } else {
                                 // ❌ Error lainnya
                                 customAlert(
-                                  context: context,
                                   alertType: QuickAlertType.error,
                                   text: 'Terjadi kesalahan. Coba lagi nanti.',
                                 );
@@ -299,7 +295,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             } on SocketException {
                               Navigator.pop(context);
                               customAlert(
-                                context: context,
                                 alertType: QuickAlertType.warning,
                                 text:
                                     'Tidak ada koneksi internet. Periksa jaringan Anda.',
@@ -307,7 +302,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             } catch (e) {
                               Navigator.pop(context);
                               customAlert(
-                                context: context,
                                 alertType: QuickAlertType.error,
                                 text: 'Terjadi kesalahan: ${e.toString()}',
                               );

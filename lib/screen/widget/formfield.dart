@@ -8,6 +8,7 @@ Widget customTextFormField({
   String? titleText,
   Widget? suffixIcon,
   String? labelText,
+  GlobalKey? keyForm,
   bool? obscureText,
   TextInputType? keyboardType,
   List<TextInputFormatter>? inputFormatters,
@@ -27,51 +28,56 @@ Widget customTextFormField({
           ),
         ),
       ),
-      const SizedBox(height: 5),
-      TextFormField(
-        enabled: status ?? true,
-        textCapitalization: textCapitalization,
-        keyboardType: keyboardType,
-        inputFormatters: inputFormatters,
-        controller: controller,
-        obscureText: obscureText ?? false,
-        decoration: InputDecoration(
-          contentPadding: const EdgeInsets.only(top: 8, left: 20, right: 8),
-          filled: true,
-          fillColor: const Color(0xFFECECEC),
-          hintText: labelText,
-          hintStyle: const TextStyle(
-            fontFamily: "Inter",
-            fontSize: 14,
-            color: Color(0xFFB0B0B0),
-          ),
-          labelStyle: const TextStyle(
-            color: Color(0xffBFBFBF),
-            fontFamily: "Inter",
-          ),
-          prefixIcon: prefixIcon,
-          suffixIcon: suffixIcon,
-          border: InputBorder.none,
-          enabledBorder: const OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(5)),
-            borderSide: BorderSide(
-              color: Colors.white,
+      const SizedBox(height: 10),
+      Form(
+        key: keyForm,
+        child: TextFormField(
+          enabled: status ?? true,
+          textCapitalization: textCapitalization,
+          keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
+          controller: controller,
+          obscureText: obscureText ?? false,
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.only(top: 8, left: 20, right: 8),
+            filled: true,
+            fillColor: const Color(0xFFECECEC),
+            hintText: labelText,
+            hintStyle: const TextStyle(
+              fontFamily: "Inter",
+              fontSize: 14,
+              color: Color(0xFFB0B0B0),
+            ),
+            labelStyle: const TextStyle(
+              color: Color(0xffBFBFBF),
+              fontFamily: "Inter",
+            ),
+            prefixIcon: prefixIcon,
+            suffixIcon: suffixIcon,
+            border: InputBorder.none,
+            enabledBorder: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              borderSide: BorderSide(
+                width: 2,
+                color: Color(0xff293066),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5),
+              borderSide: const BorderSide(
+                width: 2,
+                color: Color(0xff293066),
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5),
+              borderSide: const BorderSide(
+                color: Color(0xffFF0000),
+              ),
             ),
           ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(5),
-            borderSide: const BorderSide(
-              color: Color(0xffECECEC),
-            ),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(5),
-            borderSide: const BorderSide(
-              color: Color(0xffFF0000),
-            ),
-          ),
+          validator: validator,
         ),
-        validator: validator,
       ),
       const SizedBox(height: 18),
     ],

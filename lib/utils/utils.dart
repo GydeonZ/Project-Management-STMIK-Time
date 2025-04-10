@@ -11,4 +11,5 @@ class Urls {
   static const String gantiPassword = "/api/reset-password";
   static const String updateProfile = "/api/update-profile";
   static const String fetchCardList = "/api/cards";
+  static const String apiTugas = "/api/tasks";
 }

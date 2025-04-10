@@ -117,7 +117,6 @@ class CreateBoardrBottomSheetState extends State<CreateBoardBottomSheet> {
                       addBoardViewModel.clearAll();
                     } else {
                       customAlert(
-                        context: context,
                         alertType: QuickAlertType.error,
                         text: 'Terjadi kesalahan mohon coba lagi',
                       );

@@ -17,7 +17,7 @@ void showCustomDialog(BuildContext context, Size size) {
             ),
           ),
           Text(
-            'Anda berhasil mendaftar Sebagai Volunteer',
+            'Board Berhasil dibuat',
             style: TextStyle(
               fontFamily: 'Helvetica',
               color: Color(0xff4B4B4B),

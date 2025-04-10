@@ -122,7 +122,6 @@ class GantiPasswordScreen extends StatelessWidget {
                           onPressed: () async {
                             if (viewModel.formKey.currentState!.validate()) {
                               customAlert(
-                                context: context,
                                 alertType: QuickAlertType.loading,
                                 text: "Mohon Tunggu...",
                               );
@@ -135,7 +134,6 @@ class GantiPasswordScreen extends StatelessWidget {
                                 Navigator.pop(context);
                                 if (response == 200) {
                                   customAlert(
-                                    context: context,
                                     alertType: QuickAlertType.success,
                                     title: viewModel.successMessage ??
                                         "Password berhasil diperbarui silahkan login kembali",
@@ -152,7 +150,6 @@ class GantiPasswordScreen extends StatelessWidget {
                                   );
                                 } else if (response == 400) {
                                   customAlert(
-                                    context: context,
                                     alertType: QuickAlertType.error,
                                     title: "Data Anda Salah!\n",
                                     text: viewModel.errorMessages ??
@@ -160,7 +157,6 @@ class GantiPasswordScreen extends StatelessWidget {
                                   );
                                 } else {
                                   customAlert(
-                                    context: context,
                                     alertType: QuickAlertType.error,
                                     text: "Terjadi kesalahan. Coba lagi nanti.",
                                   );
@@ -168,7 +164,6 @@ class GantiPasswordScreen extends StatelessWidget {
                               } on SocketException {
                                 Navigator.pop(context);
                                 customAlert(
-                                  context: context,
                                   alertType: QuickAlertType.warning,
                                   text:
                                       'Tidak ada koneksi internet. Periksa jaringan Anda.',
@@ -176,7 +171,6 @@ class GantiPasswordScreen extends StatelessWidget {
                               } catch (e) {
                                 Navigator.pop(context);
                                 customAlert(
-                                  context: context,
                                   alertType: QuickAlertType.error,
                                   text: 'Terjadi kesalahan: ${e.toString()}',
                                 );

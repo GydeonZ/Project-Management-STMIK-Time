@@ -6,6 +6,7 @@ import 'package:projectmanagementstmiktime/screen/view/profile/profile_screen.da
 import 'package:projectmanagementstmiktime/screen/widget/boardbottomsheet.dart';
 import 'package:projectmanagementstmiktime/screen/widget/board/card_board.dart';
 import 'package:projectmanagementstmiktime/view_model/board/view_model_board.dart';
+import 'package:projectmanagementstmiktime/view_model/cardtugas/view_model_card_tugas.dart';
 import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signin.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -171,13 +172,19 @@ class _BoardScreenState extends State<BoardScreen> {
                           }
                           final board = boards[index];
                           return GestureDetector(
-                            onTap: () => Navigator.push(
+                            onTap: () { 
+                              final cardTugasViewModel =
+                                  Provider.of<CardTugasViewModel>(context,
+                                      listen: false);
+                              cardTugasViewModel.setBoardId(
+                                  board.id.toString()); // Simpan boardId
+                              Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (_) => CardTugasScreen(
                                     boardId: board.id), // <-- kirim ID
                               ),
-                            ),
+                            );},
                             child: customCardBoard(
                               title: board.name,
                               subtitle: board.user.name,

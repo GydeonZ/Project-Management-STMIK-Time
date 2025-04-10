@@ -180,7 +180,6 @@ class _UbahPasswordScreenState extends State<UbahPasswordScreen> {
                                     if (formKeyUbahPassword.currentState!
                                         .validate()) {
                                       customAlert(
-                                          context: context,
                                           alertType: QuickAlertType.loading,
                                           text: 'Mohon Tunggu...');
                                       try {
@@ -191,7 +190,6 @@ class _UbahPasswordScreenState extends State<UbahPasswordScreen> {
 
                                         if (statusCode == 200) {
                                           customAlert(
-                                            context: context,
                                             alertType: QuickAlertType.success,
                                             title: viewModel.successMessage ??
                                                 'Password Berhasil Diperbarui',
@@ -207,21 +205,18 @@ class _UbahPasswordScreenState extends State<UbahPasswordScreen> {
                                           );
                                         } else if (statusCode == 422) {
                                           customAlert(
-                                            context: context,
                                             alertType: QuickAlertType.error,
                                             title: viewModel.errorMessages ??
                                                 'Token Tidak Valid !',
                                           );
                                         } else {
                                           customAlert(
-                                            context: context,
                                             alertType: QuickAlertType.error,
                                             title: 'Gagal memperbarui password',
                                           );
                                         }
                                       } on SocketException {
                                         customAlert(
-                                          context: context,
                                           alertType: QuickAlertType.warning,
                                           text:
                                               'Tidak ada koneksi internet. Periksa jaringan Anda.',
@@ -229,7 +224,6 @@ class _UbahPasswordScreenState extends State<UbahPasswordScreen> {
                                       } 
                                       catch (e) {
                                         customAlert(
-                                          context: context,
                                           alertType: QuickAlertType.error,
                                           text:
                                               'Terjadi kesalahan: ${e.toString()}',

@@ -146,7 +146,6 @@ class _ProfileEditState extends State<ProfileEdit> {
                           onPressed: () async {
                             if (formKey.currentState!.validate()) {
                               customAlert(
-                                context: context,
                                 alertType: QuickAlertType.loading,
                                 text: "Mohon Tunggu...",
                               );
@@ -158,7 +157,6 @@ class _ProfileEditState extends State<ProfileEdit> {
                                 Navigator.pop(context);
                                 if (statusCode == 200) {
                                   customAlert(
-                                      context: context,
                                       alertType: QuickAlertType.success,
                                       title: "Berhasil...\n",
                                       text: viewModel.successMessage ??
@@ -175,7 +173,6 @@ class _ProfileEditState extends State<ProfileEdit> {
                                       });
                                 } else {
                                   customAlert(
-                                    context: context,
                                     alertType: QuickAlertType.error,
                                     text:
                                         "Terjadi kesalahan. Coba lagi nanti.",
@@ -183,14 +180,12 @@ class _ProfileEditState extends State<ProfileEdit> {
                                 }
                               } on SocketException {
                                 customAlert(
-                                  context: context,
                                   alertType: QuickAlertType.warning,
                                   text:
                                       'Tidak ada koneksi internet. Periksa jaringan Anda.',
                                 );
                               } catch (e) {
                                 customAlert(
-                                  context: context,
                                   alertType: QuickAlertType.error,
                                   text: 'Terjadi kesalahan: ${e.toString()}',
                                 );

@@ -1,17 +1,21 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:quickalert/quickalert.dart';
+import 'package:projectmanagementstmiktime/main.dart';
 
 Future customAlert({
-  required BuildContext context,
   required QuickAlertType alertType,
+  bool autoClose = true,
+  Duration autoCloseDuration = const Duration(seconds: 3),
   String? customAsset,
   String? text,
   String? title,
   VoidCallback? afterDelay,
 }) async {
+  final context = navigatorKey.currentState?.overlay?.context;
+  if (context == null) return;
+
   QuickAlert.show(
+    barrierDismissible: false,
     showCancelBtn: false,
     showConfirmBtn: false,
     animType: QuickAlertAnimType.slideInDown,
@@ -23,8 +27,9 @@ Future customAlert({
     text: text,
     widget: const SizedBox(),
   );
-  await Future.delayed(const Duration(seconds: 3));
-  if (afterDelay != null) {
-    afterDelay();
+  if (autoClose) {
+    await Future.delayed(autoCloseDuration);
+    afterDelay?.call();
+    navigatorKey.currentState?.pop();
   }
 }

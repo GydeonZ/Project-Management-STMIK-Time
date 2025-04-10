@@ -177,12 +177,12 @@ class _SignInScreenState extends State<SignInScreen> {
                                       text: "Masuk",
                                       bgColor: const Color(0xFF484F88),
                                       onPressed: () async {
+                                        FocusScope.of(context).unfocus();
                                         if (viewModel
                                             .formKeySignin.currentState!
                                             .validate()) {
                                           // ✅ Tampilkan loading alert sebelum login
                                           customAlert(
-                                            context: context,
                                             alertType: QuickAlertType.loading,
                                             text: "Mohon tunggu...",
                                           );
@@ -191,12 +191,10 @@ class _SignInScreenState extends State<SignInScreen> {
                                             final response =
                                                 await viewModel.signIn();
 
-                                            Navigator.pop(
-                                                context); // ✅ Tutup loading alert
+                                            if (!context.mounted) return;
 
                                             if (response == 200) {
                                               customAlert(
-                                                context: context,
                                                 alertType:
                                                     QuickAlertType.success,
                                                 title: 'Login Berhasil',
@@ -216,21 +214,18 @@ class _SignInScreenState extends State<SignInScreen> {
                                               viewModel.rememberMe = false;
                                             } else if (response == 401) {
                                               customAlert(
-                                                context: context,
                                                 alertType: QuickAlertType.error,
                                                 text:
                                                     'Email atau password salah. Silakan coba lagi.',
                                               );
                                             } else if (response == 403) {
                                               customAlert(
-                                                context: context,
                                                 alertType: QuickAlertType.error,
                                                 text:
                                                     'Anda Belum MemVerifikasi Email Anda',
                                               );
                                             } else {
                                               customAlert(
-                                                context: context,
                                                 alertType: QuickAlertType.error,
                                                 text:
                                                     'Terjadi kesalahan. Coba lagi nanti.',
@@ -239,7 +234,6 @@ class _SignInScreenState extends State<SignInScreen> {
                                           } on SocketException catch (_) {
                                             Navigator.pop(context);
                                             customAlert(
-                                              context: context,
                                               alertType: QuickAlertType.warning,
                                               text:
                                                   'Tidak ada koneksi internet. Periksa jaringan Anda.',
@@ -247,7 +241,6 @@ class _SignInScreenState extends State<SignInScreen> {
                                           } catch (e) {
                                             Navigator.pop(context);
                                             customAlert(
-                                              context: context,
                                               alertType: QuickAlertType.error,
                                               text:
                                                   'Terjadi kesalahan: ${e.toString()}',

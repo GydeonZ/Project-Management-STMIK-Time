@@ -23,6 +23,7 @@ class MyApp extends StatefulWidget {
   @override
   State<MyApp> createState() => _MyAppState();
 }
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class _MyAppState extends State<MyApp> {
   @override
@@ -41,6 +42,7 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (_) => CardTugasViewModel()),
         ],
         child: MaterialApp(
+          navigatorKey: navigatorKey,
           theme: ThemeData(
             useMaterial3: false,
             brightness: Brightness.light,

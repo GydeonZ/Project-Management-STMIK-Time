@@ -156,7 +156,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                           .currentState!
                                           .validate()) {
                                         customAlert(
-                                          context: context,
                                           alertType: QuickAlertType.loading,
                                           text: "Mohon tunggu...",
                                         );
@@ -169,7 +168,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                                           if (statusCode == 200) {
                                             customAlert(
-                                                context: context,
                                                 alertType:
                                                     QuickAlertType.success,
                                                 title: "Kode OTP Dikirim!",
@@ -186,7 +184,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                                 });
                                           } else if (statusCode == 400) {
                                             customAlert(
-                                              context: context,
                                               alertType: QuickAlertType.error,
                                               title: "Data Tidak Ditemukan!\n",
                                               text: viewModel.errorMessages ??
@@ -194,7 +191,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                             );
                                           } else if (statusCode == 429) {
                                             customAlert(
-                                              context: context,
                                               alertType: QuickAlertType.warning,
                                               title: "Terlalu Banyak Permintaan!\n",
                                               text: viewModel.errorMessages ??
@@ -202,7 +198,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                             );
                                           } else {
                                             customAlert(
-                                              context: context,
                                               alertType: QuickAlertType.error,
                                               text:
                                                   "Terjadi kesalahan. Coba lagi nanti.",
@@ -210,14 +205,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                           }
                                         } on SocketException {
                                           customAlert(
-                                            context: context,
                                             alertType: QuickAlertType.warning,
                                             text:
                                                 'Tidak ada koneksi internet. Periksa jaringan Anda.',
                                           );
                                         } catch (e) {
                                           customAlert(
-                                            context: context,
                                             alertType: QuickAlertType.error,
                                             text:
                                                 'Terjadi kesalahan: ${e.toString()}',

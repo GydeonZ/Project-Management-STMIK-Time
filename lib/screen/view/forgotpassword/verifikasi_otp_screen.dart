@@ -169,7 +169,6 @@ class _VerifikasiOtpScreenState extends State<VerifikasiOtpScreen> {
 
                                                 if (statusCode == 200) {
                                                   customAlert(
-                                                    context: context,
                                                     alertType:
                                                         QuickAlertType.success,
                                                     title: "Kode OTP Dikirim!",
@@ -179,7 +178,6 @@ class _VerifikasiOtpScreenState extends State<VerifikasiOtpScreen> {
                                                   );
                                                 } else if (statusCode == 400) {
                                                   customAlert(
-                                                    context: context,
                                                     alertType:
                                                         QuickAlertType.error,
                                                     title:
@@ -190,7 +188,6 @@ class _VerifikasiOtpScreenState extends State<VerifikasiOtpScreen> {
                                                   );
                                                 } else if (statusCode == 429) {
                                                   customAlert(
-                                                    context: context,
                                                     alertType:
                                                         QuickAlertType.warning,
                                                     title:
@@ -201,7 +198,6 @@ class _VerifikasiOtpScreenState extends State<VerifikasiOtpScreen> {
                                                   );
                                                 } else {
                                                   customAlert(
-                                                    context: context,
                                                     alertType:
                                                         QuickAlertType.error,
                                                     text:
@@ -210,7 +206,6 @@ class _VerifikasiOtpScreenState extends State<VerifikasiOtpScreen> {
                                                 }
                                               } on SocketException {
                                                 customAlert(
-                                                  context: context,
                                                   alertType:
                                                       QuickAlertType.warning,
                                                   text:
@@ -218,7 +213,6 @@ class _VerifikasiOtpScreenState extends State<VerifikasiOtpScreen> {
                                                 );
                                               } catch (e) {
                                                 customAlert(
-                                                  context: context,
                                                   alertType:
                                                       QuickAlertType.error,
                                                   text:
@@ -253,7 +247,6 @@ class _VerifikasiOtpScreenState extends State<VerifikasiOtpScreen> {
 
                                   if (statusCode == 200) {
                                     customAlert(
-                                      context: context,
                                       alertType: QuickAlertType.success,
                                       title: viewModel.successMessage ??
                                           "OTP Berhasil di Verifikasi!",
@@ -272,7 +265,6 @@ class _VerifikasiOtpScreenState extends State<VerifikasiOtpScreen> {
                                   } else if (statusCode == 422) {
                                     // ✅ Tidak ada pop, biarkan user tetap di screen Verifikasi OTP
                                     customAlert(
-                                      context: context,
                                       alertType: QuickAlertType.error,
                                       title: viewModel.errorMessages ??
                                           "Kode OTP Salah!",
@@ -280,7 +272,6 @@ class _VerifikasiOtpScreenState extends State<VerifikasiOtpScreen> {
                                   } else {
                                     // ✅ Tidak ada pop, tetap di screen yang sama
                                     customAlert(
-                                      context: context,
                                       alertType: QuickAlertType.error,
                                       text:
                                           "Terjadi kesalahan. Coba lagi nanti.",
@@ -289,7 +280,6 @@ class _VerifikasiOtpScreenState extends State<VerifikasiOtpScreen> {
                                 } on SocketException {
                                   if (context.mounted) {
                                     customAlert(
-                                      context: context,
                                       alertType: QuickAlertType.warning,
                                       text:
                                           "Tidak ada koneksi internet. Periksa jaringan anda",
@@ -299,38 +289,11 @@ class _VerifikasiOtpScreenState extends State<VerifikasiOtpScreen> {
                                   if (context.mounted) {
                                     // ❌ Jangan pop context saat error terjadi
                                     customAlert(
-                                      context: context,
                                       alertType: QuickAlertType.error,
                                       text: 'Terjadi kesalahan ${e.toString()}',
                                     );
                                   }
                                 }
-                                // ? customAlert(
-                                //     context: context,
-                                //     alertType: QuickAlertType.custom,
-                                //     customAsset:
-                                //         'assets/Group 427318233.png',
-                                //     text:
-                                //         'Yey! Akun anda telah berhasil dipulihkan...!',
-                                //     afterDelay: () {
-                                //       Navigator.pop(context);
-                                //       Navigator.pushReplacement(
-                                //         context,
-                                //         MaterialPageRoute(
-                                //           builder: (_) =>
-                                //               const UbahPasswordScreen(),
-                                //         ),
-                                //       );
-                                //     },
-                                //   )
-                                // : customAlert(
-                                //     context: context,
-                                //     alertType: QuickAlertType.error,
-                                //     text: 'OTP yang anda masukkan salah',
-                                //     afterDelay: () {
-                                //       Navigator.pop(context);
-                                //     },
-                                //   );
                               },
                             );
                           },
