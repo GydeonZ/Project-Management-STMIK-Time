@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:projectmanagementstmiktime/main.dart';
 import 'package:projectmanagementstmiktime/screen/view/signin_signup/signscreen.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
 import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signup.dart';
@@ -116,7 +117,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(5),
                                 borderSide: const BorderSide(
-                                  color: Colors.white,
+                                  width: 2,
+                                  color: Color(0xff293066),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5),
+                                borderSide: const BorderSide(
+                                  width: 2,
+                                  color: Color(0xff293066),
                                 ),
                               ),
                             ),
@@ -240,17 +249,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             customAlert(
                               alertType: QuickAlertType.loading,
                               text: "Mohon tunggu...",
+                              autoClose: false,
                             );
 
                             try {
-                              final statusCode = await viewModel.signUp();
-                              Navigator.pop(context); // ✅ Tutup loading alert
-
+                              final statusCode = await viewModel.signUp(); // ✅ Tutup loading alert
+                              navigatorKey.currentState?.pop();
                               if (statusCode == 200) {
                                 // ✅ Registrasi sukses
                                 customAlert(
                                   alertType: QuickAlertType.success,
-                                  text: 'Daftar berhasil! Silakan verifikasi email Anda.',
+                                  text:
+                                      'Daftar berhasil! Silakan verifikasi email Anda.',
                                   afterDelay: () {
                                     Navigator.pushReplacement(
                                       context,

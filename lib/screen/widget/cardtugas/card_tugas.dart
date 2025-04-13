@@ -3,9 +3,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:projectmanagementstmiktime/main.dart';
+import 'package:projectmanagementstmiktime/screen/view/detailtugas/detail_tugas_screen.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
 import 'package:projectmanagementstmiktime/screen/widget/cardtugas/customcard.dart';
 import 'package:projectmanagementstmiktime/screen/widget/customshowdialog.dart';
+import 'package:projectmanagementstmiktime/screen/widget/detailtugas/customtambahdetailtugas.dart';
 import 'package:projectmanagementstmiktime/screen/widget/formfield.dart';
 import 'package:provider/provider.dart';
 import 'package:projectmanagementstmiktime/model/model_fetch_card_tugas.dart'
@@ -116,104 +118,30 @@ class _CustomCardTugasState extends State<CustomCardTugas> {
                           text: TextSpan(
                             children: [
                               TextSpan(
-                                  text: '+ Tambah Task',
+                                  text: '+ Tambah Tugas',
                                   style: const TextStyle(
-                                    color: Color(0xff0088D1),
+                                    color: Color(0xff293066),
                                     fontSize: 13,
                                     fontFamily: "Helvetica",
                                   ),
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
-                                      viewModel.cardId = card.id.toString();
-                                      final token = sp.tokenSharedPreference;
-                                      customShowDialog(
-                                          useForm: true,
-                                          context: context,
-                                          customWidget: customTextFormField(
-                                            keyForm: viewModel.formKey,
-                                            titleText: "Judul Tugas",
-                                            controller: viewModel.namaTugas,
-                                            labelText: "Masukkan Judul Tugas",
-                                            validator: (value) => viewModel
-                                                .validateNamaCard(value!),
+                                      // Navigasi ke CustomTambahDetailCardTugas dengan cardId
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              CustomTambahDetailCardTugas(
+                                            cardId: card
+                                                .id, // Pass cardId ke widget
                                           ),
-                                          txtButtonL: "Batal",
-                                          txtButtonR: "Tambah",
-                                          onPressedBtnL: () {
-                                            Navigator.pop(context);
-                                          },
-                                          onPressedBtnR: () async {
-                                            Navigator.pop(
-                                                context); // Tutup form/modal sebelumnya
-
-                                            if (viewModel.formKey.currentState!
-                                                .validate()) {
-                                              await customAlert(
-                                                alertType:
-                                                    QuickAlertType.loading,
-                                                text: "Mohon tunggu...",
-                                                autoClose: false,
-                                              );
-
-                                              try {
-                                                final response = await viewModel
-                                                    .tambahTugas(token: token);
-
-                                                if (response == 200) {
-                                                  final success =
-                                                      await viewModel
-                                                          .refreshCardTugasData(
-                                                              token: token);
-
-                                                  navigatorKey.currentState
-                                                      ?.pop();
-
-                                                  if (success) {
-                                                    await customAlert(
-                                                      alertType: QuickAlertType
-                                                          .success,
-                                                      title:
-                                                          "Tugas berhasil ditambahkan!",
-                                                    );
-                                                  } else {
-                                                    await customAlert(
-                                                      alertType:
-                                                          QuickAlertType.error,
-                                                      text: viewModel
-                                                          .errorMessages,
-                                                    );
-                                                  }
-                                                } else {
-                                                  navigatorKey.currentState
-                                                      ?.pop();
-                                                  await customAlert(
-                                                    alertType:
-                                                        QuickAlertType.error,
-                                                    text:
-                                                        "Gagal menambahkan tugas. Coba lagi nanti.",
-                                                  );
-                                                }
-                                              } on SocketException catch (_) {
-                                                navigatorKey.currentState
-                                                    ?.pop();
-                                                await customAlert(
-                                                  alertType:
-                                                      QuickAlertType.warning,
-                                                  text:
-                                                      'Tidak ada koneksi internet. Periksa jaringan Anda.',
-                                                );
-                                              } catch (e) {
-                                                navigatorKey.currentState
-                                                    ?.pop();
-                                                await customAlert(
-                                                  alertType:
-                                                      QuickAlertType.error,
-                                                  text:
-                                                      'Terjadi kesalahan: ${e.toString()}',
-                                                );
-                                              }
-                                            }
-                                          });
+                                        ),
+                                      ).then((_) {
+                                        // Refresh data saat kembali dari halaman tambah
+                                        final token = sp.tokenSharedPreference;
+                                        cardTugasViewModel.refreshCardTugasData(
+                                            token: token);
+                                      });
                                     }),
                             ],
                           ),
@@ -227,30 +155,47 @@ class _CustomCardTugasState extends State<CustomCardTugas> {
                         card.tasks.length,
                         (taskIndex) {
                           final task = card.tasks[taskIndex];
-                          return Card(
-                            color: const Color(0xff293066),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.all(size.height * 0.013),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    task.name,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 13,
-                                      fontFamily: "Helvetica",
+                          return GestureDetector(
+                            onTap: () {
+                              final cardTugasViewModel =
+                                  Provider.of<CardTugasViewModel>(context,
+                                      listen: false);
+                              cardTugasViewModel.setBoardId(
+                                  board.id.toString()); // Simpan boardId
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => DetailTugasScreen(
+                                    taskId: task.id,
+                                      boardId: board.id), // <-- kirim ID
+                                ),
+                              );
+                            },
+                            child: Card(
+                              color: const Color(0xff293066),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.all(size.height * 0.013),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      task.name,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 13,
+                                        fontFamily: "Helvetica",
+                                      ),
                                     ),
-                                  ),
-                                  const Icon(
-                                    Icons.arrow_forward_ios_rounded,
-                                    color: Colors.white,
-                                  ),
-                                ],
+                                    const Icon(
+                                      Icons.arrow_forward_ios_rounded,
+                                      color: Colors.white,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           );
@@ -309,7 +254,8 @@ class _CustomCardTugasState extends State<CustomCardTugas> {
                                         } else {
                                           customAlert(
                                             alertType: QuickAlertType.error,
-                                            text: "Gagal mengupdate card. Coba lagi nanti.",
+                                            text:
+                                                "Gagal mengupdate card. Coba lagi nanti.",
                                           );
                                         }
                                       } else {

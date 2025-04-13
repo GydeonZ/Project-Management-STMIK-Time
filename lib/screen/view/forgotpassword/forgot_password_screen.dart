@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:projectmanagementstmiktime/main.dart';
 import 'package:projectmanagementstmiktime/screen/view/forgotpassword/verifikasi_otp_screen.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
 import 'package:projectmanagementstmiktime/screen/widget/button.dart';
@@ -158,16 +159,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                         customAlert(
                                           alertType: QuickAlertType.loading,
                                           text: "Mohon tunggu...",
+                                          autoClose: false,
                                         );
 
                                         try {
                                           final statusCode = await viewModel
                                               .sendReqOtp();
-                                          Navigator.pop(
-                                              context); // Tutup loading alert
-
+                                              
+                                          navigatorKey.currentState?.pop();
                                           if (statusCode == 200) {
                                             customAlert(
+                                              autoClose: false,
                                                 alertType:
                                                     QuickAlertType.success,
                                                 title: "Kode OTP Dikirim!",
@@ -183,6 +185,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                                   );
                                                 });
                                           } else if (statusCode == 400) {
+                                            navigatorKey.currentState?.pop();
                                             customAlert(
                                               alertType: QuickAlertType.error,
                                               title: "Data Tidak Ditemukan!\n",
@@ -197,6 +200,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                                   "Terlalu banyak permintaan OTP. Coba lagi dalam beberapa menit.",
                                             );
                                           } else {
+                                            navigatorKey.currentState?.pop();
                                             customAlert(
                                               alertType: QuickAlertType.error,
                                               text:
@@ -204,12 +208,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                             );
                                           }
                                         } on SocketException {
+                                          navigatorKey.currentState?.pop();
                                           customAlert(
                                             alertType: QuickAlertType.warning,
                                             text:
                                                 'Tidak ada koneksi internet. Periksa jaringan Anda.',
                                           );
                                         } catch (e) {
+                                          navigatorKey.currentState?.pop();
                                           customAlert(
                                             alertType: QuickAlertType.error,
                                             text:

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:projectmanagementstmiktime/main.dart';
 import 'package:projectmanagementstmiktime/screen/view/board/board.dart';
 import 'package:projectmanagementstmiktime/screen/view/forgotpassword/forgot_password_screen.dart';
 import 'package:projectmanagementstmiktime/screen/view/signin_signup/signupscreen.dart';
@@ -185,13 +186,14 @@ class _SignInScreenState extends State<SignInScreen> {
                                           customAlert(
                                             alertType: QuickAlertType.loading,
                                             text: "Mohon tunggu...",
+                                            autoClose: false,
                                           );
 
                                           try {
                                             final response =
                                                 await viewModel.signIn();
 
-                                            if (!context.mounted) return;
+                                            navigatorKey.currentState?.pop();
 
                                             if (response == 200) {
                                               customAlert(
@@ -232,14 +234,12 @@ class _SignInScreenState extends State<SignInScreen> {
                                               );
                                             }
                                           } on SocketException catch (_) {
-                                            Navigator.pop(context);
                                             customAlert(
                                               alertType: QuickAlertType.warning,
                                               text:
                                                   'Tidak ada koneksi internet. Periksa jaringan Anda.',
                                             );
                                           } catch (e) {
-                                            Navigator.pop(context);
                                             customAlert(
                                               alertType: QuickAlertType.error,
                                               text:

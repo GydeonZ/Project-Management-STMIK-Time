@@ -14,45 +14,52 @@ class TambahTugasService {
 
   Future<ModelTambahTugas?> hitTambahTugas({
     required String token,
-    required String namaCard,
     required String cardId,
+    required String namaCard,
+    required String? deskripsiTugas,
+    required DateTime startDate,
+    required DateTime endDate,
   }) async {
     try {
+      // Format DateTime ke format yang diharapkan oleh API
+      String formattedStartDate =
+          "${startDate.year}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')} ${startDate.hour.toString().padLeft(2, '0')}:${startDate.minute.toString().padLeft(2, '0')}:${startDate.second.toString().padLeft(2, '0')}";
+      String formattedEndDate =
+          "${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')} ${endDate.hour.toString().padLeft(2, '0')}:${endDate.minute.toString().padLeft(2, '0')}:${endDate.second.toString().padLeft(2, '0')}";
+
+      // Buat body sesuai format yang diharapkan
       final formData = FormData.fromMap({
-        'name': namaCard,
         'card_id': cardId,
+        'name': namaCard,
+        'description': deskripsiTugas,
+        'start_time': formattedStartDate,
+        'end_time': formattedEndDate,
       });
 
+      // Kirim request POST ke API
       final response = await _dio.post(
-        Urls.apiTugas,
+        Urls.apiTugas, // Endpoint API
+        data: formData,
         options: Options(
           headers: {
-            'Authorization': 'Bearer $token',
+            'Authorization': 'Bearer $token', // Sertakan token
           },
         ),
-        data: formData,
       );
 
+      // Periksa status response
       if (response.statusCode == 200) {
         return ModelTambahTugas.fromJson(response.data);
       } else {
         throw DioException(
           response: response,
           requestOptions: response.requestOptions,
-          message: "Terjadi kesalahan: ${response.statusMessage}",
+          message: "Gagal menambahkan tugas: ${response.statusMessage}",
           type: DioExceptionType.badResponse,
         );
       }
-    } on DioException catch (e) {
-      // ✅ Pastikan error dari API tetap ditampilkan
-      if (e.response != null) {
-        rethrow; // Lempar kembali error untuk ditangani di ViewModel
-      }
-      throw DioException(
-        requestOptions: RequestOptions(path: Urls.apiTugas),
-        message: "Kesalahan jaringan: ${e.message}",
-        type: DioExceptionType.connectionError,
-      );
+    } catch (e) {
+      rethrow;
     }
   }
 }

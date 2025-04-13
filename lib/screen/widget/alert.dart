@@ -29,7 +29,10 @@ Future customAlert({
   );
   if (autoClose) {
     await Future.delayed(autoCloseDuration);
-    afterDelay?.call();
     navigatorKey.currentState?.pop();
+  }
+  await Future.delayed(const Duration(seconds: 3));
+  if (afterDelay != null) {
+    afterDelay();
   }
 }

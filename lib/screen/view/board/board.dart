@@ -172,19 +172,20 @@ class _BoardScreenState extends State<BoardScreen> {
                           }
                           final board = boards[index];
                           return GestureDetector(
-                            onTap: () { 
+                            onTap: () {
                               final cardTugasViewModel =
                                   Provider.of<CardTugasViewModel>(context,
                                       listen: false);
                               cardTugasViewModel.setBoardId(
                                   board.id.toString()); // Simpan boardId
                               Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => CardTugasScreen(
-                                    boardId: board.id), // <-- kirim ID
-                              ),
-                            );},
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => CardTugasScreen(
+                                      boardId: board.id), // <-- kirim ID
+                                ),
+                              );
+                            },
                             child: customCardBoard(
                               title: board.name,
                               subtitle: board.user.name,
