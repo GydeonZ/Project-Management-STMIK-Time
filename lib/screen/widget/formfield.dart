@@ -5,6 +5,7 @@ import 'package:flutter_svg/svg.dart';
 Widget customTextFormField({
   required TextEditingController controller,
   bool? status,
+  bool? editDeskripsi = false,
   bool? formTambahTugas = false,
   bool? butuhJudul = true,
   bool? requiredSpacing = true,
@@ -42,6 +43,7 @@ Widget customTextFormField({
         key: keyForm,
         child: formTambahTugas == false
             ? TextFormField(
+                maxLines: editDeskripsi == true ? 5 : 1,
                 enabled: status ?? true,
                 textCapitalization: textCapitalization,
                 keyboardType: keyboardType,
@@ -139,7 +141,8 @@ Widget customTextFormField({
                     decoration: const BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(5)),
                       border: Border(
-                          top: BorderSide(color: Color(0xff293066), width: 3)),
+                          top:
+                              BorderSide(color: Color(0xff293066), width: 1.5)),
                     ),
                   ),
                 ],
@@ -160,6 +163,7 @@ Widget customFormDetailTugas({
   required BuildContext context,
   bool? listContainer = true,
   bool? textBold = true,
+  bool? containerAnggotaList = false,
   String? iconPath,
   String? listDataTitle,
   Color? colorText,
@@ -173,6 +177,7 @@ Widget customFormDetailTugas({
   ScrollPhysics? scrollListData,
   VoidCallback? containerOnTap,
   VoidCallback? onTapListContainer,
+  Widget? suffixWidget, // Add this parameter
 }) {
   Size size = MediaQuery.of(context).size;
   return Column(
@@ -193,20 +198,22 @@ Widget customFormDetailTugas({
                         height: heightIcon ?? size.width * 0.07,
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15.0),
-                      child: Text(
-                        labelText ?? "",
-                        style: TextStyle(
-                          fontFamily: "Helvetica",
-                          fontSize: 14,
-                          color: colorText ?? const Color(0xFFB0B0B0),
-                          fontWeight: textBold == true
-                              ? FontWeight.w600
-                              : FontWeight.w400,
-                        ),
-                      ),
-                    )
+                    containerAnggotaList == true 
+                        ? suffixWidget!
+                        : Padding(
+                            padding: const EdgeInsets.only(left: 15.0),
+                            child: Text(
+                              labelText ?? "",
+                              style: TextStyle(
+                                fontFamily: "Helvetica",
+                                fontSize: 14,
+                                color: colorText ?? const Color(0xFFB0B0B0),
+                                fontWeight: textBold == true
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                              ),
+                            ),
+                          )
                   ],
                 ),
               ),

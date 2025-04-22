@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:projectmanagementstmiktime/main.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
+import 'package:projectmanagementstmiktime/screen/widget/botsheetaddbutton.dart';
 import 'package:projectmanagementstmiktime/screen/widget/cardtugas/card_tugas.dart';
 import 'package:projectmanagementstmiktime/screen/widget/customshowdialog.dart';
 import 'package:projectmanagementstmiktime/screen/widget/formfield.dart';
@@ -94,113 +95,85 @@ class _CardTugasScreenState extends State<CardTugasScreen> {
             ],
           ),
         ),
-        bottomNavigationBar: _buildAddCard());
-  }
+        bottomNavigationBar:
+            Consumer<CardTugasViewModel>(builder: (context, viewModel, child) {
+          return bottomSheetAddCard(
+            context: context,
+            judulBtn: "Tugas",
+            onTap: () {
+              
+              final token = sp.tokenSharedPreference;
+              customShowDialog(
+                  useForm: true,
+                  context: context,
+                  customWidget: customTextFormField(
+                    keyForm: viewModel.formKey,
+                    titleText: "Judul Card",
+                    controller: viewModel.namaCard,
+                    labelText: "Masukkan Judul Card",
+                    validator: (value) => viewModel.validateNamaCard(value!),
+                  ),
+                  txtButtonL: "Batal",
+                  txtButtonR: "Tambah",
+                  onPressedBtnL: () {
+                    Navigator.pop(context);
+                  },
+                  onPressedBtnR: () async {
+                    Navigator.pop(context); // Tutup form/modal sebelumnya
 
-  Widget _buildAddCard() {
-    Size size = MediaQuery.of(context).size;
-    return Consumer<CardTugasViewModel>(
-      builder: (context, viewModel, child) {
-        if (viewModel.isLoading) {
-          return const SizedBox();
-        }
-        return GestureDetector(
-          onTap: () {
-            final token = sp.tokenSharedPreference;
-            customShowDialog(
-                useForm: true,
-                context: context,
-                customWidget: customTextFormField(
-                  keyForm: viewModel.formKey,
-                  titleText: "Judul Card",
-                  controller: viewModel.namaCard,
-                  labelText: "Masukkan Judul Card",
-                  validator: (value) => viewModel.validateNamaCard(value!),
-                ),
-                txtButtonL: "Batal",
-                txtButtonR: "Tambah",
-                onPressedBtnL: () {
-                  Navigator.pop(context);
-                },
-                onPressedBtnR: () async {
-                  Navigator.pop(context); // Tutup form/modal sebelumnya
+                    if (viewModel.formKey.currentState!.validate()) {
+                      await customAlert(
+                        alertType: QuickAlertType.loading,
+                        text: "Mohon tunggu...",
+                        autoClose: false,
+                      );
 
-                  if (viewModel.formKey.currentState!.validate()) {
-                    await customAlert(
-                      alertType: QuickAlertType.loading,
-                      text: "Mohon tunggu...",
-                      autoClose: false,
-                    );
+                      try {
+                        final response =
+                            await viewModel.tambahTugasCard(token: token);
 
-                    try {
-                      final response =
-                          await viewModel.tambahTugasCard(token: token);
+                        if (response == 200) {
+                          final success = await viewModel.refreshCardTugasData(
+                              token: token);
 
-                      if (response == 200) {
-                        final success =
-                            await viewModel.refreshCardTugasData(token: token);
+                          navigatorKey.currentState?.pop();
 
-                        navigatorKey.currentState?.pop();
-
-                        if (success) {
-                          await customAlert(
-                            alertType: QuickAlertType.success,
-                            title: "Card berhasil ditambahkan!",
-                          );
+                          if (success) {
+                            await customAlert(
+                              alertType: QuickAlertType.success,
+                              title: "Card berhasil ditambahkan!",
+                            );
+                          } else {
+                            await customAlert(
+                              alertType: QuickAlertType.error,
+                              text: viewModel.errorMessages,
+                            );
+                          }
                         } else {
+                          navigatorKey.currentState?.pop();
                           await customAlert(
                             alertType: QuickAlertType.error,
-                            text: viewModel.errorMessages,
+                            text: "Gagal menambahkan card. Coba lagi nanti.",
                           );
                         }
-                      } else {
+                      } on SocketException catch (_) {
+                        navigatorKey.currentState?.pop();
+                        await customAlert(
+                          alertType: QuickAlertType.warning,
+                          text:
+                              'Tidak ada koneksi internet. Periksa jaringan Anda.',
+                        );
+                      } catch (e) {
                         navigatorKey.currentState?.pop();
                         await customAlert(
                           alertType: QuickAlertType.error,
-                          text: "Gagal menambahkan card. Coba lagi nanti.",
+                          text: 'Terjadi kesalahan: ${e.toString()}',
                         );
                       }
-                    } on SocketException catch (_) {
-                      navigatorKey.currentState?.pop();
-                      await customAlert(
-                        alertType: QuickAlertType.warning,
-                        text:
-                            'Tidak ada koneksi internet. Periksa jaringan Anda.',
-                      );
-                    } catch (e) {
-                      navigatorKey.currentState?.pop();
-                      await customAlert(
-                        alertType: QuickAlertType.error,
-                        text: 'Terjadi kesalahan: ${e.toString()}',
-                      );
                     }
-                  }
-                });
-          },
-          child: SizedBox(
-            height: size.height * 0.075,
-            child: Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-                side: const BorderSide(
-                  color: Color(0xff293066),
-                  width: 2,
-                ),
-              ),
-              child: const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("Tambah Tugas",
-                        style: TextStyle(
-                            color: Colors.black, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
+                  });
+            },
+          );
+        }));
   }
 }

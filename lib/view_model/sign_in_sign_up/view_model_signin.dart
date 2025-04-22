@@ -18,6 +18,7 @@ class SignInViewModel with ChangeNotifier {
   ModelSignIn? dataLogin;
   late SharedPreferences logindata;
   late bool newUser;
+  int idSharedPreference = 0;
   String nameSharedPreference = '';
   String emailSharedPreference = '';
   String roleSharedPreference = '';
@@ -54,6 +55,7 @@ class SignInViewModel with ChangeNotifier {
 
       if (dataLogin != null) {
         // ✅ Simpan data ke SharedPreferences
+        idSharedPreference = dataLogin!.user.id;
         nameSharedPreference = dataLogin!.user.name;
         emailSharedPreference = dataLogin!.user.email;
         roleSharedPreference = dataLogin!.user.role;
@@ -93,6 +95,7 @@ class SignInViewModel with ChangeNotifier {
 
   Future<void> saveDataSharedPreferences() async {
     final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('id', idSharedPreference);
     await prefs.setString('name', nameSharedPreference);
     await prefs.setString('email', emailSharedPreference);
     await prefs.setString('role', roleSharedPreference);
@@ -106,6 +109,7 @@ class SignInViewModel with ChangeNotifier {
 
   Future<void> checkSharedPreferences() async {
     final prefs = await SharedPreferences.getInstance();
+    idSharedPreference = prefs.getInt('id') ?? 0;
     nameSharedPreference = prefs.getString('name') ?? "";
     emailSharedPreference = prefs.getString('email') ?? "";
     roleSharedPreference = prefs.getString('role') ?? "";

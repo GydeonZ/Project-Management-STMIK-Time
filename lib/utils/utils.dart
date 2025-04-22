@@ -13,4 +13,5 @@ class Urls {
   static const String fetchCardList = "/api/cards";
   static const String apiTugas = "/api/tasks";
   static const String taskListId = "/api/tasks/";
+  static const String availableMember = "/api/users/";
 }

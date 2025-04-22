@@ -37,13 +37,13 @@ class Task {
   DateTime endTime;
   DateTime createdAt;
   DateTime updatedAt;
-  List<dynamic>? membersInvite; // Made nullable with ?
+  List<MembersInvite> membersInvite;
   Card card;
-  List<dynamic>? checklists; // Made nullable with ?
-  List<dynamic>? files; // Made nullable with ?
+  List<dynamic> checklists;
+  List<dynamic> files;
   List<Activity> activities;
-  List<dynamic>? comments; // Made nullable with ?
-  List<dynamic>? members; // Made nullable with ?
+  List<Comment> comments;
+  List<Member> members;
 
   Task({
     required this.id,
@@ -55,13 +55,13 @@ class Task {
     required this.endTime,
     required this.createdAt,
     required this.updatedAt,
-    this.membersInvite, // Remove 'required'
+    required this.membersInvite,
     required this.card,
-    this.checklists, // Remove 'required'
-    this.files, // Remove 'required'
+    required this.checklists,
+    required this.files,
     required this.activities,
-    this.comments, // Remove 'required'
-    this.members, // Remove 'required'
+    required this.comments,
+    required this.members,
   });
 
   factory Task.fromJson(Map<String, dynamic> json) => Task(
@@ -75,23 +75,36 @@ class Task {
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),
         membersInvite: json["members_invite"] != null
-            ? List<dynamic>.from(json["members_invite"].map((x) => x))
-            : null,
-        card: Card.fromJson(json["card"]),
-        checklists: json["checklists"] != null
-            ? List<dynamic>.from(json["checklists"].map((x) => x))
-            : null,
-        files: json["files"] != null
-            ? List<dynamic>.from(json["files"].map((x) => x))
-            : null,
+            ? List<MembersInvite>.from(
+                json["members_invite"].map((x) => MembersInvite.fromJson(x)))
+            : [], // Empty list if null
+        card: json["card"] != null
+            ? Card.fromJson(json["card"])
+            : Card(
+                id: 0,
+                boardId: 0,
+                name: "",
+                position: 0,
+                createdAt: DateTime.now(),
+                updatedAt: DateTime.now(),
+                board: Board(
+                  id: 0,
+                  name: "",
+                  visibility: "",
+                  userId: 0,
+                  createdAt: DateTime.now(),
+                  updatedAt: DateTime.now(),
+                  encryptedId: "",
+                ),
+              ),
+        checklists: List<dynamic>.from(json["checklists"].map((x) => x)),
+        files: List<dynamic>.from(json["files"].map((x) => x)),
         activities: List<Activity>.from(
             json["activities"].map((x) => Activity.fromJson(x))),
-        comments: json["comments"] != null
-            ? List<dynamic>.from(json["comments"].map((x) => x))
-            : null,
-        members: json["members"] != null
-            ? List<dynamic>.from(json["members"].map((x) => x))
-            : null,
+        comments: List<Comment>.from(
+            json["comments"].map((x) => Comment.fromJson(x))),
+        members:
+            List<Member>.from(json["members"].map((x) => Member.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -104,19 +117,14 @@ class Task {
         "end_time": endTime.toIso8601String(),
         "created_at": createdAt.toIso8601String(),
         "updated_at": updatedAt.toIso8601String(),
-        "members_invite": membersInvite != null
-            ? List<dynamic>.from(membersInvite!.map((x) => x))
-            : [],
+        "members_invite":
+            List<dynamic>.from(membersInvite.map((x) => x.toJson())),
         "card": card.toJson(),
-        "checklists": checklists != null
-            ? List<dynamic>.from(checklists!.map((x) => x))
-            : [],
-        "files": files != null ? List<dynamic>.from(files!.map((x) => x)) : [],
+        "checklists": List<dynamic>.from(checklists.map((x) => x)),
+        "files": List<dynamic>.from(files.map((x) => x)),
         "activities": List<dynamic>.from(activities.map((x) => x.toJson())),
-        "comments":
-            comments != null ? List<dynamic>.from(comments!.map((x) => x)) : [],
-        "members":
-            members != null ? List<dynamic>.from(members!.map((x) => x)) : [],
+        "comments": List<dynamic>.from(comments.map((x) => x.toJson())),
+        "members": List<dynamic>.from(members.map((x) => x.toJson())),
       };
 }
 
@@ -127,7 +135,7 @@ class Activity {
   String activity;
   DateTime createdAt;
   DateTime updatedAt;
-  User user;
+  MembersInvite user;
 
   Activity({
     required this.id,
@@ -146,7 +154,7 @@ class Activity {
         activity: json["activity"],
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),
-        user: User.fromJson(json["user"]),
+        user: MembersInvite.fromJson(json["user"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -160,18 +168,19 @@ class Activity {
       };
 }
 
-class User {
+class MembersInvite {
   int id;
-  String name;
-  String email;
+  String name; // Changed from enum to String
+  String email; // Changed from enum to String
   DateTime emailVerifiedAt;
-  String role;
-  String nim;
-  dynamic nidn;
+  String role; // Changed from enum to String
+  String? nim;
+  String? nidn;
   DateTime createdAt;
   DateTime updatedAt;
+  Pivot? pivot;
 
-  User({
+  MembersInvite({
     required this.id,
     required this.name,
     required this.email,
@@ -181,28 +190,69 @@ class User {
     required this.nidn,
     required this.createdAt,
     required this.updatedAt,
+    this.pivot,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) => User(
+  factory MembersInvite.fromJson(Map<String, dynamic> json) => MembersInvite(
         id: json["id"],
-        name: json["name"],
-        email: json["email"],
-        emailVerifiedAt: DateTime.parse(json["email_verified_at"]),
-        role: json["role"],
+        name: json["name"] ?? "Unknown User", // Direct assignment
+        email: json["email"] ?? "unknown@example.com", // Direct assignment
+        emailVerifiedAt: json["email_verified_at"] != null
+            ? DateTime.parse(json["email_verified_at"])
+            : DateTime.now(),
+        role: json["role"] ?? "Member", // Direct assignment
         nim: json["nim"],
         nidn: json["nidn"],
+        createdAt: json["created_at"] != null
+            ? DateTime.parse(json["created_at"])
+            : DateTime.now(),
+        updatedAt: json["updated_at"] != null
+            ? DateTime.parse(json["updated_at"])
+            : DateTime.now(),
+        pivot: json["pivot"] == null ? null : Pivot.fromJson(json["pivot"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name, // Direct use
+        "email": email, // Direct use
+        "email_verified_at": emailVerifiedAt.toIso8601String(),
+        "role": role, // Direct use
+        "nim": nim,
+        "nidn": nidn,
+        "created_at": createdAt.toIso8601String(),
+        "updated_at": updatedAt.toIso8601String(),
+        "pivot": pivot?.toJson(),
+      };
+}
+
+class Pivot {
+  int taskId;
+  int userId;
+  String level;
+  DateTime createdAt;
+  DateTime updatedAt;
+
+  Pivot({
+    required this.taskId,
+    required this.userId,
+    required this.level,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory Pivot.fromJson(Map<String, dynamic> json) => Pivot(
+        taskId: json["task_id"],
+        userId: json["user_id"],
+        level: json["level"],
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "email": email,
-        "email_verified_at": emailVerifiedAt.toIso8601String(),
-        "role": role,
-        "nim": nim,
-        "nidn": nidn,
+        "task_id": taskId,
+        "user_id": userId,
+        "level": level,
         "created_at": createdAt.toIso8601String(),
         "updated_at": updatedAt.toIso8601String(),
       };
@@ -286,4 +336,96 @@ class Board {
         "updated_at": updatedAt.toIso8601String(),
         "encrypted_id": encryptedId,
       };
+}
+
+class Comment {
+  int id;
+  int taskId;
+  int userId;
+  String comment;
+  DateTime createdAt;
+  DateTime updatedAt;
+  MembersInvite user;
+
+  Comment({
+    required this.id,
+    required this.taskId,
+    required this.userId,
+    required this.comment,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.user,
+  });
+
+  factory Comment.fromJson(Map<String, dynamic> json) => Comment(
+        id: json["id"],
+        taskId: json["task_id"],
+        userId: json["user_id"],
+        comment: json["comment"],
+        createdAt: DateTime.parse(json["created_at"]),
+        updatedAt: DateTime.parse(json["updated_at"]),
+        user: MembersInvite.fromJson(json["user"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "task_id": taskId,
+        "user_id": userId,
+        "comment": comment,
+        "created_at": createdAt.toIso8601String(),
+        "updated_at": updatedAt.toIso8601String(),
+        "user": user.toJson(),
+      };
+}
+
+class Member {
+  int id;
+  int taskId;
+  int userId;
+  String level;
+  DateTime createdAt;
+  DateTime updatedAt;
+  MembersInvite user;
+
+  Member({
+    required this.id,
+    required this.taskId,
+    required this.userId,
+    required this.level,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.user,
+  });
+
+  factory Member.fromJson(Map<String, dynamic> json) => Member(
+        id: json["id"],
+        taskId: json["task_id"],
+        userId: json["user_id"],
+        level: json["level"],
+        createdAt: DateTime.parse(json["created_at"]),
+        updatedAt: DateTime.parse(json["updated_at"]),
+        user: MembersInvite.fromJson(json["user"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "task_id": taskId,
+        "user_id": userId,
+        "level": level,
+        "created_at": createdAt.toIso8601String(),
+        "updated_at": updatedAt.toIso8601String(),
+        "user": user.toJson(),
+      };
+}
+
+class EnumValues<T> {
+  Map<String, T> map;
+  late Map<T, String> reverseMap;
+
+  EnumValues(this.map);
+
+  Map<T, String> get reverse {
+    reverseMap = map.map((k, v) => MapEntry(v, k));
+    return reverseMap;
+  }
 }

@@ -4,3 +4,10 @@ enum MyState {
   loaded,
   failed,
 }
+
+enum RoleUserInBoard {
+  owner,
+  admin,
+  member,
+  unknown,
+}

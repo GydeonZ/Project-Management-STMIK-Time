@@ -5,6 +5,7 @@ import 'package:projectmanagementstmiktime/screen/view/cardtugas/card_tugas_scre
 import 'package:projectmanagementstmiktime/screen/view/profile/profile_screen.dart';
 import 'package:projectmanagementstmiktime/screen/widget/boardbottomsheet.dart';
 import 'package:projectmanagementstmiktime/screen/widget/board/card_board.dart';
+import 'package:projectmanagementstmiktime/screen/widget/formfield.dart';
 import 'package:projectmanagementstmiktime/view_model/board/view_model_board.dart';
 import 'package:projectmanagementstmiktime/view_model/cardtugas/view_model_card_tugas.dart';
 import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signin.dart';
@@ -121,6 +122,11 @@ class _BoardScreenState extends State<BoardScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                customTextFormField(
+                  controller: TextEditingController(),
+                  labelText: "Pencarian",
+                  prefixIcon: const Icon(Icons.search),
+                ),
                 Consumer<BoardViewModel>(
                     builder: (context, boardViewModel, child) {
                   return Text(

@@ -158,15 +158,13 @@ class _CustomTambahDetailCardTugasState
                         final success =
                             await viewModel.refreshCardTugasData(token: token);
 
-                        navigatorKey.currentState?.pop();
-
+                          navigatorKey.currentState?.pop();
                         if (success) {
                           await customAlert(
                             alertType: QuickAlertType.success,
                             title: "Tugas berhasil ditambahkan!",
                           );
                           viewModel.clearForm();
-                          navigatorKey.currentState?.pop();
                         } else {
                           await customAlert(
                             alertType: QuickAlertType.error,

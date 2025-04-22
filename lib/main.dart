@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:projectmanagementstmiktime/screen/view/splashscreen/splashscreen.dart';
 import 'package:projectmanagementstmiktime/view_model/board/view_model_addboard.dart';
 import 'package:projectmanagementstmiktime/view_model/board/view_model_board.dart';
+import 'package:projectmanagementstmiktime/view_model/cardtugas/view_model_anggota_list.dart';
 import 'package:projectmanagementstmiktime/view_model/cardtugas/view_model_card_tugas.dart';
 import 'package:projectmanagementstmiktime/view_model/forgot_password/view_model_reset_password.dart';
 import 'package:projectmanagementstmiktime/view_model/forgot_password/view_model_forgot_password.dart';
@@ -23,7 +24,8 @@ class MyApp extends StatefulWidget {
   @override
   State<MyApp> createState() => _MyAppState();
 }
-  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class _MyAppState extends State<MyApp> {
   @override
@@ -40,6 +42,7 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (_) => ProfileViewModel()),
           ChangeNotifierProvider(create: (_) => GantiPasswordViewModel()),
           ChangeNotifierProvider(create: (_) => CardTugasViewModel()),
+          ChangeNotifierProvider(create: (_) => AnggotaListViewModel()),
         ],
         child: MaterialApp(
           navigatorKey: navigatorKey,
