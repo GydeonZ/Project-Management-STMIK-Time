@@ -7,11 +7,11 @@ import 'package:projectmanagementstmiktime/screen/widget/botsheetaddbutton.dart'
 import 'package:projectmanagementstmiktime/screen/widget/cardtugas/card_tugas.dart';
 import 'package:projectmanagementstmiktime/screen/widget/customshowdialog.dart';
 import 'package:projectmanagementstmiktime/screen/widget/formfield.dart';
+import 'package:projectmanagementstmiktime/view_model/board/view_model_board.dart';
 import 'package:projectmanagementstmiktime/view_model/cardtugas/view_model_card_tugas.dart';
 import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signin.dart';
 import 'package:provider/provider.dart';
 import 'package:quickalert/models/quickalert_type.dart';
-// import 'package:skeletonizer/skeletonizer.dart';
 
 class CardTugasScreen extends StatefulWidget {
   final int boardId;
@@ -36,23 +36,21 @@ class _CardTugasScreenState extends State<CardTugasScreen> {
       cardTugasViewModel.getCardTugasList(token: token);
     });
   }
-  // bool _isError = false; // Untuk menandai jika ada kendala jaringan
 
-  // Future<void> _refreshData() async {
-  //   try {
-  //     // Panggil fungsi untuk memuat ulang data di CustomCardTugas
-  //     setState(() {
-  //       _isError = false; // Reset error jika berhasil
-  //     });
-  //   } catch (e) {
-  //     setState(() {
-  //       _isError = true; // Tandai error jika gagal
-  //     });
-  //   }
-  // }
+  bool _checkUserCanEdit() {
+    // Mendapatkan user ID dari SharedPreferences
+    final currentUserId = sp.idSharedPreference;
+
+    // Mendapatkan board view model
+    final boardVm = Provider.of<BoardViewModel>(context, listen: false);
+
+    // Menggunakan fungsi yang baru dibuat
+    return boardVm.checkUserCanEditBoardById(widget.boardId, currentUserId);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final bool canEdit = _checkUserCanEdit();
     return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -97,11 +95,13 @@ class _CardTugasScreenState extends State<CardTugasScreen> {
         ),
         bottomNavigationBar:
             Consumer<CardTugasViewModel>(builder: (context, viewModel, child) {
+          if (!canEdit) {
+            return const SizedBox.shrink();
+          }
           return bottomSheetAddCard(
             context: context,
             judulBtn: "Tugas",
             onTap: () {
-              
               final token = sp.tokenSharedPreference;
               customShowDialog(
                   useForm: true,
@@ -167,7 +167,8 @@ class _CardTugasScreenState extends State<CardTugasScreen> {
                         navigatorKey.currentState?.pop();
                         await customAlert(
                           alertType: QuickAlertType.error,
-                          text: 'Terjadi kesalahan: ${e.toString()}',
+                          text:
+                              'Terjadi kesalahan, Coba lagi beberapa saat lagi',
                         );
                       }
                     }

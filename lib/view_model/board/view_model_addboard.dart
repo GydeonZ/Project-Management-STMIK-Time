@@ -5,28 +5,52 @@ import 'package:projectmanagementstmiktime/services/service_add_board.dart';
 class AddBoardViewModel with ChangeNotifier {
   final TextEditingController boardName = TextEditingController();
   final TextEditingController selectedVisibility = TextEditingController();
+  final formKey = GlobalKey<FormState>();
   bool heightContainer = false;
-  bool isSukses = true;
+  bool isSukses = false;
+  bool isLoading = false;
   final addBoardService = AddBoardListService();
+  String? errorMessages;
+  String? successMessage;
 
-  Future addBoardList({
+  Future<int> addBoardList({
     required String token,
   }) async {
     try {
-      isSukses = false;
-      await addBoardService.hitAddBoardList(
+      isLoading = true;
+      notifyListeners();
+
+      final response = await addBoardService.hitAddBoardList(
         token: token,
         name: boardName.text,
         visibility: selectedVisibility.text,
       );
-      isSukses = true;
-    } catch (e) {
-      // ignore: deprecated_member_use
-      if (e is DioError) {
-        e.response!.statusCode;
+
+      isLoading = false;
+
+      if (response != null) {
+        successMessage = response.message;
+        errorMessages = null;
+        boardName.text = '';
+        notifyListeners();
+        return 200;
+      } else { 
+        isSukses = false;
+        notifyListeners();
+        return 500;
       }
+    } on DioException catch (e) {
+      isLoading = false;
+      notifyListeners();
+
+      if (e.response != null && e.response!.statusCode == 400) {
+        errorMessages = e.message; // ✅ Ambil langsung message dari DioException
+        return 400;
+      }
+
+      errorMessages = "Terjadi kesalahan";
+      return 500;
     }
-    notifyListeners();
   }
 
   String? validateBoardName(String value) {

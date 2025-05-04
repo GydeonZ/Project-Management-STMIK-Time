@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:projectmanagementstmiktime/screen/view/splashscreen/splashscreen.dart';
 import 'package:projectmanagementstmiktime/view_model/board/view_model_addboard.dart';
+import 'package:projectmanagementstmiktime/view_model/board/view_model_anggota_list_board.dart';
 import 'package:projectmanagementstmiktime/view_model/board/view_model_board.dart';
 import 'package:projectmanagementstmiktime/view_model/cardtugas/view_model_anggota_list.dart';
 import 'package:projectmanagementstmiktime/view_model/cardtugas/view_model_card_tugas.dart';
+import 'package:projectmanagementstmiktime/view_model/cardtugas/view_model_comment.dart';
 import 'package:projectmanagementstmiktime/view_model/forgot_password/view_model_reset_password.dart';
 import 'package:projectmanagementstmiktime/view_model/forgot_password/view_model_forgot_password.dart';
 import 'package:projectmanagementstmiktime/view_model/navigation/view_model_navigation.dart';
@@ -43,6 +45,8 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (_) => GantiPasswordViewModel()),
           ChangeNotifierProvider(create: (_) => CardTugasViewModel()),
           ChangeNotifierProvider(create: (_) => AnggotaListViewModel()),
+          ChangeNotifierProvider(create: (_) => CommentViewModel()),
+          ChangeNotifierProvider(create: (_) => BoardAnggotaListViewModel()),
         ],
         child: MaterialApp(
           navigatorKey: navigatorKey,

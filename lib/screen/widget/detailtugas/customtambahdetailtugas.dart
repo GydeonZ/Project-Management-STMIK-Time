@@ -63,6 +63,11 @@ class _CustomTambahDetailCardTugasState
             color: Color(0xff293066),
           ),
           onPressed: () {
+            cardTugasViewModel.namaTugas.clear();
+            cardTugasViewModel.deskripsiTugas.clear();
+            cardTugasViewModel.deskripsiTugas.clear();
+            cardTugasViewModel.isStartDateSelected = false;
+            cardTugasViewModel.isEndDateSelected = false;
             Navigator.pop(context);
           },
         ),
@@ -158,7 +163,7 @@ class _CustomTambahDetailCardTugasState
                         final success =
                             await viewModel.refreshCardTugasData(token: token);
 
-                          navigatorKey.currentState?.pop();
+                        navigatorKey.currentState?.pop();
                         if (success) {
                           await customAlert(
                             alertType: QuickAlertType.success,

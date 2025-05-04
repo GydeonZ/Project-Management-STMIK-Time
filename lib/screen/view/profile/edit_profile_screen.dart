@@ -3,7 +3,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:projectmanagementstmiktime/screen/view/profile/profile_screen.dart';
+import 'package:projectmanagementstmiktime/main.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
 import 'package:projectmanagementstmiktime/screen/widget/settings/text_field_setting.dart';
 import 'package:projectmanagementstmiktime/screen/widget/settings/text_title_text_field.dart';
@@ -69,12 +69,11 @@ class _ProfileEditState extends State<ProfileEdit> {
             children: [
               Consumer<SignInViewModel>(
                 builder: (context, contactModel, child) {
-                  String initials =
-                      contactModel.nameSharedPreference.isNotEmpty
-                          ? contactModel.nameSharedPreference
-                              .substring(0, 2)
-                              .toUpperCase()
-                          : "??";
+                  String initials = contactModel.nameSharedPreference.isNotEmpty
+                      ? contactModel.nameSharedPreference
+                          .substring(0, 2)
+                          .toUpperCase()
+                      : "??";
                   return SizedBox(
                     width: size.width * 0.25,
                     height: size.width * 0.25,
@@ -95,24 +94,23 @@ class _ProfileEditState extends State<ProfileEdit> {
               Consumer<ProfileViewModel>(
                 builder: (context, contactModel, child) {
                   return Form(
-                          key: formKey,
-                          child: Column(
-                            children: [
-                              textSetting(text: "Fullname"),
-                              textFieldSetting(
-                                controller: viewModel.fullNameController,
-                                enable: viewModel.isEdit,
-                                fill: viewModel.isEdit
-                                    ? Colors.white
-                                    : const Color.fromARGB(
-                                        130, 158, 158, 158),
-                                colorhintext: viewModel.isEdit
-                                    ? const Color(0xFF999999)
-                                    : Colors.black,
-                              ),
-                            ],
-                          ),
-                        );
+                    key: formKey,
+                    child: Column(
+                      children: [
+                        textSetting(text: "Fullname"),
+                        textFieldSetting(
+                          controller: viewModel.fullNameController,
+                          enable: viewModel.isEdit,
+                          fill: viewModel.isEdit
+                              ? Colors.white
+                              : const Color.fromARGB(130, 158, 158, 158),
+                          colorhintext: viewModel.isEdit
+                              ? const Color(0xFF999999)
+                              : Colors.black,
+                        ),
+                      ],
+                    ),
+                  );
                 },
               ),
               const SizedBox(
@@ -144,38 +142,31 @@ class _ProfileEditState extends State<ProfileEdit> {
                             backgroundColor: Colors.blueGrey,
                           ),
                           onPressed: () async {
+                            FocusScope.of(context).unfocus();
                             if (formKey.currentState!.validate()) {
                               customAlert(
                                 alertType: QuickAlertType.loading,
                                 text: "Mohon Tunggu...",
+                                autoClose: false,
                               );
                               try {
                                 final statusCode =
                                     await viewModel.changeProfile(
                                         token: accessToken,
                                         signInViewModel: sp);
-                                Navigator.pop(context);
+                                navigatorKey.currentState?.pop();
                                 if (statusCode == 200) {
                                   customAlert(
-                                      alertType: QuickAlertType.success,
-                                      title: "Berhasil...\n",
-                                      text: viewModel.successMessage ??
-                                          "Nama berhasil diperbarui!",
-                                      afterDelay: () {
-                                        Navigator.popUntil(context,
-                                            (route) => route.isFirst);
-                                        Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) =>
-                                                  const ProfileScreen(),
-                                            ));
-                                      });
+                                    alertType: QuickAlertType.success,
+                                    title: "Berhasil...\n",
+                                    text: viewModel.successMessage ??
+                                        "Nama berhasil diperbarui!",
+                                  );
+                                  navigatorKey.currentState?.pop();
                                 } else {
                                   customAlert(
                                     alertType: QuickAlertType.error,
-                                    text:
-                                        "Terjadi kesalahan. Coba lagi nanti.",
+                                    text: "Terjadi kesalahan. Coba lagi nanti.",
                                   );
                                 }
                               } on SocketException {

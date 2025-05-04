@@ -36,9 +36,10 @@ class Data {
   String name;
   String email;
   DateTime emailVerifiedAt;
+  int active;
   String role;
-  String nim;
-  dynamic nidn;
+  String? nim; // Ubah menjadi nullable
+  String? nidn; // Ubah menjadi nullable
   DateTime createdAt;
   DateTime updatedAt;
 
@@ -47,9 +48,10 @@ class Data {
     required this.name,
     required this.email,
     required this.emailVerifiedAt,
+    required this.active,
     required this.role,
-    required this.nim,
-    required this.nidn,
+    this.nim, // Parameter opsional
+    this.nidn, // Parameter opsional
     required this.createdAt,
     required this.updatedAt,
   });
@@ -59,9 +61,10 @@ class Data {
         name: json["name"],
         email: json["email"],
         emailVerifiedAt: DateTime.parse(json["email_verified_at"]),
+        active: json["active"],
         role: json["role"],
-        nim: json["nim"],
-        nidn: json["nidn"],
+        nim: json["nim"] ?? "", // Berikan default string kosong jika null
+        nidn: json["nidn"] ?? "", // Berikan default string kosong jika null
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),
       );
@@ -71,9 +74,10 @@ class Data {
         "name": name,
         "email": email,
         "email_verified_at": emailVerifiedAt.toIso8601String(),
+        "active": active,
         "role": role,
-        "nim": nim,
-        "nidn": nidn,
+        "nim": nim ?? "", // Gunakan string kosong jika nim null
+        "nidn": nidn ?? "", // Gunakan string kosong jika nidn null
         "created_at": createdAt.toIso8601String(),
         "updated_at": updatedAt.toIso8601String(),
       };

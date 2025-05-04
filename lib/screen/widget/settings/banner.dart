@@ -103,10 +103,10 @@ class _BannerSettingState extends State<BannerSetting> {
                       ),
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.pushReplacement(
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const ProfileEdit(),
+                              builder: (context) => const ProfileEdit(),
                             ),
                           );
                         },

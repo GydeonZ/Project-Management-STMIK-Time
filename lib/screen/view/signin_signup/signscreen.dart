@@ -243,7 +243,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                             customAlert(
                                               alertType: QuickAlertType.error,
                                               text:
-                                                  'Terjadi kesalahan: ${e.toString()}',
+                                                  'Terjadi kesalahan',
                                             );
                                           }
                                         }

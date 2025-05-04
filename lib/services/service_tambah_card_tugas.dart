@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:projectmanagementstmiktime/model/mode_move_card.dart';
+import 'package:projectmanagementstmiktime/model/model_move_task.dart';
 import 'package:projectmanagementstmiktime/model/model_tambah_card_tugas.dart';
 import 'package:projectmanagementstmiktime/model/model_update_card_tugas.dart';
 import '../utils/utils.dart';
@@ -134,6 +136,70 @@ class TambahCardTugasService {
         message: "Kesalahan jaringan: ${e.message}",
         type: DioExceptionType.connectionError,
       );
+    }
+  }
+
+  Future<ModelMoveTask?> hitUpdateMoveTask({
+    required String token,
+    required int taskId,
+    required int cardId,
+    required int position, // Pastikan nilai minimal 1
+  }) async {
+    try {
+      // Validasi position minimal 1
+      final validPosition = position < 1 ? 1 : position;
+
+      final response = await _dio.post(
+        "${Urls.taskListId}$taskId/move", // Sesuaikan dengan endpoint API
+        data: {
+          'card_id': cardId,
+          'position': validPosition, // Gunakan nilai yang valid
+        },
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return ModelMoveTask.fromJson(response.data);
+      }
+      return null;
+    } on DioException {
+      rethrow;
+    }
+  }
+
+  Future<ModelMoveCard?> hitUpdateCardPosition({
+    required String token,
+    required int cardId,
+    required int position,
+    required int boardId,
+  }) async {
+    try {
+      // Validasi position minimal 1
+      final validPosition = position < 1 ? 1 : position;
+
+      final response = await _dio.post(
+        "${Urls.fetchCardList}/$cardId/move", // Sesuaikan dengan endpoint API
+        data: {
+          'board_id': boardId,
+          'position': validPosition,
+        },
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return ModelMoveCard.fromJson(response.data);
+      }
+      return null;
+    } on DioException {
+      rethrow;
     }
   }
 }

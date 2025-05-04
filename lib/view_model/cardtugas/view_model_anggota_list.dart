@@ -28,6 +28,11 @@ class AnggotaListViewModel with ChangeNotifier {
   String get searchQuery => _searchQuery;
   List<Datum> get filteredMembers => _filteredMembers;
 
+  String _searchQueryForMembers = "";
+  List<Member> _filteredBoardMembers = [];
+  String get searchQueryForMembers => _searchQueryForMembers;
+  List<Member> get filteredBoardMembers => _filteredBoardMembers;
+
   AnggotaListViewModel() {
     searchController.addListener(_onSearchChanged);
   }
@@ -45,7 +50,7 @@ class AnggotaListViewModel with ChangeNotifier {
       modelAnggotaList = result;
 
       // Initialize filtered list with all members
-      // _filteredMembers = modelAnggotaList?.members ?? [];
+      _filteredBoardMembers = modelAnggotaList?.members ?? [];
 
       isLoading = false;
       notifyListeners();
@@ -192,6 +197,50 @@ class AnggotaListViewModel with ChangeNotifier {
     }
   }
 
+  Future<int> editAnggotaList({
+    required String token,
+    String? level,
+  }) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      final userLevel = level ?? _selectedMemberLevel;
+      final response = await services.editAnggotaList(
+        token: token,
+        taskId: savedTaskId,
+        userId: savedUserId,
+        userLevel: userLevel,
+      );
+
+      isLoading = false;
+
+      if (response != null) {
+        successMessage = response.message;
+        errorMessages = null;
+        isSukses = true;
+        savedUserId = "";
+        notifyListeners();
+        return 200;
+      } else {
+        isSukses = false;
+        notifyListeners();
+        return 500;
+      }
+    } on DioException catch (e) {
+      isLoading = false;
+      notifyListeners();
+
+      if (e.response != null && e.response!.statusCode == 400) {
+        errorMessages = e.message; // ✅ Ambil langsung message dari DioException
+        return 400;
+      }
+
+      errorMessages = "Terjadi kesalahan: ${e.message}";
+      return 500;
+    }
+  }
+
   void setTaskId(String taskId) {
     savedTaskId = taskId;
     notifyListeners(); // Memastikan UI diperbarui jika diperlukan
@@ -235,6 +284,31 @@ class AnggotaListViewModel with ChangeNotifier {
           .toList();
     }
 
+    notifyListeners();
+  }
+
+  void searchBoardMembers(String query) {
+    _searchQueryForMembers = query.toLowerCase().trim();
+
+    if (_searchQueryForMembers.isEmpty) {
+      // Jika pencarian kosong, tampilkan semua member
+      _filteredBoardMembers = modelAnggotaList?.members ?? [];
+    } else {
+      // Filter berdasarkan nama, email, atau role
+      _filteredBoardMembers = (modelAnggotaList?.members ?? []).where((member) {
+        final user = member.user;
+        return user.name.toLowerCase().contains(_searchQueryForMembers) ||
+            user.email.toLowerCase().contains(_searchQueryForMembers) ||
+            user.role.toLowerCase().contains(_searchQueryForMembers);
+      }).toList();
+    }
+
+    notifyListeners();
+  }
+
+  void clearBoardMemberSearch() {
+    _searchQueryForMembers = "";
+    _filteredBoardMembers = modelAnggotaList?.members ?? [];
     notifyListeners();
   }
 

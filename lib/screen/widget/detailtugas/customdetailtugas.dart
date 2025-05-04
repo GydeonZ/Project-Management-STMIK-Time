@@ -11,6 +11,7 @@ import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
 import 'package:projectmanagementstmiktime/screen/widget/customshowdialog.dart';
 import 'package:projectmanagementstmiktime/screen/widget/formfield.dart';
 import 'package:projectmanagementstmiktime/utils/state/finite_state.dart';
+import 'package:projectmanagementstmiktime/utils/utils.dart';
 import 'package:projectmanagementstmiktime/view_model/cardtugas/view_model_anggota_list.dart';
 import 'package:provider/provider.dart';
 import 'package:projectmanagementstmiktime/view_model/cardtugas/view_model_card_tugas.dart';
@@ -18,6 +19,7 @@ import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model
 import 'package:projectmanagementstmiktime/model/model_fetch_tasklist_id.dart'
     as model;
 import 'package:quickalert/models/quickalert_type.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CustomDetailCardTugas extends StatefulWidget {
   final int boardId;
@@ -35,24 +37,11 @@ class _CustomDetailCardTugasState extends State<CustomDetailCardTugas> {
   late AnggotaListViewModel anggotaListViewModel;
   late SignInViewModel sp;
 
-  // State untuk mengontrol ekspansi panel
+  // Replace your existing _expandedSections declaration with this in _CustomDetailCardTugasState class
   final Map<String, bool> _expandedSections = {
-    'PENDAHULUAN': false,
-    'METODOLOGI': false,
-    'HASIL': false,
+    'Daftar List Tugas': false,
+    'File Lampiran': false,
   };
-
-  // Contoh data untuk ListView
-  final List<String> _pendahuluanItems = [
-    'Latar Belakang',
-    'Rumusan Masalah',
-    'Batasan Masalah',
-    'Tujuan Penelitian',
-    'Manfaat Penelitian',
-    'A',
-    'B',
-    'C',
-  ];
 
   @override
   void initState() {
@@ -78,6 +67,16 @@ class _CustomDetailCardTugasState extends State<CustomDetailCardTugas> {
         anggotaListViewModel.getAnggotaList(token: token);
       }
     });
+  }
+
+  Future<void> launchURL(int fileId) async {
+    String url = '${Urls.baseUrls}${Urls.downloadFileUrls}$fileId/download';
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   String _truncateDescription(String text, int maxLength) {
@@ -118,13 +117,14 @@ class _CustomDetailCardTugasState extends State<CustomDetailCardTugas> {
         final boardName = task.card.board.name;
 
         // Format the dates
-        String startTime = "Waktu mulai belum diatur";
-        if (task.startTime != null) {
+        String startTime = "Waktu mulai...";
+        final bool canEdit = _checkUserCanEdit();
+        if (task.startTime != null && canEdit) {
           startTime = cardTugasViewModel.formatDateTime(task.startTime);
         }
 
-        String endTime = "Waktu selesai belum diatur";
-        if (task.endTime != null) {
+        String endTime = "Waktu selesai...";
+        if (task.endTime != null && canEdit) {
           endTime = cardTugasViewModel.formatDateTime(task.endTime);
         }
 
@@ -168,7 +168,7 @@ class _CustomDetailCardTugasState extends State<CustomDetailCardTugas> {
     );
   }
 
-  Widget _buildExpandableSection(String title, List<String> items, Size size) {
+  Widget buildExpandableSection(String title, List<String> items, Size size) {
     return customFormDetailTugas(
       context: context,
       listContainer: true,
@@ -245,6 +245,7 @@ class _CustomDetailCardTugasState extends State<CustomDetailCardTugas> {
 
   Widget _buildFormFields(
       Size size, model.Task task, String startTime, String endTime) {
+    final bool canEdit = _checkUserCanEdit();
     return Consumer<CardTugasViewModel>(
       builder: (context, viewModel, child) {
         return Column(
@@ -253,9 +254,12 @@ class _CustomDetailCardTugasState extends State<CustomDetailCardTugas> {
               context: context,
               colorText: Colors.black,
               containerOnTap: () {
+                if (!canEdit) {
+                  return;
+                }
                 customShowDialogDeskripsi(
                   useForm: false,
-                  roleChecker: _checkUserCanEdit(),
+                  roleChecker: canEdit,
                   context: context,
                   text1: task.description,
                   txtButtonL: "Batal",
@@ -268,7 +272,7 @@ class _CustomDetailCardTugasState extends State<CustomDetailCardTugas> {
                     viewModel.deskripsiTugas.text = task.description;
                     customShowDialogDeskripsi(
                       useForm: true,
-                      roleChecker: _checkUserCanEdit(),
+                      roleChecker: canEdit,
                       context: context,
                       formKey: viewModel.formKey,
                       txtButtonL: 'Batal',
@@ -336,7 +340,7 @@ class _CustomDetailCardTugasState extends State<CustomDetailCardTugas> {
                 );
               },
               listContainer: false,
-              labelText: task.description.isNotEmpty
+              labelText: task.description.isNotEmpty && canEdit
                   ? _truncateDescription(task.description, 40)
                   : "Deskripsi belum ditambah...",
               iconPath: "assets/deskripsi.svg",
@@ -348,7 +352,6 @@ class _CustomDetailCardTugasState extends State<CustomDetailCardTugas> {
               context: context,
               colorText: Colors.black,
               containerOnTap: () async {
-                bool canEdit = _checkUserCanEdit();
                 if (!canEdit) {
                   return;
                 }
@@ -438,31 +441,31 @@ class _CustomDetailCardTugasState extends State<CustomDetailCardTugas> {
               context: context,
               colorText: Colors.black,
               containerOnTap: () async {
-                bool canEdit = _checkUserCanEdit();
                 if (!canEdit) {
                   return;
                 }
+
                 final originalEnd = viewModel.end;
                 viewModel.end = task.endTime;
                 viewModel.isEndDateSelected = true;
 
                 // Show date picker
-                await viewModel.selectStartDate(context);
+                await viewModel.selectEndDate(context);
 
                 // Confirm changes
-                if (viewModel.start != originalEnd) {
+                if (viewModel.end != originalEnd) {
                   // Show confirmation dialog
                   bool confirm = await showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
-                          title: const Text('Ubah Waktu Mulai'),
+                          title: const Text('Ubah Waktu Akkhir'),
                           content: Text(
-                              'Ubah waktu mulai menjadi: ${viewModel.formatDateTime(viewModel.start)}?'),
+                              'Ubah waktu mulai menjadi: ${viewModel.formatDateTime(viewModel.end)}?'),
                           actions: [
                             TextButton(
                               onPressed: () {
                                 // Reset to original value
-                                viewModel.start = originalEnd;
+                                viewModel.end = originalEnd;
                                 Navigator.pop(context, false);
                               },
                               child: const Text('Batal'),
@@ -525,6 +528,9 @@ class _CustomDetailCardTugasState extends State<CustomDetailCardTugas> {
             customFormDetailTugas(
               context: context,
               containerOnTap: () {
+                if (!canEdit) {
+                  return;
+                }
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -534,7 +540,9 @@ class _CustomDetailCardTugasState extends State<CustomDetailCardTugas> {
               containerAnggotaList: true,
               listContainer: false,
               iconPath: "assets/Two-user.svg",
-              suffixWidget: task.members != null && task.members.isNotEmpty
+              suffixWidget: task.members != null &&
+                      task.members.isNotEmpty &&
+                      canEdit
                   ? Padding(
                       padding: const EdgeInsets.only(left: 15.0),
                       child: SizedBox(
@@ -557,15 +565,19 @@ class _CustomDetailCardTugasState extends State<CustomDetailCardTugas> {
                     ),
             ),
 
-            // Show checklists if available
-            if (task.checklists != null && task.checklists.isNotEmpty)
-              _buildExpandableSection(
-                  'Daftar List Tugas', _pendahuluanItems, size),
+            // Show checklists if available - replace this section
+            if (task.checklists.isNotEmpty)
+              _buildChecklistSection(task.checklists, size),
 
             _buildCommentList(size, task.comments),
             customFormDetailTugas(
               context: context,
-              containerOnTap: () {},
+              containerOnTap: () {
+                if (!canEdit) {
+                  return;
+                }
+                showFilePickerOption(context);
+              },
               listContainer: false,
               labelText: "Upload File",
               iconPath: "assets/clip.svg",
@@ -575,27 +587,352 @@ class _CustomDetailCardTugasState extends State<CustomDetailCardTugas> {
 
             // Display files if available
             if (task.files != null && task.files.isNotEmpty)
-              SizedBox(
-                height: 100,
-                child: ListView.builder(
-                  itemCount: task.files.length,
-                  itemBuilder: (context, index) {
-                    // Build file items here
-                    return const ListTile(
-                      leading: Icon(Icons.file_present),
-                      title: Text("File name"),
-                    );
-                  },
-                ),
-              ),
+              _buildFileSection(task.files, size),
           ],
         );
       },
     );
   }
 
+  // Add this new method to build the checklist section
+  // Update your _buildChecklistSection to include an Add button
+  Widget _buildChecklistSection(
+    List<Checklist> checklists,
+    Size size,
+  ) {
+    final bool canEdit = _checkUserCanEdit();
+    if (!canEdit) {
+      return const SizedBox.shrink();
+    }
+    return Column(
+      children: [
+        customFormDetailTugas(
+            context: context,
+            listContainer: true,
+            onTapListContainer: () {
+              setState(() {
+                _expandedSections['Daftar List Tugas'] =
+                    !(_expandedSections['Daftar List Tugas'] ?? false);
+              });
+            },
+            listDataTitle: "Daftar List Tugas",
+            animatedTurn:
+                _expandedSections['Daftar List Tugas'] ?? false ? 0.5 : 0,
+            maxHeightListData: _expandedSections['Daftar List Tugas'] ?? false
+                ? (checklists.length > 6 ? 6 * 75.0 : checklists.length * 75.0)
+                : 0,
+            scrollListData: _expandedSections['Daftar List Tugas'] ?? false
+                ? const AlwaysScrollableScrollPhysics()
+                : const NeverScrollableScrollPhysics(),
+            opacityDataList:
+                _expandedSections['Daftar List Tugas'] ?? false ? 1.0 : 0.0,
+            itemDataList: checklists
+                .map((checklist) => _buildChecklistItem(checklist))
+                .toList(),
+            roleCheckerList: _checkUserCanEdit(),
+            onTapCL: () {
+              _addChecklist();
+            }),
+      ],
+    );
+  }
+
+  // Add this method to build individual checklist items
+  Widget _buildChecklistItem(Checklist checklist) {
+    Size size = MediaQuery.of(context).size;
+    final bool canEdit = _checkUserCanEdit();
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: Color(0xFFE0E0E0), width: 1)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                // Use the is_checked value to set checkbox state
+                Checkbox(
+                  value: checklist.isChecked,
+                  onChanged: (bool? value) {
+                    _updateChecklistStatus(checklist.id, value ?? false);
+                  },
+                  activeColor: const Color(0xFF484F88),
+                ),
+                SizedBox(width: size.width * 0.02),
+                Expanded(
+                  child: Text(
+                    checklist.name,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontFamily: 'Helvetica',
+                      // Optionally strike through text if checked
+                      decoration: checklist.isChecked
+                          ? TextDecoration.lineThrough
+                          : TextDecoration.none,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Only show edit/delete buttons if user can edit
+          if (canEdit)
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    _editChecklist(checklist);
+                  },
+                  icon: SvgPicture.asset(
+                    'assets/pencil.svg',
+                    height: size.height * 0.02,
+                    width: size.width * 0.02,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    _deleteChecklist(checklist.id);
+                  },
+                  icon: SvgPicture.asset(
+                    'assets/tongsampah.svg',
+                    height: size.height * 0.02,
+                    width: size.width * 0.02,
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  // Add these methods to handle checklist actions
+  void _updateChecklistStatus(int checklistId, bool isChecked) async {
+    // Show loading indicator
+    await customAlert(
+      alertType: QuickAlertType.loading,
+      text: "Mohon tunggu...",
+      autoClose: false,
+    );
+
+    try {
+      // Call view model method to update checklist status
+      final response = await cardTugasViewModel.toggleChecklistStatus(
+          token: sp.tokenSharedPreference, checklistId: checklistId);
+
+      // Close loading indicator
+      navigatorKey.currentState?.pop();
+
+      if (response == 200) {
+        // Refresh task data to show updated checklists
+        await cardTugasViewModel.refreshTaskListById(
+          token: sp.tokenSharedPreference,
+        );
+      } else {
+        customAlert(
+          alertType: QuickAlertType.error,
+          text:
+              cardTugasViewModel.errorMessages ?? "Gagal mengupdate checklist",
+        );
+      }
+    } catch (e) {
+      navigatorKey.currentState?.pop();
+      customAlert(
+        alertType: QuickAlertType.error,
+        text: "Terjadi kesalahan: ${e.toString()}",
+      );
+    }
+  }
+
+  void _addChecklist() {
+    // Show edit dialog
+    customShowDialog(
+        useForm: true,
+        context: context,
+        customWidget: customTextFormField(
+          keyForm: cardTugasViewModel.formKey,
+          titleText: "Judul Checklist",
+          controller: cardTugasViewModel.clName,
+          labelText: "Masukkan Judul Tugas yang Baru",
+          validator: (value) =>
+              cardTugasViewModel.validateNamaChecklist(value!),
+        ),
+        txtButtonL: "Batal",
+        txtButtonR: "Update",
+        onPressedBtnL: () {
+          cardTugasViewModel.clName.clear();
+          Navigator.pop(context);
+        },
+        onPressedBtnR: () async {
+          // Close dialog
+          Navigator.pop(context);
+
+          // Show loading indicator
+          await customAlert(
+            alertType: QuickAlertType.loading,
+            text: "Mohon tunggu...",
+            autoClose: false,
+          );
+
+          try {
+            // Call view model method to create new checklist
+            final response = await cardTugasViewModel.addChecklist(
+              token: sp.tokenSharedPreference,
+              taskId: widget.taskId!,
+            );
+
+            // Close loading indicator
+            navigatorKey.currentState?.pop();
+
+            if (response == 200) {
+              // Refresh task data to show updated checklists
+              await cardTugasViewModel.refreshTaskListById(
+                token: sp.tokenSharedPreference,
+              );
+              cardTugasViewModel.clName.clear();
+            } else {
+              customAlert(
+                alertType: QuickAlertType.error,
+                text: cardTugasViewModel.errorMessages ??
+                    "Gagal menambahkan checklist",
+              );
+            }
+          } catch (e) {
+            navigatorKey.currentState?.pop();
+            customAlert(
+              alertType: QuickAlertType.error,
+              text: "Terjadi kesalahan: ${e.toString()}",
+            );
+          }
+        });
+  }
+
+  void _editChecklist(Checklist checklist) {
+    // Create text controller with current checklist name
+    final TextEditingController controller =
+        TextEditingController(text: checklist.name);
+
+    // Show edit dialog
+    customShowDialog(
+        useForm: true,
+        context: context,
+        customWidget: customTextFormField(
+          keyForm: cardTugasViewModel.formKey,
+          titleText: "Update Judul Checklist",
+          controller: controller,
+          labelText: "Masukkan Judul Checklist yang Baru",
+          validator: (value) =>
+              cardTugasViewModel.validateNamaChecklist(value!),
+        ),
+        txtButtonL: "Batal",
+        txtButtonR: "Update",
+        onPressedBtnL: () {
+          Navigator.pop(context);
+        },
+        onPressedBtnR: () async {
+          // Close dialog
+          Navigator.pop(context);
+
+          // Show loading indicator
+          await customAlert(
+            alertType: QuickAlertType.loading,
+            text: "Mohon tunggu...",
+            autoClose: false,
+          );
+
+          try {
+            // Call view model method to update checklist name
+            final response = await cardTugasViewModel.updateChecklistName(
+              token: sp.tokenSharedPreference,
+              checklistId: checklist.id,
+              name: controller.text,
+            );
+
+            // Close loading indicator
+            navigatorKey.currentState?.pop();
+
+            if (response == 200) {
+              // Refresh task data to show updated checklists
+              await cardTugasViewModel.refreshTaskListById(
+                token: sp.tokenSharedPreference,
+              );
+            } else {
+              customAlert(
+                alertType: QuickAlertType.error,
+                text: cardTugasViewModel.errorMessages ??
+                    "Gagal mengupdate checklist",
+              );
+            }
+          } catch (e) {
+            navigatorKey.currentState?.pop();
+            customAlert(
+              alertType: QuickAlertType.error,
+              text: "Terjadi kesalahan: ${e.toString()}",
+            );
+          }
+        });
+  }
+
+  void _deleteChecklist(int checklistId) {
+    // Show confirmation dialog
+    customShowDialog(
+        context: context,
+        useForm: false,
+        text1: "Apakah anda yakin ingin menghapus Checklist tugas ini?",
+        txtButtonL: "Batal",
+        txtButtonR: "Hapus",
+        onPressedBtnL: () {
+          Navigator.pop(context);
+        },
+        onPressedBtnR: () async {
+          Navigator.pop(context);
+
+          // Show loading indicator
+          await customAlert(
+            alertType: QuickAlertType.loading,
+            text: "Mohon tunggu...",
+            autoClose: false,
+          );
+
+          try {
+            // Call view model method to delete checklist
+            final response = await cardTugasViewModel.deleteChecklist(
+              token: sp.tokenSharedPreference,
+              checklistId: checklistId,
+            );
+
+            // Close loading indicator
+            navigatorKey.currentState?.pop();
+
+            if (response == 200) {
+              // Refresh task data to show updated checklists
+              await cardTugasViewModel.refreshTaskListById(
+                token: sp.tokenSharedPreference,
+              );
+            } else {
+              customAlert(
+                alertType: QuickAlertType.error,
+                text: cardTugasViewModel.errorMessages ??
+                    "Gagal menghapus checklist",
+              );
+            }
+          } catch (e) {
+            navigatorKey.currentState?.pop();
+            customAlert(
+              alertType: QuickAlertType.error,
+              text: "Terjadi kesalahan: ${e.toString()}",
+            );
+          }
+        });
+  }
+
   // Add a new method to display activities from the task
   Widget _buildActivityList(Size size, List<Activity> activities) {
+    final bool canEdit = _checkUserCanEdit();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -606,7 +943,7 @@ class _CustomDetailCardTugasState extends State<CustomDetailCardTugas> {
           iconPath: "assets/komentar.svg",
           colorText: Colors.black,
         ),
-        SizedBox(
+        canEdit ? SizedBox(
           height: activities.isEmpty ? size.height * 0.20 : size.height * 0.20,
           child: activities.isEmpty
               ? const Center(
@@ -659,12 +996,16 @@ class _CustomDetailCardTugasState extends State<CustomDetailCardTugas> {
                                     fontSize: 16,
                                   ),
                                 ),
+                                cardTugasViewModel
+                                    .formatActivityText(activity.activity),
+                                SizedBox(height: size.height * 0.005),
                                 Text(
-                                  activity.activity,
+                                  cardTugasViewModel
+                                      .formatDateTime(activity.createdAt),
                                   style: const TextStyle(
-                                    color: Colors.black,
+                                    color: Colors.grey,
                                     fontFamily: 'helvetica',
-                                    fontSize: 14,
+                                    fontSize: 12,
                                   ),
                                 ),
                               ],
@@ -675,12 +1016,14 @@ class _CustomDetailCardTugasState extends State<CustomDetailCardTugas> {
                     );
                   },
                 ),
-        ),
+        ) : const SizedBox.shrink()
       ],
     );
   }
 
   Widget _buildCommentList(Size size, List<Comment> comments) {
+    final bool canEdit = _checkUserCanEdit();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -691,76 +1034,92 @@ class _CustomDetailCardTugasState extends State<CustomDetailCardTugas> {
           iconPath: "assets/komentar.svg",
           colorText: Colors.black,
         ),
-        SizedBox(
-          height: comments.isEmpty ? size.height * 0.20 : size.height * 0.20,
-          child: comments.isEmpty
-              ? const Center(
-                  child: Text(
-                    "Belum ada Komentar",
-                    style: TextStyle(
-                      fontStyle: FontStyle.italic,
-                      color: Colors.grey,
-                    ),
-                  ),
-                )
-              : ListView.builder(
-                  itemCount: comments.length,
-                  itemBuilder: (context, index) {
-                    // Calculate reversed index: start from the end of the list
-                    final reversedIndex = comments.length - 1 - index;
-                    final comment = comments[reversedIndex];
-
-                    final userName = comment.user.name;
-                    final initial =
-                        cardTugasViewModel.getMemberInitials(comment.user);
-
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          CircleAvatar(
-                            backgroundColor: Colors.primaries[
-                                userName.hashCode % Colors.primaries.length],
-                            child: Text(
-                              initial,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+        canEdit
+            ? SizedBox(
+                height:
+                    comments.isEmpty ? size.height * 0.20 : size.height * 0.20,
+                child: comments.isEmpty
+                    ? const Center(
+                        child: Text(
+                          "Belum ada Komentar",
+                          style: TextStyle(
+                            fontStyle: FontStyle.italic,
+                            color: Colors.grey,
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: comments.length,
+                        itemBuilder: (context, index) {
+                          // Calculate reversed index: start from the end of the list
+                          final reversedIndex = comments.length - 1 - index;
+                          final comment = comments[reversedIndex];
+
+                          final userName = comment.user.name;
+                          final initial = cardTugasViewModel
+                              .getMemberInitials(comment.user);
+
+                          return Padding(
+                            padding:
+                                const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Text(
-                                  userName,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: 'helvetica',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
+                                CircleAvatar(
+                                  backgroundColor: Colors.primaries[
+                                      userName.hashCode %
+                                          Colors.primaries.length],
+                                  child: Text(
+                                    initial,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                                Text(
-                                  comment.comment,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: 'helvetica',
-                                    fontSize: 14,
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        userName,
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontFamily: 'helvetica',
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      Text(
+                                        comment.comment,
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontFamily: 'helvetica',
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      SizedBox(height: size.height * 0.005),
+                                      Text(
+                                        cardTugasViewModel
+                                            .formatDateTime(comment.createdAt),
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                          fontFamily: 'helvetica',
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
-                          ),
-                        ],
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
-        ),
+              )
+            : const SizedBox.shrink()
       ],
     );
   }
@@ -874,5 +1233,332 @@ class _CustomDetailCardTugasState extends State<CustomDetailCardTugas> {
     final canEdit =
         userRole == RoleUserInBoard.owner || userRole == RoleUserInBoard.admin;
     return canEdit;
+  }
+
+  void showFilePickerOption(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    showModalBottomSheet(
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(30),
+        topRight: Radius.circular(30),
+      )),
+      backgroundColor: Colors.white,
+      context: context,
+      builder: (builder) {
+        return SizedBox(
+          width: size.width * 0.9,
+          height: size.height * 0.26,
+          child: Padding(
+            padding: EdgeInsetsDirectional.fromSTEB(
+              size.width * 0.05,
+              size.height * 0.001,
+              size.width * 0.05,
+              size.height * 0.01,
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Upload File',
+                      style: TextStyle(
+                          color: Color(0xff293066),
+                          fontFamily: 'Helvetica',
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                          width: size.width * 0.07,
+                          height: size.height * 0.07,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(0xff293066),
+                          ),
+                          child: const Icon(
+                            Icons.close,
+                            color: Colors.white,
+                            size: 14.35,
+                          )),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: () async {
+                            // First close the bottom sheet
+                            Navigator.pop(context);
+
+                            // IMMEDIATELY show loading indicator before file selection
+                            customAlert(
+                              alertType: QuickAlertType.loading,
+                              text: "Mohon tunggu...",
+                              autoClose: false,
+                            );
+
+                            final token = sp.tokenSharedPreference;
+                            final taskId = widget.taskId!;
+
+                            try {
+                              // This will trigger the file picker and upload process
+                              final response = await cardTugasViewModel
+                                  .filePicker(token: token, taskId: taskId);
+
+                              // Close the loading indicator that was shown earlier
+                              navigatorKey.currentState?.pop();
+
+                              if (response == 200) {
+                                // Refresh the task data to show the uploaded file
+                                await cardTugasViewModel.refreshTaskListById(
+                                    token: sp.tokenSharedPreference);
+
+                                // Show success message
+                                customAlert(
+                                  alertType: QuickAlertType.success,
+                                  text: "File berhasil diunggah",
+                                );
+                              } else {
+                                // Show error message if upload failed
+                                customAlert(
+                                  alertType: QuickAlertType.error,
+                                  text: cardTugasViewModel.errorMessages ??
+                                      "Gagal mengunggah file",
+                                );
+                              }
+                            } on SocketException catch (_) {
+                              // Close the loading indicator
+                              navigatorKey.currentState?.pop();
+
+                              await customAlert(
+                                alertType: QuickAlertType.warning,
+                                text:
+                                    'Tidak ada koneksi internet. Periksa jaringan Anda.',
+                              );
+                            } catch (e) {
+                              // Close the loading indicator
+                              navigatorKey.currentState?.pop();
+
+                              customAlert(
+                                alertType: QuickAlertType.error,
+                                text: "Terjadi kesalahan, Silahkan Coba lagi",
+                              );
+                            }
+                          },
+                          child: Container(
+                            width: size.width * 0.2,
+                            height: size.height * 0.1,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: const Color(0xff293066),
+                                width: 2,
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.folder,
+                              color: Color(0xff293066),
+                              size: 40,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: size.height * 0.01),
+                          child: const Text(
+                            'Pick File',
+                            style: TextStyle(
+                              fontFamily: 'Helvetica',
+                              fontSize: 20,
+                              color: Color(0xff293066),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Tambahkan method ini ke _CustomDetailCardTugasState
+  Widget _buildFileSection(List<FileElement> files, Size size) {
+    final bool canEdit = _checkUserCanEdit();
+    if (!canEdit) {
+      return const SizedBox.shrink(); // Return an empty widget if not editable
+    }
+    return Column(
+      children: [
+        customFormDetailTugas(
+          context: context,
+          listContainer: true,
+          onTapListContainer: () {
+            setState(() {
+              _expandedSections['File Lampiran'] =
+                  !(_expandedSections['File Lampiran'] ?? false);
+            });
+          },
+          listDataTitle: "File Lampiran",
+          animatedTurn: _expandedSections['File Lampiran'] ?? false ? 0.5 : 0,
+          maxHeightListData: _expandedSections['File Lampiran'] ?? false
+              ? (files.length > 3 ? 3 * 85.0 : files.length * 85.0)
+              : 0,
+          scrollListData: _expandedSections['File Lampiran'] ?? false
+              ? const AlwaysScrollableScrollPhysics()
+              : const NeverScrollableScrollPhysics(),
+          opacityDataList:
+              _expandedSections['File Lampiran'] ?? false ? 1.0 : 0.0,
+          itemDataList: files.map((file) => _buildFileItem(file)).toList(),
+          roleCheckerList: false,
+          onTapCL: () {
+            showFilePickerOption(context);
+          },
+        ),
+      ],
+    );
+  }
+
+  // Tambahkan method ini untuk menampilkan item file
+  Widget _buildFileItem(FileElement file) {
+    Size size = MediaQuery.of(context).size;
+    final bool canEdit = _checkUserCanEdit();
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: Color(0xFFE0E0E0), width: 1)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: InkWell(
+              onTap: () {},
+              child: Row(
+                children: [
+                  // Gunakan getFileIcon dari viewModel
+                  cardTugasViewModel.getFileIcon(file.displayName),
+                  SizedBox(width: size.width * 0.03),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          file.displayName,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontFamily: 'Helvetica',
+                            fontWeight: FontWeight.w500,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          file.formattedFileSize,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontFamily: 'Helvetica',
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Row(
+            children: [
+              IconButton(
+                onPressed: () async {
+                  launchURL(file.id);
+                },
+                icon: const Icon(
+                  Icons.download,
+                  color: Color(0xFF484F88),
+                  size: 22,
+                ),
+                tooltip: "Download",
+              ),
+              if (canEdit)
+                IconButton(
+                  onPressed: () {
+                    _deleteFile(file.id);
+                  },
+                  icon: SvgPicture.asset(
+                    'assets/tongsampah.svg',
+                    height: size.height * 0.02,
+                    width: size.width * 0.02,
+                  ),
+                  tooltip: "Hapus",
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Tambahkan method untuk menghapus file
+  void _deleteFile(int fileId) {
+    customShowDialog(
+      context: context,
+      useForm: false,
+      text1: "Apakah anda yakin ingin menghapus file ini?",
+      txtButtonL: "Batal",
+      txtButtonR: "Hapus",
+      onPressedBtnL: () {
+        Navigator.pop(context);
+      },
+      onPressedBtnR: () async {
+        Navigator.pop(context);
+
+        await customAlert(
+          alertType: QuickAlertType.loading,
+          text: "Mohon tunggu...",
+          autoClose: false,
+        );
+
+        try {
+          final response = await cardTugasViewModel.deleteFile(
+            token: sp.tokenSharedPreference,
+            fileId: fileId,
+          );
+          navigatorKey.currentState?.pop();
+
+          if (response == 200) {
+            // Refresh task data to show updated checklists
+            await cardTugasViewModel.refreshTaskListById(
+              token: sp.tokenSharedPreference,
+            );
+          } else {
+            customAlert(
+              alertType: QuickAlertType.error,
+              text: cardTugasViewModel.errorMessages ?? "Gagal menghapus Files",
+            );
+          }
+        } catch (e) {
+          navigatorKey.currentState?.pop();
+          customAlert(
+            alertType: QuickAlertType.error,
+            text: "Terjadi kesalahan: ${e.toString()}",
+          );
+        }
+      },
+    );
   }
 }

@@ -1,13 +1,17 @@
 import 'package:dio/dio.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:projectmanagementstmiktime/model/model_fetch_card_tugas.dart';
 import 'package:projectmanagementstmiktime/model/model_fetch_tasklist_id.dart';
 import 'package:projectmanagementstmiktime/services/service_add_tugas.dart';
 import 'package:projectmanagementstmiktime/services/service_card_tugas.dart';
+import 'package:projectmanagementstmiktime/services/service_checklist.dart';
 import 'package:projectmanagementstmiktime/services/service_delete_task_detail.dart';
 import 'package:projectmanagementstmiktime/services/service_edit_task_detail.dart';
 import 'package:projectmanagementstmiktime/services/service_fetch_tasklist_id.dart';
 import 'package:projectmanagementstmiktime/services/service_tambah_card_tugas.dart';
+import 'dart:io';
+import 'package:projectmanagementstmiktime/services/service_task_attachment.dart';
 
 class CardTugasViewModel with ChangeNotifier {
   ModelFetchCardTugas? modelFetchCardTugas;
@@ -15,18 +19,22 @@ class CardTugasViewModel with ChangeNotifier {
   TextEditingController namaCard = TextEditingController();
   TextEditingController namaTugas = TextEditingController();
   TextEditingController deskripsiTugas = TextEditingController();
+  TextEditingController clName = TextEditingController();
   final services = CardTugasService();
+  final clService = ChecklistService();
   final service = TambahCardTugasService();
   final deleteDetailTugasService = DeleteDetailTaskService();
   final taskService = TambahTugasService();
   final editTaskService = EditDetailTaskService();
   final fetchTaskListService = FetchTaskListIdService();
+  final uploadFileService = UploadFileService();
   bool isLoading = false;
   bool isSukses = false;
   bool heightContainer = false;
   String savedBoardId = "";
   String savedTaskId = "";
   String cardId = "";
+  String checklistId = "";
   String? successMessage;
   String? errorMessages;
   final formKey = GlobalKey<FormState>();
@@ -34,6 +42,13 @@ class CardTugasViewModel with ChangeNotifier {
   DateTime end = DateTime.now().add(const Duration(days: 30));
   bool isStartDateSelected = false;
   bool isEndDateSelected = false;
+
+  File? uploadedFile;
+  String? uploadedFileName;
+  bool isFileTooLarge = false;
+  bool isUploading = false;
+  bool hasUploadedFile = false;
+  final int maxFileSizeBytes = 10 * 1024 * 1024; // 10MB
 
   String get startTimeLabel {
     if (!isStartDateSelected) {
@@ -161,6 +176,17 @@ class CardTugasViewModel with ChangeNotifier {
       heightContainer = true;
       notifyListeners();
       return 'Deskripsi tugas tidak boleh kosong';
+    }
+    heightContainer = false;
+    notifyListeners();
+    return null;
+  }
+
+  String? validateNamaChecklist(String value) {
+    if (value.trim().isEmpty) {
+      heightContainer = true;
+      notifyListeners();
+      return 'Judul Checklist tugas tidak boleh kosong';
     }
     heightContainer = false;
     notifyListeners();
@@ -302,6 +328,100 @@ class CardTugasViewModel with ChangeNotifier {
     }
   }
 
+  Future<int> updatePosTugasCard({
+    required String token,
+    required int taskId,
+    required int cardId,
+    required int newPosition, // Pastikan nilai ini minimal 1
+  }) async {
+    try {
+      // Validasi posisi minimal 1
+      if (newPosition < 1) {
+        newPosition = 1; // Force minimal position to 1
+      }
+
+      isLoading = true;
+      notifyListeners();
+
+      final response = await service.hitUpdateMoveTask(
+          token: token, taskId: taskId, cardId: cardId, position: newPosition);
+
+      isLoading = false;
+
+      if (response != null) {
+        successMessage = response.message;
+        errorMessages = null;
+        isSukses = true;
+        notifyListeners();
+        return 200;
+      } else {
+        isSukses = false;
+        notifyListeners();
+        return 500;
+      }
+    } on DioException catch (e) {
+      isLoading = false;
+      notifyListeners();
+
+      if (e.response != null && e.response!.statusCode == 400) {
+        errorMessages = e.response?.data['message'] ?? e.message;
+        return 400;
+      }
+
+      errorMessages = "Terjadi kesalahan: ${e.message}";
+      return 500;
+    }
+  }
+
+  Future<int> updatePosCard({
+    required String token,
+    required int cardId,
+    required int boardId,
+    required int newPosition, // Pastikan nilai minimal 1
+  }) async {
+    try {
+      // Validasi posisi minimal 1
+      if (newPosition < 1) {
+        newPosition = 1; // Force minimal position to 1
+      }
+
+      isLoading = true;
+      notifyListeners();
+
+      final response = await service.hitUpdateCardPosition(
+        token: token,
+        cardId: cardId,
+        position: newPosition,
+        boardId: boardId,
+      );
+
+      isLoading = false;
+
+      if (response != null) {
+        successMessage = response.message;
+        errorMessages = null;
+        isSukses = true;
+        notifyListeners();
+        return 200;
+      } else {
+        isSukses = false;
+        notifyListeners();
+        return 500;
+      }
+    } on DioException catch (e) {
+      isLoading = false;
+      notifyListeners();
+
+      if (e.response != null && e.response!.statusCode == 400) {
+        errorMessages = e.response?.data['message'] ?? e.message;
+        return 400;
+      }
+
+      errorMessages = "Terjadi kesalahan: ${e.message}";
+      return 500;
+    }
+  }
+
   Future<int> tambahTugas({
     required String token,
   }) async {
@@ -325,6 +445,7 @@ class CardTugasViewModel with ChangeNotifier {
         errorMessages = null;
         isSukses = true;
         namaTugas.clear();
+        deskripsiTugas.clear();
         heightContainer = false;
         notifyListeners();
         return 200;
@@ -348,39 +469,65 @@ class CardTugasViewModel with ChangeNotifier {
   }
 
   Future<void> selectEndDate(BuildContext context) async {
-    final pickedEndDate = await showDatePicker(
+    // Mendapatkan tanggal hari ini
+    final DateTime now = DateTime.now();
+
+    // Pastikan tanggal akhir tidak sebelum tanggal mulai atau hari ini
+    DateTime minDate = start.isAfter(now) ? start : now;
+
+    // Menentukan tanggal awal untuk picker
+    // Pastikan initialDate tidak sebelum firstDate (tanggal mulai atau hari ini)
+    DateTime initialDate;
+    if (isEndDateSelected) {
+      // Jika ada tanggal yang sudah dipilih sebelumnya
+      if (end.isBefore(minDate)) {
+        // Jika tanggal akhir sebelum tanggal mulai atau hari ini, gunakan tanggal mulai
+        initialDate = minDate;
+      } else {
+        initialDate = end;
+      }
+    } else {
+      // Jika belum ada tanggal yang dipilih, gunakan tanggal mulai + 1 hari
+      initialDate = start.add(const Duration(days: 1));
+    }
+
+    final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: end,
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
+      initialDate: initialDate,
+      firstDate:
+          minDate, // Tidak bisa memilih sebelum tanggal mulai atau hari ini
+      lastDate: DateTime(now.year + 5, now.month, now.day), // 5 tahun ke depan
     );
 
-    if (pickedEndDate != null) {
-      // Tambahkan pemilih waktu (timepicker)
+    if (picked != null) {
+      // Setelah tanggal dipilih, tampilkan time picker
       final TimeOfDay? pickedTime = await showTimePicker(
         context: context,
-        initialTime: TimeOfDay.fromDateTime(end),
+        initialTime: TimeOfDay.fromDateTime(
+            isEndDateSelected ? end : start.add(const Duration(hours: 1))),
       );
 
       if (pickedTime != null) {
         // Gabungkan tanggal dan waktu yang dipilih
         final newDateTime = DateTime(
-          pickedEndDate.year,
-          pickedEndDate.month,
-          pickedEndDate.day,
+          picked.year,
+          picked.month,
+          picked.day,
           pickedTime.hour,
           pickedTime.minute,
         );
 
+        // Validasi tanggal akhir harus setelah tanggal mulai
         if (newDateTime.isAfter(start)) {
+          // Update state
+          isEndDateSelected = true;
           end = newDateTime;
-          isEndDateSelected = true; // Set flag ke true ketika dipilih
           notifyListeners();
         } else {
-          // Tampilkan pesan error jika diperlukan
+          // Tampilkan pesan error jika tanggal akhir sebelum tanggal mulai
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Waktu selesai harus setelah waktu mulai'),
+              content: Text("Waktu selesai harus setelah waktu mulai"),
               backgroundColor: Colors.red,
             ),
           );
@@ -390,39 +537,52 @@ class CardTugasViewModel with ChangeNotifier {
   }
 
   Future<void> selectStartDate(BuildContext context) async {
-    final pickedStartDate = await showDatePicker(
+    // Mendapatkan tanggal hari ini
+    final DateTime now = DateTime.now();
+
+    // Menentukan tanggal awal untuk picker
+    // Pastikan initialDate tidak sebelum firstDate
+    DateTime initialDate;
+    if (isStartDateSelected) {
+      // Jika ada tanggal yang sudah dipilih sebelumnya
+      if (start.isBefore(now)) {
+        // Jika tanggal sebelumnya sebelum hari ini, gunakan hari ini sebagai initialDate
+        initialDate = now;
+      } else {
+        initialDate = start;
+      }
+    } else {
+      initialDate = now;
+    }
+
+    final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: start,
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
+      initialDate: initialDate,
+      firstDate: now.subtract(const Duration(days: 365)), // 1 tahun ke belakang
+      lastDate: DateTime(now.year + 5, now.month, now.day), // 5 tahun ke depan
     );
 
-    if (pickedStartDate != null) {
-      // Tambahkan pemilih waktu (timepicker)
+    if (picked != null) {
+      // Setelah tanggal dipilih, tampilkan time picker
       final TimeOfDay? pickedTime = await showTimePicker(
         context: context,
-        initialTime: TimeOfDay.fromDateTime(start),
+        initialTime: TimeOfDay.fromDateTime(
+            isStartDateSelected ? start : DateTime.now()),
       );
 
       if (pickedTime != null) {
         // Gabungkan tanggal dan waktu yang dipilih
         final newDateTime = DateTime(
-          pickedStartDate.year,
-          pickedStartDate.month,
-          pickedStartDate.day,
+          picked.year,
+          picked.month,
+          picked.day,
           pickedTime.hour,
           pickedTime.minute,
         );
 
+        // Update state
+        isStartDateSelected = true;
         start = newDateTime;
-        isStartDateSelected = true; // Set flag ke true ketika dipilih
-
-        // Update end date jika start date lebih lambat
-        if (end.isBefore(start)) {
-          end = start.add(const Duration(hours: 1));
-          isEndDateSelected = true;
-        }
-
         notifyListeners();
       }
     }
@@ -506,7 +666,7 @@ class CardTugasViewModel with ChangeNotifier {
   }
 
 // Get initials from a member object
-String getMemberInitials(dynamic member) {
+  String getMemberInitials(dynamic member) {
     try {
       // Check if member has a name property
       if (member is Member) {
@@ -549,8 +709,13 @@ String getMemberInitials(dynamic member) {
   }
 
   // Format DateTime to Indonesian format
+  // Format DateTime to Indonesian format with Jakarta timezone (WIB)
   String formatDateTime(DateTime dateTime) {
     try {
+      // Mengkonversi ke timezone Jakarta (UTC+7)
+      final jakartaOffset = const Duration(hours: 7);
+      final jakartaDateTime = dateTime.toUtc().add(jakartaOffset);
+
       // Format bulan dalam bahasa Indonesia
       List<String> namaBulan = [
         'Januari',
@@ -567,13 +732,13 @@ String getMemberInitials(dynamic member) {
         'Desember'
       ];
 
-      String hari = dateTime.day.toString();
-      String bulan = namaBulan[dateTime.month - 1];
-      String tahun = dateTime.year.toString();
-      String jam = dateTime.hour.toString().padLeft(2, '0');
-      String menit = dateTime.minute.toString().padLeft(2, '0');
+      String hari = jakartaDateTime.day.toString();
+      String bulan = namaBulan[jakartaDateTime.month - 1];
+      String tahun = jakartaDateTime.year.toString();
+      String jam = jakartaDateTime.hour.toString().padLeft(2, '0');
+      String menit = jakartaDateTime.minute.toString().padLeft(2, '0');
 
-      return "$hari $bulan $tahun jam $jam.$menit";
+      return "$hari $bulan $tahun jam $jam.$menit WIB";
     } catch (e) {
       return "Format waktu tidak valid";
     }
@@ -745,7 +910,7 @@ String getMemberInitials(dynamic member) {
     }
   }
 
-    Future<int> updateJudulTugas({
+  Future<int> updateJudulTugas({
     required String token,
   }) async {
     try {
@@ -784,6 +949,323 @@ String getMemberInitials(dynamic member) {
 
       errorMessages = "Terjadi kesalahan: ${e.message}";
       return 500;
+    }
+  }
+
+  // Add to your CardTugasViewModel class
+
+  Future<int> toggleChecklistStatus({
+    required String token,
+    required int checklistId,
+  }) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      final response = await clService.toggleCheckList(
+        token: token,
+        clID: checklistId,
+      );
+
+      isLoading = false;
+      notifyListeners();
+
+      if (response != null) {
+        successMessage = response.message;
+        errorMessages = null;
+        return 200;
+      } else {
+        errorMessages = "Gagal mengupdate checklist";
+        return 400;
+      }
+    } catch (e) {
+      isLoading = false;
+      errorMessages = e.toString();
+      notifyListeners();
+      return 500;
+    }
+  }
+
+  Future<int> addChecklist({
+    required String token,
+    required int taskId,
+  }) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      final response = await clService.addCheckList(
+        token: token,
+        taskId: taskId,
+        clName: clName.text,
+      );
+
+      isLoading = false;
+      notifyListeners();
+
+      if (response != null) {
+        successMessage = response.message;
+        errorMessages = null;
+        return 200;
+      } else {
+        errorMessages = "Gagal mengupdate nama checklist";
+        return 400;
+      }
+    } catch (e) {
+      isLoading = false;
+      errorMessages = e.toString();
+      notifyListeners();
+      return 500;
+    }
+  }
+
+  Future<int> updateChecklistName({
+    required String token,
+    required int checklistId,
+    required String name,
+  }) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      final response = await clService.updateNameCheckList(
+        token: token,
+        clID: checklistId,
+        clName: name,
+      );
+
+      isLoading = false;
+      notifyListeners();
+
+      if (response != null) {
+        successMessage = response.message;
+        errorMessages = null;
+        return 200;
+      } else {
+        errorMessages = "Gagal mengupdate nama checklist";
+        return 400;
+      }
+    } catch (e) {
+      isLoading = false;
+      errorMessages = e.toString();
+      notifyListeners();
+      return 500;
+    }
+  }
+
+  Future<int> deleteChecklist({
+    required String token,
+    required int checklistId,
+  }) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      final response = await clService.deleteChecklist(
+        token: token,
+        clID: checklistId,
+      );
+
+      isLoading = false;
+      notifyListeners();
+
+      if (response != null) {
+        successMessage = response.message;
+        errorMessages = null;
+        return 200;
+      } else {
+        errorMessages = "Gagal menghapus checklist";
+        return 400;
+      }
+    } catch (e) {
+      isLoading = false;
+      errorMessages = e.toString();
+      notifyListeners();
+      return 500;
+    }
+  }
+
+  Future<int> filePicker({
+    required String token,
+    required int taskId,
+  }) async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.any,
+        allowMultiple: false,
+      );
+
+      if (result != null) {
+        File file = File(result.files.single.path!);
+
+        // Check file size
+        int fileSize = await file.length();
+        if (fileSize > maxFileSizeBytes) {
+          isFileTooLarge = true;
+          errorMessages = "Ukuran file melebihi batas maksimal 10MB";
+          notifyListeners();
+          return 400; // Return code untuk file terlalu besar
+        }
+
+        isFileTooLarge = false;
+        uploadedFile = file;
+        uploadedFileName = result.files.single.name;
+        isUploading = true;
+        notifyListeners();
+
+        // Call the service method to upload the file
+        final response = await uploadFileService.uploadFileToServer(
+          file: file,
+          token: token,
+          taskId: taskId,
+        );
+
+        isUploading = false;
+        notifyListeners();
+
+        if (response != null) {
+          hasUploadedFile = true;
+          successMessage = response.message;
+          errorMessages = null;
+          return 200; // Return success code
+        } else {
+          uploadedFile = null;
+          uploadedFileName = null;
+          errorMessages = "Gagal mengunggah file";
+          return 500; // Return error code
+        }
+      } else {
+        // User canceled file selection
+        return 0; // Return code untuk canceled
+      }
+    } catch (e) {
+      isLoading = false;
+      errorMessages = e.toString();
+      notifyListeners();
+      return 500; // Return error code
+    }
+  }
+
+  Future<int> deleteFile({
+    required String token,
+    required int fileId,
+  }) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      final response = await uploadFileService.deleteChecklist(
+        token: token,
+        fileId: fileId,
+      );
+
+      isLoading = false;
+      notifyListeners();
+
+      if (response != null) {
+        successMessage = response.message;
+        errorMessages = null;
+        return 200;
+      } else {
+        errorMessages = "Gagal menghapus checklist";
+        return 400;
+      }
+    } catch (e) {
+      isLoading = false;
+      errorMessages = e.toString();
+      notifyListeners();
+      return 500;
+    }
+  }
+
+  // Tambahkan fungsi ini ke CardTugasViewModel
+  Widget getFileIcon(String fileName) {
+    final extension = fileName.split('.').last.toLowerCase();
+
+    IconData iconData;
+    Color iconColor;
+
+    switch (extension) {
+      case 'pdf':
+        iconData = Icons.picture_as_pdf;
+        iconColor = Colors.red;
+        break;
+      case 'doc':
+      case 'docx':
+        iconData = Icons.description;
+        iconColor = Colors.blue;
+        break;
+      case 'xls':
+      case 'xlsx':
+        iconData = Icons.table_chart;
+        iconColor = Colors.green;
+        break;
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+        iconData = Icons.image;
+        iconColor = Colors.purple;
+        break;
+      default:
+        iconData = Icons.insert_drive_file;
+        iconColor = Colors.grey;
+    }
+
+    return Icon(iconData, color: iconColor, size: 36);
+  }
+
+  // Tambahkan metode ini ke class CardTugasViewModel
+  Widget formatActivityText(String activityText) {
+    // Regular expression untuk mencari teks di dalam tanda kutip
+    final RegExp quotePattern = RegExp(r"'([^']*)'");
+
+    // Jika tidak ada tanda kutip, tampilkan teks biasa
+    if (!quotePattern.hasMatch(activityText)) {
+      return Text(
+        activityText,
+        style: const TextStyle(
+          color: Colors.black,
+          fontFamily: 'helvetica',
+          fontSize: 14,
+        ),
+      );
+    }
+
+    // Jika ada tanda kutip, format sesuai kebutuhan
+    final match = quotePattern.firstMatch(activityText);
+    if (match != null) {
+      final beforeQuote = activityText.substring(0, match.start);
+      final quotedText = match.group(1)!; // Teks dalam tanda kutip
+      final afterQuote = activityText.substring(match.end);
+
+      return RichText(
+        text: TextSpan(
+          style: const TextStyle(
+            color: Colors.black,
+            fontFamily: 'helvetica',
+            fontSize: 14,
+          ),
+          children: [
+            TextSpan(text: beforeQuote),
+            TextSpan(
+              text: quotedText, // Tanpa tanda kutip
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            TextSpan(text: afterQuote),
+          ],
+        ),
+      );
+    } else {
+      return Text(
+        activityText,
+        style: const TextStyle(
+          color: Colors.black,
+          fontFamily: 'helvetica',
+          fontSize: 14,
+        ),
+      );
     }
   }
 }

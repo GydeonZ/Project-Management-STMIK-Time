@@ -1,15 +1,22 @@
+import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:projectmanagementstmiktime/main.dart';
 import 'package:projectmanagementstmiktime/screen/view/cardtugas/card_tugas_screen.dart';
+import 'package:projectmanagementstmiktime/screen/view/member/board_anggota_screen.dart';
 import 'package:projectmanagementstmiktime/screen/view/profile/profile_screen.dart';
+import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
 import 'package:projectmanagementstmiktime/screen/widget/boardbottomsheet.dart';
 import 'package:projectmanagementstmiktime/screen/widget/board/card_board.dart';
+import 'package:projectmanagementstmiktime/screen/widget/customshowdialog.dart';
+import 'package:projectmanagementstmiktime/screen/widget/detailtugas/customdropdown.dart';
 import 'package:projectmanagementstmiktime/screen/widget/formfield.dart';
 import 'package:projectmanagementstmiktime/view_model/board/view_model_board.dart';
 import 'package:projectmanagementstmiktime/view_model/cardtugas/view_model_card_tugas.dart';
 import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signin.dart';
 import 'package:provider/provider.dart';
+import 'package:quickalert/models/quickalert_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -21,42 +28,56 @@ class BoardScreen extends StatefulWidget {
 }
 
 class _BoardScreenState extends State<BoardScreen> {
-  late BoardViewModel boardViewModel;
-  late SignInViewModel sp;
-  late SharedPreferences logindata;
+  BoardViewModel? boardViewModel;
+  SignInViewModel? sp;
+  SharedPreferences? logindata;
+  bool isInitialized = false;
+  String? selectedVisibility;
 
   @override
   void initState() {
     super.initState();
-    initial();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      sp = Provider.of<SignInViewModel>(context, listen: false);
-      final token = sp.tokenSharedPreference;
-      boardViewModel = Provider.of<BoardViewModel>(context, listen: false);
-      sp.setSudahLogin();
-      boardViewModel.getBoardList(
-        token: token,
-      );
-    });
+    _initializeData();
   }
 
-  void initial() async {
-    logindata = await SharedPreferences.getInstance();
+  Future<void> _initializeData() async {
+    try {
+      logindata = await SharedPreferences.getInstance();
+
+      if (!mounted) return;
+
+      sp = Provider.of<SignInViewModel>(context, listen: false);
+      boardViewModel = Provider.of<BoardViewModel>(context, listen: false);
+
+      final token = sp!.tokenSharedPreference;
+      sp!.setSudahLogin();
+      await boardViewModel!.getBoardList(token: token);
+
+      if (mounted) {
+        setState(() {
+          isInitialized = true;
+        });
+      }
+    } catch (e) {
+      print("Error initializing data: $e");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
+    // Tampilkan loading screen jika belum terinisialisasi
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return; // ✅ Pastikan tidak double pop
-        if (!mounted) return; // ✅ Pastikan widget masih terpasang sebelum aksi
+        if (didPop) return;
+        if (!mounted) return;
 
-        // ✅ Gunakan SystemNavigator.pop() untuk keluar dari aplikasi
         Future.delayed(Duration.zero, () {
           if (mounted) {
-            SystemNavigator.pop(); // 🚀 Keluar dari aplikasi tanpa error
+            SystemNavigator.pop();
           }
         });
       },
@@ -115,7 +136,10 @@ class _BoardScreenState extends State<BoardScreen> {
         ),
         body: RefreshIndicator(
           onRefresh: () async {
-            await boardViewModel.getBoardList(token: sp.tokenSharedPreference);
+            if (sp != null && boardViewModel != null) {
+              await boardViewModel!
+                  .getBoardList(token: sp!.tokenSharedPreference);
+            }
           },
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -152,7 +176,8 @@ class _BoardScreenState extends State<BoardScreen> {
                               itemCount: 7, // +1 for "Add Board"
                               itemBuilder: (context, index) {
                                 return customCardBoard(
-                                  title: 'Item number $index as title',
+                                  context: context,
+                                  title: 'Skipsi aaaa',
                                   subtitle: 'Subtitle here',
                                   color: Colors.grey,
                                   nickname: 'AA',
@@ -193,12 +218,257 @@ class _BoardScreenState extends State<BoardScreen> {
                               );
                             },
                             child: customCardBoard(
-                              title: board.name,
-                              subtitle: board.user.name,
-                              color: Colors.primaries[
-                                  Random().nextInt(Colors.primaries.length)],
-                              nickname: board.user.name.substring(0, 2),
-                            ),
+                                title: boardViewModel.truncateDescription(
+                                    board.name, 14),
+                                subtitle: board.user.name,
+                                color: Colors.primaries[
+                                    Random().nextInt(Colors.primaries.length)],
+                                nickname: board.user.name.substring(
+                                    0, min(2, board.user.name.length)),
+                                context: context,
+                                boardId: board.id,
+                                canEdit: _checkUserCanEditBoard(board.user.id),
+                                onTap: (value) async {
+                                  if (value == 'edit') {
+                                    // Edit board name
+                                    // boardViewModel.boardId = boardId.toString();
+                                    selectedVisibility =
+                                        boardViewModel.selectedBoardVisibility;
+                                    boardViewModel.judulBoard.text = board.name;
+                                    customShowDialog(
+                                      useForm: true,
+                                      context: context,
+                                      customWidget: Column(
+                                        children: [
+                                          customTextFormField(
+                                            keyForm: boardViewModel.formKey,
+                                            titleText: "Update Nama Board",
+                                            controller:
+                                                boardViewModel.judulBoard,
+                                            labelText:
+                                                "Masukkan Nama Board yang Baru",
+                                            validator: (value) => boardViewModel
+                                                .validateBoardName(value!),
+                                          ),
+                                          visibilityDropdownWidget(
+                                            context,
+                                            selectedVisibility ?? "Public",
+                                            (value) {
+                                              setState(() {
+                                                selectedVisibility = value;
+                                              });
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                      txtButtonL: "Batal",
+                                      txtButtonR: "Update",
+                                      onPressedBtnL: () {
+                                        boardViewModel.judulBoard.clear();
+                                        Navigator.pop(context);
+                                      },
+                                      onPressedBtnR: () async {
+                                        final token = sp?.tokenSharedPreference;
+
+                                        Navigator.pop(
+                                            context); // Tutup form/modal sebelumnya
+                                        if (boardViewModel.formKey.currentState!
+                                            .validate()) {
+                                          customAlert(
+                                            alertType: QuickAlertType.loading,
+                                            text: "Mohon tunggu...",
+                                            autoClose: false,
+                                          );
+
+                                          try {
+                                            final response =
+                                                await boardViewModel.editBoard(
+                                              token: token,
+                                              encryptId: board.encryptedId,
+                                              visibility: selectedVisibility,
+                                            );
+                                            navigatorKey.currentState?.pop();
+                                            if (response == 200) {
+                                              final success =
+                                                  await boardViewModel
+                                                      .refreshBoardList(
+                                                          token: token);
+                                              if (success) {
+                                              } else {
+                                                await customAlert(
+                                                  alertType:
+                                                      QuickAlertType.error,
+                                                  text: boardViewModel
+                                                      .errorMessages,
+                                                );
+                                              }
+                                            } else {
+                                              navigatorKey.currentState?.pop();
+                                              await customAlert(
+                                                alertType: QuickAlertType.error,
+                                                text:
+                                                    "Gagal mengubah board. Coba lagi nanti.",
+                                              );
+                                            }
+                                          } on SocketException catch (_) {
+                                            customAlert(
+                                              alertType: QuickAlertType.warning,
+                                              text:
+                                                  'Tidak ada koneksi internet. Periksa jaringan Anda.',
+                                            );
+                                          } catch (e) {
+                                            customAlert(
+                                              alertType: QuickAlertType.error,
+                                              text: 'Terjadi kesalahan',
+                                            );
+                                          }
+                                        }
+                                      },
+                                    );
+                                  } else if (value == 'anggota') {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => BoardAnggotaTaskScreen(
+                                            boardId: board.id),
+                                      ),
+                                    );
+                                  } else if (value == 'duplicate') {
+                                    customShowDialog(
+                                      useForm: false,
+                                      context: context,
+                                      text1:
+                                          "Apakah anda yakin ingin menduplikasi board ini?",
+                                      txtButtonL: "Batal",
+                                      txtButtonR: "Duplikat",
+                                      onPressedBtnL: () {
+                                        Navigator.pop(context);
+                                      },
+                                      onPressedBtnR: () async {
+                                        Navigator.pop(context);
+                                        final token = sp?.tokenSharedPreference;
+
+                                        await customAlert(
+                                          alertType: QuickAlertType.loading,
+                                          text: "Mohon tunggu...",
+                                          autoClose: false,
+                                        );
+
+                                        try {
+                                          final response = await boardViewModel
+                                              .duplicateBoard(
+                                                  token: token,
+                                                  encryptId: board.encryptedId);
+                                          navigatorKey.currentState
+                                              ?.pop(); // Tutup loading alert
+
+                                          if (response == 200) {
+                                            final success = await boardViewModel
+                                                .refreshBoardList(token: token);
+                                            if (success) {
+                                              customAlert(
+                                                alertType:
+                                                    QuickAlertType.success,
+                                                title:
+                                                    "Board berhasil diduplikasi!",
+                                              );
+                                            } else {
+                                              // Error saat refresh
+                                              customAlert(
+                                                alertType: QuickAlertType.error,
+                                                text: boardViewModel
+                                                        .errorMessages ??
+                                                    "Gagal merefresh data board",
+                                              );
+                                            }
+                                          } else {
+                                            // Error dari API (400, dll)
+                                            customAlert(
+                                              alertType: QuickAlertType.error,
+                                              text: boardViewModel
+                                                      .errorMessages ??
+                                                  "Gagal menduplikasi board",
+                                            );
+                                          }
+                                        } catch (e) {
+                                          navigatorKey.currentState
+                                              ?.pop(); // Tutup loading alert
+                                          customAlert(
+                                            alertType: QuickAlertType.error,
+                                            text: "Terjadi kesalahan: $e",
+                                          );
+                                        }
+                                      },
+                                    );
+                                  } else if (value == 'delete') {
+                                    customShowDialog(
+                                      useForm: false,
+                                      context: context,
+                                      text1:
+                                          "Apakah anda yakin ingin menghapus user ini?",
+                                      txtButtonL: "Batal",
+                                      txtButtonR: "Hapus",
+                                      onPressedBtnL: () {
+                                        Navigator.pop(context);
+                                      },
+                                      onPressedBtnR: () async {
+                                        Navigator.pop(context);
+                                        final token = sp?.tokenSharedPreference;
+
+                                        await customAlert(
+                                          alertType: QuickAlertType.loading,
+                                          text: "Mohon tunggu...",
+                                          autoClose: false,
+                                        );
+
+                                        try {
+                                          final response =
+                                              await boardViewModel.deleteBoard(
+                                                  token: token,
+                                                  encryptId: board.encryptedId);
+                                          navigatorKey.currentState
+                                              ?.pop(); // Tutup loading alert
+
+                                          if (response == 200) {
+                                            final success = await boardViewModel
+                                                .refreshBoardList(token: token);
+                                            if (success) {
+                                              customAlert(
+                                                alertType:
+                                                    QuickAlertType.success,
+                                                title:
+                                                    "Board berhasil dihapus!",
+                                              );
+                                            } else {
+                                              // Error saat refresh
+                                              customAlert(
+                                                alertType: QuickAlertType.error,
+                                                text: boardViewModel
+                                                        .errorMessages ??
+                                                    "Gagal merefresh data board",
+                                              );
+                                            }
+                                          } else {
+                                            // Error dari API (400, dll)
+                                            customAlert(
+                                              alertType: QuickAlertType.error,
+                                              text: boardViewModel
+                                                      .errorMessages ??
+                                                  "Gagal menghapus board",
+                                            );
+                                          }
+                                        } catch (e) {
+                                          navigatorKey.currentState
+                                              ?.pop(); // Tutup loading alert
+                                          customAlert(
+                                            alertType: QuickAlertType.error,
+                                            text: "Terjadi kesalahan: $e",
+                                          );
+                                        }
+                                      },
+                                    );
+                                  }
+                                }),
                           );
                         },
                       );
@@ -230,6 +500,9 @@ class _BoardScreenState extends State<BoardScreen> {
   }
 
   Widget _buildAddBoardCard() {
+    if (sp == null || sp!.roleSharedPreference != "Dosen") {
+      return const SizedBox.shrink();
+    }
     return GestureDetector(
       onTap: () {
         _showCreateBoardBottomSheet();
@@ -248,5 +521,12 @@ class _BoardScreenState extends State<BoardScreen> {
         ),
       ),
     );
+  }
+
+  bool _checkUserCanEditBoard(int boardOwnerId) {
+    if (sp == null) return false;
+
+    final currentUserId = sp!.idSharedPreference;
+    return currentUserId == boardOwnerId;
   }
 }

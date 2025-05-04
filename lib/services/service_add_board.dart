@@ -1,11 +1,19 @@
 // ignore_for_file: avoid_print
 import 'package:dio/dio.dart';
+import 'package:projectmanagementstmiktime/model/model_add_board.dart';
 import 'package:projectmanagementstmiktime/utils/utils.dart';
 
 class AddBoardListService {
-  final Dio _dio = Dio();
+  final Dio _dio = Dio(BaseOptions(
+    baseUrl: Urls.baseUrls,
+    connectTimeout: const Duration(seconds: 10),
+    receiveTimeout: const Duration(seconds: 10),
+    validateStatus: (status) {
+      return status! < 500; // Jangan anggap 401 sebagai error
+    },
+  ));
 
-  Future<void> hitAddBoardList({
+  Future<ModelAddBoard?> hitAddBoardList({
     required String token,
     required String name,
     required String visibility,
@@ -26,10 +34,26 @@ class AddBoardListService {
         data: formData,
       );
 
-      print("API Response: ${response.data}");
-    } catch (e) {
-      print("Unexpected error: $e");
-      rethrow;
+      if (response.statusCode == 200) {
+        return ModelAddBoard.fromJson(response.data);
+      } else {
+        throw DioException(
+          response: response,
+          requestOptions: response.requestOptions,
+          message: "Terjadi kesalahan",
+          type: DioExceptionType.badResponse,
+        );
+      }
+    } on DioException catch (e) {
+      // ✅ Pastikan error dari API tetap ditampilkan
+      if (e.response != null && e.response!.statusCode == 400) {
+        throw e; // Lempar kembali error untuk ditangani di ViewModel
+      }
+      throw DioException(
+        requestOptions: RequestOptions(path: Urls.baseUrls + Urls.board),
+        message: "Kesalahan jaringan",
+        type: DioExceptionType.connectionError,
+      );
     }
   }
 }

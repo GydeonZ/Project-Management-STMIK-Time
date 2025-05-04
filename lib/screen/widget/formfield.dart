@@ -22,6 +22,7 @@ Widget customTextFormField({
   TextInputType? keyboardType,
   List<TextInputFormatter>? inputFormatters,
   String? Function(String?)? validator,
+  Function(String)? onChanged, // Tambahkan parameter onChanged
   TextCapitalization textCapitalization = TextCapitalization.none,
 }) {
   return Column(
@@ -47,6 +48,7 @@ Widget customTextFormField({
                 enabled: status ?? true,
                 textCapitalization: textCapitalization,
                 keyboardType: keyboardType,
+                onChanged: onChanged, // Tambahkan ini
                 inputFormatters: inputFormatters,
                 controller: controller,
                 obscureText: obscureText ?? false,
@@ -164,6 +166,8 @@ Widget customFormDetailTugas({
   bool? listContainer = true,
   bool? textBold = true,
   bool? containerAnggotaList = false,
+  bool? roleCheckerList,
+  bool? useSpacing,
   String? iconPath,
   String? listDataTitle,
   Color? colorText,
@@ -177,7 +181,8 @@ Widget customFormDetailTugas({
   ScrollPhysics? scrollListData,
   VoidCallback? containerOnTap,
   VoidCallback? onTapListContainer,
-  Widget? suffixWidget, // Add this parameter
+  VoidCallback? onTapCL,
+  Widget? suffixWidget,
 }) {
   Size size = MediaQuery.of(context).size;
   return Column(
@@ -198,7 +203,7 @@ Widget customFormDetailTugas({
                         height: heightIcon ?? size.width * 0.07,
                       ),
                     ),
-                    containerAnggotaList == true 
+                    containerAnggotaList == true
                         ? suffixWidget!
                         : Padding(
                             padding: const EdgeInsets.only(left: 15.0),
@@ -224,13 +229,19 @@ Widget customFormDetailTugas({
                 InkWell(
                   onTap: onTapListContainer,
                   child: Container(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.only(left: 10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children: [
-                            SvgPicture.asset('assets/listtugas.svg'),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 12.5, bottom: 12.5),
+                              child: SvgPicture.asset(
+                                'assets/listtugas.svg',
+                              ),
+                            ),
                             SizedBox(width: size.width * 0.04),
                             Text(
                               listDataTitle ?? "",
@@ -253,15 +264,17 @@ Widget customFormDetailTugas({
                                 size: size.height * 0.03,
                               ),
                             ),
-                            IconButton(
-                              splashRadius: 1,
-                              onPressed: () {},
-                              icon: SvgPicture.asset(
-                                'assets/plus.svg',
-                                height: size.height * 0.02,
-                                width: size.width * 0.02,
-                              ),
-                            )
+                            roleCheckerList == true
+                                ? IconButton(
+                                    splashRadius: 1,
+                                    onPressed: onTapCL,
+                                    icon: SvgPicture.asset(
+                                      'assets/plus.svg',
+                                      height: size.height * 0.02,
+                                      width: size.width * 0.02,
+                                    ),
+                                  )
+                                : const SizedBox(),
                           ],
                         )
                       ],
@@ -305,12 +318,20 @@ Widget customFormDetailTugas({
                 ),
               ],
             ),
-      Container(
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(5)),
-          border: Border(top: BorderSide(color: Color(0xff293066), width: 1.5)),
-        ),
-      ),
+            useSpacing == true
+                ? const Divider(
+                    color: Color(0xFF293066),
+                    thickness: 1.5,
+                  )
+                : const SizedBox(
+                    height: 0,
+                  ),
+      // Container(
+      //   decoration: const BoxDecoration(
+      //     borderRadius: BorderRadius.all(Radius.circular(5)),
+      //     border: Border(top: BorderSide(color: Color(0xff293066), width: 1.5)),
+      //   ),
+      // ),
     ],
   );
 }

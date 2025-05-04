@@ -39,8 +39,8 @@ class Task {
   DateTime updatedAt;
   List<MembersInvite> membersInvite;
   Card card;
-  List<dynamic> checklists;
-  List<dynamic> files;
+  List<Checklist> checklists;
+  List<FileElement> files;
   List<Activity> activities;
   List<Comment> comments;
   List<Member> members;
@@ -64,12 +64,14 @@ class Task {
     required this.members,
   });
 
-  factory Task.fromJson(Map<String, dynamic> json) => Task(
+  factory Task.fromJson(Map<String, dynamic> json) {
+    try {
+      return Task(
         id: json["id"],
         cardId: json["card_id"],
-        name: json["name"],
-        description: json["description"],
-        position: json["position"],
+        name: json["name"] ?? "",
+        description: json["description"] ?? "",
+        position: json["position"] ?? 0,
         startTime: DateTime.parse(json["start_time"]),
         endTime: DateTime.parse(json["end_time"]),
         createdAt: DateTime.parse(json["created_at"]),
@@ -77,7 +79,7 @@ class Task {
         membersInvite: json["members_invite"] != null
             ? List<MembersInvite>.from(
                 json["members_invite"].map((x) => MembersInvite.fromJson(x)))
-            : [], // Empty list if null
+            : [],
         card: json["card"] != null
             ? Card.fromJson(json["card"])
             : Card(
@@ -97,15 +99,76 @@ class Task {
                   encryptedId: "",
                 ),
               ),
-        checklists: List<dynamic>.from(json["checklists"].map((x) => x)),
-        files: List<dynamic>.from(json["files"].map((x) => x)),
-        activities: List<Activity>.from(
-            json["activities"].map((x) => Activity.fromJson(x))),
-        comments: List<Comment>.from(
-            json["comments"].map((x) => Comment.fromJson(x))),
-        members:
-            List<Member>.from(json["members"].map((x) => Member.fromJson(x))),
+        checklists: _parseListSafely<Checklist>(
+            json["checklists"], (x) => Checklist.fromJson(x)),
+        files: _parseListSafely<FileElement>(
+            json["files"], (x) => FileElement.fromJson(x)),
+        activities: _parseListSafely<Activity>(
+            json["activities"], (x) => Activity.fromJson(x)),
+        comments: _parseListSafely<Comment>(
+            json["comments"], (x) => Comment.fromJson(x)),
+        members: _parseListSafely<Member>(
+            json["members"], (x) => Member.fromJson(x)),
       );
+    } catch (e) {
+      print("Error parsing task: $e");
+      // Return a default task object in case of error
+      return Task(
+        id: json["id"] ?? 0,
+        cardId: json["card_id"] ?? 0,
+        name: json["name"] ?? "Error parsing task",
+        description: json["description"] ?? "",
+        position: json["position"] ?? 0,
+        startTime: DateTime.now(),
+        endTime: DateTime.now().add(Duration(days: 1)),
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        membersInvite: [],
+        card: Card(
+          id: 0,
+          boardId: 0,
+          name: "",
+          position: 0,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          board: Board(
+            id: 0,
+            name: "",
+            visibility: "",
+            userId: 0,
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+            encryptedId: "",
+          ),
+        ),
+        checklists: [],
+        files: [],
+        activities: [],
+        comments: [],
+        members: [],
+      );
+    }
+  }
+
+  // Add this helper method to safely parse lists with error handling
+  static List<T> _parseListSafely<T>(
+      dynamic jsonList, T Function(Map<String, dynamic>) fromJson) {
+    if (jsonList == null) return [];
+
+    try {
+      return List<T>.from(jsonList.map((x) {
+        try {
+          return fromJson(x);
+        } catch (e) {
+          print("Error parsing item in list: $e");
+          return null;
+        }
+      }).where((x) => x != null));
+    } catch (e) {
+      print("Error parsing list: $e");
+      return [];
+    }
+  }
 
   Map<String, dynamic> toJson() => {
         "id": id,
@@ -120,8 +183,8 @@ class Task {
         "members_invite":
             List<dynamic>.from(membersInvite.map((x) => x.toJson())),
         "card": card.toJson(),
-        "checklists": List<dynamic>.from(checklists.map((x) => x)),
-        "files": List<dynamic>.from(files.map((x) => x)),
+        "checklists": List<dynamic>.from(checklists.map((x) => x.toJson())),
+        "files": List<dynamic>.from(files.map((x) => x.toJson())),
         "activities": List<dynamic>.from(activities.map((x) => x.toJson())),
         "comments": List<dynamic>.from(comments.map((x) => x.toJson())),
         "members": List<dynamic>.from(members.map((x) => x.toJson())),
@@ -338,6 +401,42 @@ class Board {
       };
 }
 
+class Checklist {
+  int id;
+  int taskId;
+  String name;
+  bool isChecked;
+  DateTime createdAt;
+  DateTime updatedAt;
+
+  Checklist({
+    required this.id,
+    required this.taskId,
+    required this.name,
+    required this.isChecked,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory Checklist.fromJson(Map<String, dynamic> json) => Checklist(
+        id: json["id"],
+        taskId: json["task_id"],
+        name: json["name"],
+        isChecked: json["is_checked"],
+        createdAt: DateTime.parse(json["created_at"]),
+        updatedAt: DateTime.parse(json["updated_at"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "task_id": taskId,
+        "name": name,
+        "is_checked": isChecked,
+        "created_at": createdAt.toIso8601String(),
+        "updated_at": updatedAt.toIso8601String(),
+      };
+}
+
 class Comment {
   int id;
   int taskId;
@@ -376,6 +475,95 @@ class Comment {
         "updated_at": updatedAt.toIso8601String(),
         "user": user.toJson(),
       };
+}
+
+class FileElement {
+  int id;
+  int taskId;
+  int userId;
+  String displayName;
+  String encryptedFilename;
+  String originalFilename;
+  String filePath;
+  String mimeType;
+  int fileSize;
+  DateTime createdAt;
+  DateTime updatedAt;
+
+  FileElement({
+    required this.id,
+    required this.taskId,
+    required this.userId,
+    required this.displayName,
+    required this.encryptedFilename,
+    required this.originalFilename,
+    required this.filePath,
+    required this.mimeType,
+    required this.fileSize,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory FileElement.fromJson(Map<String, dynamic> json) => FileElement(
+        id: json["id"],
+        taskId: json["task_id"],
+        userId: json["user_id"],
+        displayName: json["display_name"],
+        encryptedFilename: json["encrypted_filename"],
+        originalFilename: json["original_filename"],
+        filePath: json["file_path"],
+        mimeType: json["mime_type"],
+        fileSize: json["file_size"],
+        createdAt: DateTime.parse(json["created_at"]),
+        updatedAt: DateTime.parse(json["updated_at"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "task_id": taskId,
+        "user_id": userId,
+        "display_name": displayName,
+        "encrypted_filename": encryptedFilename,
+        "original_filename": originalFilename,
+        "file_path": filePath,
+        "mime_type": mimeType,
+        "file_size": fileSize,
+        "created_at": createdAt.toIso8601String(),
+        "updated_at": updatedAt.toIso8601String(),
+      };
+
+  String get fullFilePath {
+    // Jika file_path sudah memiliki URL lengkap, gunakan langsung
+    if (filePath.startsWith('http')) {
+      return filePath;
+    }
+
+    // Jika tidak, gabungkan dengan base URL
+    return "https://bursting-ferret-yearly.ngrok-free.app/storage/$filePath";
+  }
+
+  String get fileExtension {
+    return displayName.split('.').last.toLowerCase();
+  }
+
+  bool get isImage {
+    final ext = fileExtension;
+    return ext == 'jpg' || ext == 'jpeg' || ext == 'png' || ext == 'gif';
+  }
+
+  bool get isPdf {
+    return fileExtension == 'pdf';
+  }
+
+  String get formattedFileSize {
+    if (fileSize < 1024) {
+      return "$fileSize B";
+    } else if (fileSize < 1024 * 1024) {
+      return "${(fileSize / 1024).toStringAsFixed(2)} KB";
+    } else {
+      return "${(fileSize / (1024 * 1024)).toStringAsFixed(2)} MB";
+    }
+  }
 }
 
 class Member {

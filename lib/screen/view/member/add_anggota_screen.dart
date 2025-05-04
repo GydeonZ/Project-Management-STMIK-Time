@@ -217,7 +217,8 @@ class _AddAnggotaScreenState extends State<AddAnggotaScreen> {
                                       if (success) {
                                         await customAlert(
                                           alertType: QuickAlertType.success,
-                                          title: "Tugas berhasil ditambahkan!",
+                                          title:
+                                              "Anggota berhasil ditambahkan!",
                                         );
                                       } else {
                                         await customAlert(
@@ -230,7 +231,7 @@ class _AddAnggotaScreenState extends State<AddAnggotaScreen> {
                                       await customAlert(
                                         alertType: QuickAlertType.error,
                                         text:
-                                            "Gagal menambahkan tugas. Coba lagi nanti.",
+                                            "Gagal menambahkan Anggota. Coba lagi nanti.",
                                       );
                                     }
                                   },
