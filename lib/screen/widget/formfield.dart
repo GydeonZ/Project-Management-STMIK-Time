@@ -318,20 +318,20 @@ Widget customFormDetailTugas({
                 ),
               ],
             ),
-            useSpacing == true
-                ? const Divider(
-                    color: Color(0xFF293066),
-                    thickness: 1.5,
-                  )
-                : const SizedBox(
-                    height: 0,
-                  ),
-      // Container(
-      //   decoration: const BoxDecoration(
-      //     borderRadius: BorderRadius.all(Radius.circular(5)),
-      //     border: Border(top: BorderSide(color: Color(0xff293066), width: 1.5)),
-      //   ),
-      // ),
+      useSpacing == true
+          ? const Divider(
+              color: Color(0xFF293066),
+              thickness: 1.5,
+            )
+          : const SizedBox(
+              height: 0,
+            ),
+      Container(
+        decoration: BoxDecoration(
+          border: Border(
+              top: BorderSide(color: Colors.white, width: size.width * 0.02)),
+        ),
+      ),
     ],
   );
 }

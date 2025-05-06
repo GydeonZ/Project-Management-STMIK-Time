@@ -307,7 +307,7 @@ class _BoardScreenState extends State<BoardScreen> {
                                               await customAlert(
                                                 alertType: QuickAlertType.error,
                                                 text:
-                                                    "Gagal mengubah board. Coba lagi nanti.",
+                                                    "Gagal mengubah judul Board. Coba lagi nanti.",
                                               );
                                             }
                                           } on SocketException catch (_) {
@@ -405,7 +405,7 @@ class _BoardScreenState extends State<BoardScreen> {
                                       useForm: false,
                                       context: context,
                                       text1:
-                                          "Apakah anda yakin ingin menghapus user ini?",
+                                          "Apakah anda yakin ingin menghapus Board ini?",
                                       txtButtonL: "Batal",
                                       txtButtonR: "Hapus",
                                       onPressedBtnL: () {

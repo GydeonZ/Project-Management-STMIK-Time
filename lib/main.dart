@@ -9,13 +9,15 @@ import 'package:projectmanagementstmiktime/view_model/cardtugas/view_model_comme
 import 'package:projectmanagementstmiktime/view_model/forgot_password/view_model_reset_password.dart';
 import 'package:projectmanagementstmiktime/view_model/forgot_password/view_model_forgot_password.dart';
 import 'package:projectmanagementstmiktime/view_model/navigation/view_model_navigation.dart';
+// import 'package:projectmanagementstmiktime/view_model/notification/view_model_notification.dart';
 import 'package:projectmanagementstmiktime/view_model/profile/view_model_ganti_password.dart';
 import 'package:projectmanagementstmiktime/view_model/profile/view_model_profile.dart';
 import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signin.dart';
 import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signup.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -47,6 +49,7 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (_) => AnggotaListViewModel()),
           ChangeNotifierProvider(create: (_) => CommentViewModel()),
           ChangeNotifierProvider(create: (_) => BoardAnggotaListViewModel()),
+          // ChangeNotifierProvider(create: (_) => NotificationViewModel()),
         ],
         child: MaterialApp(
           navigatorKey: navigatorKey,

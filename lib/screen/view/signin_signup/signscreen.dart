@@ -31,7 +31,6 @@ class _SignInScreenState extends State<SignInScreen> {
     viewModel = Provider.of<SignInViewModel>(context, listen: false);
     viewModel.clearSignInForm();
     viewModel.formKeySignin = GlobalKey<FormState>();
-
     super.initState();
   }
 
@@ -182,7 +181,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                         if (viewModel
                                             .formKeySignin.currentState!
                                             .validate()) {
-                                          // ✅ Tampilkan loading alert sebelum login
+                                          // await viewModel.getTokenFcm();
                                           customAlert(
                                             alertType: QuickAlertType.loading,
                                             text: "Mohon tunggu...",
@@ -196,6 +195,9 @@ class _SignInScreenState extends State<SignInScreen> {
                                             navigatorKey.currentState?.pop();
 
                                             if (response == 200) {
+                                              // await _registerDeviceToken(
+                                              //     viewModel
+                                              //         .tokenSharedPreference);
                                               customAlert(
                                                 alertType:
                                                     QuickAlertType.success,
@@ -242,8 +244,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                           } catch (e) {
                                             customAlert(
                                               alertType: QuickAlertType.error,
-                                              text:
-                                                  'Terjadi kesalahan',
+                                              text: 'Terjadi kesalahan',
                                             );
                                           }
                                         }

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:projectmanagementstmiktime/model/mode_move_card.dart';
+import 'package:projectmanagementstmiktime/model/model_delete_card.dart';
 import 'package:projectmanagementstmiktime/model/model_move_task.dart';
 import 'package:projectmanagementstmiktime/model/model_tambah_card_tugas.dart';
 import 'package:projectmanagementstmiktime/model/model_update_card_tugas.dart';
@@ -59,7 +60,7 @@ class TambahCardTugasService {
     }
   }
 
-  Future<ModelTambahCardTugas?> hitDeleteCardTugas({
+  Future<ModelDeleteCard?> hitDeleteCardTugas({
     required String token,
     required String cardId,
   }) async {
@@ -74,25 +75,37 @@ class TambahCardTugasService {
       );
 
       if (response.statusCode == 200) {
-        return ModelTambahCardTugas.fromJson(response.data);
+        return ModelDeleteCard.fromJson(response.data);
       } else {
+        // Dapatkan pesan error dari respons API
+        String errorMessage = "Terjadi kesalahan";
+        if (response.data != null && response.data is Map) {
+          errorMessage = response.data['message'] ?? errorMessage;
+        }
+
         throw DioException(
           response: response,
           requestOptions: response.requestOptions,
-          message: "Terjadi kesalahan: ${response.statusMessage}",
+          message: errorMessage, // Gunakan pesan dari API
           type: DioExceptionType.badResponse,
         );
       }
     } on DioException catch (e) {
-      // ✅ Pastikan error dari API tetap ditampilkan
       if (e.response != null) {
-        rethrow; // Lempar kembali error untuk ditangani di ViewModel
+        // Ekstrak pesan error dari respons API
+        String apiErrorMessage = "Terjadi kesalahan";
+        if (e.response!.data != null && e.response!.data is Map) {
+          apiErrorMessage = e.response!.data['message'] ?? apiErrorMessage;
+        }
+
+        throw DioException(
+          response: e.response,
+          requestOptions: e.requestOptions,
+          message: apiErrorMessage, // Gunakan pesan dari API
+          type: e.type,
+        );
       }
-      throw DioException(
-        requestOptions: RequestOptions(path: Urls.fetchCardList),
-        message: "Kesalahan jaringan: ${e.message}",
-        type: DioExceptionType.connectionError,
-      );
+      rethrow; // Re-throw jika tidak ada respons
     }
   }
 

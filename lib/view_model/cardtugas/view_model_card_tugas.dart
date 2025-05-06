@@ -274,15 +274,23 @@ class CardTugasViewModel with ChangeNotifier {
       }
     } on DioException catch (e) {
       isLoading = false;
-      notifyListeners();
 
-      if (e.response != null && e.response!.statusCode == 400) {
-        errorMessages = e.message; // ✅ Ambil langsung message dari DioException
-        return 400;
+      // Ambil pesan error dari API (jika tersedia)
+      if (e.response != null && e.response!.data != null) {
+        // Coba ekstrak pesan dari respons
+        if (e.response!.data is Map) {
+          errorMessages = e.response!.data['message'] ?? e.message;
+        } else {
+          errorMessages = e.message;
+        }
+      } else {
+        errorMessages = e.message;
       }
 
-      errorMessages = "Terjadi kesalahan: ${e.message}";
-      return 500;
+      notifyListeners();
+
+      // Return the status code
+      return e.response?.statusCode ?? 500;
     }
   }
 

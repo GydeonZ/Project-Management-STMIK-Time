@@ -22,7 +22,7 @@ class RoundedTextField extends StatelessWidget {
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     final size = MediaQuery.of(context).size;
 
-    bool _checkUserCanEdit() {
+    bool checkUserCanEdit() {
       // Get the current user ID from SharedPreferences
       final userIdStr = sp.idSharedPreference;
       final currentUserId = userIdStr;
@@ -54,6 +54,7 @@ class RoundedTextField extends StatelessWidget {
       color: Colors.white,
       elevation: 4, // Elevation lebih kecil
       child: Container(
+        color: Colors.transparent,
         padding: EdgeInsets.only(
           left: 16,
           right: 16,
@@ -123,7 +124,7 @@ class RoundedTextField extends StatelessWidget {
             // Send Button
             GestureDetector(
               onTap: () {
-                bool canEdit = _checkUserCanEdit();
+                bool canEdit = checkUserCanEdit();
                 if (controller.text.trim().isNotEmpty && canEdit) {
                   viewModel.postCommentTask(
                       token: sp.tokenSharedPreference, taskId: taskId);

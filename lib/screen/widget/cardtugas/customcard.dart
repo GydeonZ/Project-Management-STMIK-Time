@@ -1,21 +1,25 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-Widget customCardSkeleton({
+Widget customCard({
   required BuildContext context,
-  String? cardTitle,
-  String? taskTitle,
-  required int taskLength,
-  final task,
-  bool? icon = false,
-  String? tambahTugas,
-  Color? color,
-  Color? taskColor,
-  VoidCallback? ontapTambahTugas,
+  int? cardId,
+  required String cardTitle,
+  required ValueKey<String> valueKey,
+  required VoidCallback onTapTambahTugas,
+  required VoidCallback onTapEdit,
+  required VoidCallback onTapDelete,
+  required bool Function(Map<String, dynamic>?) onWillAccept,
+  required void Function(Map<String, dynamic>) onAccept,
+  required Function(int, int) onReorder,
+  required List<Widget> forDrag,
+  bool canEdit = true,
 }) {
   Size size = MediaQuery.of(context).size;
   return Card(
+    key: valueKey,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     child: Padding(
       padding: const EdgeInsets.all(16.0),
@@ -25,104 +29,235 @@ Widget customCardSkeleton({
           // Header Card
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
-                cardTitle ?? '',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 17,
+              Expanded(
+                child: Text(
+                  cardTitle,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                  ),
                 ),
               ),
-              RichText(
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: tambahTugas ?? '+ Tambah Task',
-                      style: TextStyle(
-                        color: taskColor ?? const Color(0xff0088D1),
-                        fontSize: 13,
-                        fontFamily: "Helvetica",
+              Row(
+                children: [
+                  if (canEdit)
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: '+ Tambah Tugas',
+                            style: const TextStyle(
+                              color: Color(0xff293066),
+                              fontSize: 13,
+                              fontFamily: "Helvetica",
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = onTapTambahTugas,
+                          ),
+                        ],
                       ),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = ontapTambahTugas,
                     ),
-                  ],
-                ),
+                ],
               ),
             ],
           ),
           SizedBox(height: size.height * 0.01),
-          // Task List
-          Column(
-            children: List.generate(
-              taskLength,
-              (taskIndex) {
-                task;
-                return Card(
-                  color: color ?? const Color(0xff293066),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(size.height * 0.013),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          taskTitle ?? '',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                            fontFamily: "Helvetica",
+
+          // Container for tasks that can accept drops from other cards
+          DragTarget<Map<String, dynamic>>(
+            onWillAccept: onWillAccept,
+            onAccept: onAccept,
+            builder: (context, candidateData, rejectedData) {
+              return Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: candidateData.isNotEmpty
+                      ? Colors.grey.withOpacity(0.2)
+                      : Colors.grey.withOpacity(0.05),
+                ),
+                child: Column(
+                  children: [
+                    // Reorderable list for tasks in this card
+                    ReorderableListView(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      onReorder: onReorder,
+                      children: forDrag,
+                    ),
+
+                    // Empty drop area at the bottom of each list
+                    if (candidateData.isNotEmpty)
+                      DottedBorder(
+                        borderType: BorderType.RRect,
+                        radius: const Radius.circular(8),
+                        color: const Color(0xff293066),
+                        strokeWidth: 2,
+                        dashPattern: const [6, 3],
+                        child: Container(
+                          height: 60,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              "Letakkan tugas di sini",
+                              style: TextStyle(
+                                color: Color(0xff293066),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ),
-                        const Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          color: Colors.white,
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
+                      ),
+                  ],
+                ),
+              );
+            },
           ),
-          icon == true
-              ? Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                  IconButton(
-                    onPressed: () {},
-                    icon: SvgPicture.asset(
-                      "assets/pencil.svg",
-                      height: size.height * 0.025,
-                    ),
+          if (canEdit)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  onPressed: onTapEdit,
+                  icon: SvgPicture.asset(
+                    "assets/pencil.svg",
+                    height: size.height * 0.025,
                   ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: SvgPicture.asset(
-                      "assets/tongsampah.svg",
-                      height: size.height * 0.025,
-                    ),
+                ),
+                IconButton(
+                  onPressed: onTapDelete,
+                  icon: SvgPicture.asset(
+                    "assets/tongsampah.svg",
+                    height: size.height * 0.025,
                   ),
-                ])
-              : Padding(
-                  padding: EdgeInsets.only(
-                      top: size.height * 0.018, right: size.width * 0.023),
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        const Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          color: Colors.white,
-                        ),
-                        SizedBox(width: size.width * 0.05),
-                        const Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          color: Colors.white,
-                        ),
-                      ]),
                 )
+              ],
+            )
         ],
       ),
     ),
+  );
+}
+
+Widget buildCardDropdown(
+  BuildContext context,
+  int cardId,
+  Size size,
+  PopupMenuItemSelected<String>? onTap,
+) {
+  // Hapus deklarasi duplikat size
+  return PopupMenuButton<String>(
+    icon: const Icon(
+      Icons.more_vert,
+      color: Colors.black,
+      size: 20,
+    ),
+    offset: const Offset(0, 40),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+    onSelected: onTap,
+    itemBuilder: (context) => [
+      PopupMenuItem<String>(
+        value: 'edit',
+        child: Row(
+          children: [
+            SvgPicture.asset(
+              "assets/pencil.svg",
+              height: size.height * 0.02,
+              colorFilter: const ColorFilter.mode(
+                Colors.blue,
+                BlendMode.srcIn,
+              ),
+            ),
+            const SizedBox(width: 16),
+            const Text(
+              'Ubah',
+              style: TextStyle(
+                color: Colors.blue,
+                fontFamily: 'Helvetica',
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+      PopupMenuItem<String>(
+        value: 'anggota',
+        child: Row(
+          children: [
+            SvgPicture.asset(
+              "assets/Two-user.svg",
+              height: size.height * 0.02,
+              colorFilter: const ColorFilter.mode(
+                Colors.purple,
+                BlendMode.srcIn,
+              ),
+            ),
+            const SizedBox(width: 16),
+            const Text(
+              'Anggota',
+              style: TextStyle(
+                color: Colors.purple,
+                fontFamily: 'Helvetica',
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+      PopupMenuItem<String>(
+        value: 'duplicate',
+        child: Row(
+          children: [
+            SvgPicture.asset(
+              "assets/dupe.svg",
+              height: size.height * 0.02,
+              colorFilter: const ColorFilter.mode(
+                Colors.green,
+                BlendMode.srcIn,
+              ),
+            ),
+            const SizedBox(width: 16),
+            const Text(
+              'Duplikat',
+              style: TextStyle(
+                color: Colors.green,
+                fontFamily: 'Helvetica',
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+      PopupMenuItem<String>(
+        value: 'delete',
+        child: Row(
+          children: [
+            SvgPicture.asset(
+              "assets/tongsampah.svg",
+              height: size.height * 0.02,
+              colorFilter: const ColorFilter.mode(
+                Colors.red,
+                BlendMode.srcIn,
+              ),
+            ),
+            const SizedBox(width: 16),
+            const Text(
+              'Hapus',
+              style: TextStyle(
+                color: Colors.red,
+                fontFamily: 'Helvetica',
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
   );
 }

@@ -25,6 +25,7 @@ class SignInViewModel with ChangeNotifier {
   String nimSharedPreference = '';
   String nidnSharedPreference = '';
   String tokenSharedPreference = '';
+  String fcm = "";
   bool isPasswordVisible = false;
   bool isSudahLogin = false;
   bool isSuksesLogin = false;

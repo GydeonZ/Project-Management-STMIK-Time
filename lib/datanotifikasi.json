@@ -1,0 +1,425 @@
+{
+    "notifications": {
+        "current_page": 1,
+        "data": [
+            {
+                "id": 896,
+                "task_id": 104,
+                "sender_id": 54,
+                "receiver_id": 28,
+                "message": "Nikky Second Menghapus file '1944100-Paper.docx' pada tugas 'Pendahuluan'",
+                "is_read": false,
+                "created_at": "2025-04-29T04:28:44.000000Z",
+                "updated_at": "2025-04-29T04:28:44.000000Z",
+                "sender": {
+                    "id": 54,
+                    "name": "Nikky Second",
+                    "email": "nikky.alesandro21@gmail.com",
+                    "email_verified_at": "2025-04-24T03:10:41.000000Z",
+                    "active": 1,
+                    "role": "Mahasiswa",
+                    "nim": "2144000",
+                    "nidn": null,
+                    "created_at": "2025-04-24T03:09:32.000000Z",
+                    "updated_at": "2025-04-29T07:43:00.000000Z"
+                },
+                "task": {
+                    "id": 104,
+                    "card_id": 135,
+                    "name": "Pendahuluan",
+                    "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                    "position": 1,
+                    "start_time": "2025-04-28 21:05:00",
+                    "end_time": "2025-04-29 21:15:00",
+                    "created_at": "2025-04-13T05:26:10.000000Z",
+                    "updated_at": "2025-04-29T03:27:50.000000Z"
+                }
+            },
+            {
+                "id": 895,
+                "task_id": 104,
+                "sender_id": 54,
+                "receiver_id": 28,
+                "message": "Nikky Second Menghapus komentar dari 'Nikky Second' pada tugas 'Pendahuluan'",
+                "is_read": false,
+                "created_at": "2025-04-29T04:28:40.000000Z",
+                "updated_at": "2025-04-29T04:28:40.000000Z",
+                "sender": {
+                    "id": 54,
+                    "name": "Nikky Second",
+                    "email": "nikky.alesandro21@gmail.com",
+                    "email_verified_at": "2025-04-24T03:10:41.000000Z",
+                    "active": 1,
+                    "role": "Mahasiswa",
+                    "nim": "2144000",
+                    "nidn": null,
+                    "created_at": "2025-04-24T03:09:32.000000Z",
+                    "updated_at": "2025-04-29T07:43:00.000000Z"
+                },
+                "task": {
+                    "id": 104,
+                    "card_id": 135,
+                    "name": "Pendahuluan",
+                    "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                    "position": 1,
+                    "start_time": "2025-04-28 21:05:00",
+                    "end_time": "2025-04-29 21:15:00",
+                    "created_at": "2025-04-13T05:26:10.000000Z",
+                    "updated_at": "2025-04-29T03:27:50.000000Z"
+                }
+            },
+            {
+                "id": 894,
+                "task_id": 104,
+                "sender_id": 54,
+                "receiver_id": 28,
+                "message": "Nikky Second Memperbarui komentar dari 'asdasd' menjadi 'asdasd12' pada tugas 'Pendahuluan'",
+                "is_read": false,
+                "created_at": "2025-04-29T04:28:39.000000Z",
+                "updated_at": "2025-04-29T04:28:39.000000Z",
+                "sender": {
+                    "id": 54,
+                    "name": "Nikky Second",
+                    "email": "nikky.alesandro21@gmail.com",
+                    "email_verified_at": "2025-04-24T03:10:41.000000Z",
+                    "active": 1,
+                    "role": "Mahasiswa",
+                    "nim": "2144000",
+                    "nidn": null,
+                    "created_at": "2025-04-24T03:09:32.000000Z",
+                    "updated_at": "2025-04-29T07:43:00.000000Z"
+                },
+                "task": {
+                    "id": 104,
+                    "card_id": 135,
+                    "name": "Pendahuluan",
+                    "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                    "position": 1,
+                    "start_time": "2025-04-28 21:05:00",
+                    "end_time": "2025-04-29 21:15:00",
+                    "created_at": "2025-04-13T05:26:10.000000Z",
+                    "updated_at": "2025-04-29T03:27:50.000000Z"
+                }
+            },
+            {
+                "id": 893,
+                "task_id": 104,
+                "sender_id": 18,
+                "receiver_id": 28,
+                "message": "Nikky Alesandro Mengubah level anggota 'Nikky Second' menjadi 'Member' pada tugas 'Pendahuluan'",
+                "is_read": false,
+                "created_at": "2025-04-29T04:28:05.000000Z",
+                "updated_at": "2025-04-29T04:28:05.000000Z",
+                "sender": {
+                    "id": 18,
+                    "name": "Nikky Alesandro",
+                    "email": "nikky.alesandro@gmail.com",
+                    "email_verified_at": "2025-03-29T07:19:02.000000Z",
+                    "active": 1,
+                    "role": "Super Admin",
+                    "nim": "2144038",
+                    "nidn": null,
+                    "created_at": "2025-03-08T09:46:13.000000Z",
+                    "updated_at": "2025-04-28T17:03:53.000000Z"
+                },
+                "task": {
+                    "id": 104,
+                    "card_id": 135,
+                    "name": "Pendahuluan",
+                    "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                    "position": 1,
+                    "start_time": "2025-04-28 21:05:00",
+                    "end_time": "2025-04-29 21:15:00",
+                    "created_at": "2025-04-13T05:26:10.000000Z",
+                    "updated_at": "2025-04-29T03:27:50.000000Z"
+                }
+            },
+            {
+                "id": 892,
+                "task_id": 104,
+                "sender_id": 18,
+                "receiver_id": 28,
+                "message": "Nikky Alesandro Mengubah level anggota 'Nikky Second' menjadi 'Admin' pada tugas 'Pendahuluan'",
+                "is_read": false,
+                "created_at": "2025-04-29T04:26:42.000000Z",
+                "updated_at": "2025-04-29T04:26:42.000000Z",
+                "sender": {
+                    "id": 18,
+                    "name": "Nikky Alesandro",
+                    "email": "nikky.alesandro@gmail.com",
+                    "email_verified_at": "2025-03-29T07:19:02.000000Z",
+                    "active": 1,
+                    "role": "Super Admin",
+                    "nim": "2144038",
+                    "nidn": null,
+                    "created_at": "2025-03-08T09:46:13.000000Z",
+                    "updated_at": "2025-04-28T17:03:53.000000Z"
+                },
+                "task": {
+                    "id": 104,
+                    "card_id": 135,
+                    "name": "Pendahuluan",
+                    "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                    "position": 1,
+                    "start_time": "2025-04-28 21:05:00",
+                    "end_time": "2025-04-29 21:15:00",
+                    "created_at": "2025-04-13T05:26:10.000000Z",
+                    "updated_at": "2025-04-29T03:27:50.000000Z"
+                }
+            },
+            {
+                "id": 891,
+                "task_id": 104,
+                "sender_id": 54,
+                "receiver_id": 28,
+                "message": "Nikky Second Memperbarui komentar dari 'asd' menjadi 'asdasd' pada tugas 'Pendahuluan'",
+                "is_read": false,
+                "created_at": "2025-04-29T03:55:10.000000Z",
+                "updated_at": "2025-04-29T03:55:10.000000Z",
+                "sender": {
+                    "id": 54,
+                    "name": "Nikky Second",
+                    "email": "nikky.alesandro21@gmail.com",
+                    "email_verified_at": "2025-04-24T03:10:41.000000Z",
+                    "active": 1,
+                    "role": "Mahasiswa",
+                    "nim": "2144000",
+                    "nidn": null,
+                    "created_at": "2025-04-24T03:09:32.000000Z",
+                    "updated_at": "2025-04-29T07:43:00.000000Z"
+                },
+                "task": {
+                    "id": 104,
+                    "card_id": 135,
+                    "name": "Pendahuluan",
+                    "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                    "position": 1,
+                    "start_time": "2025-04-28 21:05:00",
+                    "end_time": "2025-04-29 21:15:00",
+                    "created_at": "2025-04-13T05:26:10.000000Z",
+                    "updated_at": "2025-04-29T03:27:50.000000Z"
+                }
+            },
+            {
+                "id": 890,
+                "task_id": 104,
+                "sender_id": 54,
+                "receiver_id": 28,
+                "message": "Nikky Second Menambahkan komentar 'asd' pada tugas 'Pendahuluan'",
+                "is_read": false,
+                "created_at": "2025-04-29T03:54:55.000000Z",
+                "updated_at": "2025-04-29T03:54:55.000000Z",
+                "sender": {
+                    "id": 54,
+                    "name": "Nikky Second",
+                    "email": "nikky.alesandro21@gmail.com",
+                    "email_verified_at": "2025-04-24T03:10:41.000000Z",
+                    "active": 1,
+                    "role": "Mahasiswa",
+                    "nim": "2144000",
+                    "nidn": null,
+                    "created_at": "2025-04-24T03:09:32.000000Z",
+                    "updated_at": "2025-04-29T07:43:00.000000Z"
+                },
+                "task": {
+                    "id": 104,
+                    "card_id": 135,
+                    "name": "Pendahuluan",
+                    "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                    "position": 1,
+                    "start_time": "2025-04-28 21:05:00",
+                    "end_time": "2025-04-29 21:15:00",
+                    "created_at": "2025-04-13T05:26:10.000000Z",
+                    "updated_at": "2025-04-29T03:27:50.000000Z"
+                }
+            },
+            {
+                "id": 889,
+                "task_id": 104,
+                "sender_id": 54,
+                "receiver_id": 28,
+                "message": "Nikky Second Menghapus komentar dari 'Nikky Second' pada tugas 'Pendahuluan'",
+                "is_read": false,
+                "created_at": "2025-04-29T03:54:51.000000Z",
+                "updated_at": "2025-04-29T03:54:51.000000Z",
+                "sender": {
+                    "id": 54,
+                    "name": "Nikky Second",
+                    "email": "nikky.alesandro21@gmail.com",
+                    "email_verified_at": "2025-04-24T03:10:41.000000Z",
+                    "active": 1,
+                    "role": "Mahasiswa",
+                    "nim": "2144000",
+                    "nidn": null,
+                    "created_at": "2025-04-24T03:09:32.000000Z",
+                    "updated_at": "2025-04-29T07:43:00.000000Z"
+                },
+                "task": {
+                    "id": 104,
+                    "card_id": 135,
+                    "name": "Pendahuluan",
+                    "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                    "position": 1,
+                    "start_time": "2025-04-28 21:05:00",
+                    "end_time": "2025-04-29 21:15:00",
+                    "created_at": "2025-04-13T05:26:10.000000Z",
+                    "updated_at": "2025-04-29T03:27:50.000000Z"
+                }
+            },
+            {
+                "id": 888,
+                "task_id": 104,
+                "sender_id": 54,
+                "receiver_id": 28,
+                "message": "Nikky Second Menambahkan komentar 'asd' pada tugas 'Pendahuluan'",
+                "is_read": false,
+                "created_at": "2025-04-29T03:54:49.000000Z",
+                "updated_at": "2025-04-29T03:54:49.000000Z",
+                "sender": {
+                    "id": 54,
+                    "name": "Nikky Second",
+                    "email": "nikky.alesandro21@gmail.com",
+                    "email_verified_at": "2025-04-24T03:10:41.000000Z",
+                    "active": 1,
+                    "role": "Mahasiswa",
+                    "nim": "2144000",
+                    "nidn": null,
+                    "created_at": "2025-04-24T03:09:32.000000Z",
+                    "updated_at": "2025-04-29T07:43:00.000000Z"
+                },
+                "task": {
+                    "id": 104,
+                    "card_id": 135,
+                    "name": "Pendahuluan",
+                    "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                    "position": 1,
+                    "start_time": "2025-04-28 21:05:00",
+                    "end_time": "2025-04-29 21:15:00",
+                    "created_at": "2025-04-13T05:26:10.000000Z",
+                    "updated_at": "2025-04-29T03:27:50.000000Z"
+                }
+            },
+            {
+                "id": 887,
+                "task_id": 104,
+                "sender_id": 54,
+                "receiver_id": 28,
+                "message": "Nikky Second Mengunggah file '1944100-Paper.docx' pada tugas 'Pendahuluan'",
+                "is_read": false,
+                "created_at": "2025-04-29T03:52:47.000000Z",
+                "updated_at": "2025-04-29T03:52:47.000000Z",
+                "sender": {
+                    "id": 54,
+                    "name": "Nikky Second",
+                    "email": "nikky.alesandro21@gmail.com",
+                    "email_verified_at": "2025-04-24T03:10:41.000000Z",
+                    "active": 1,
+                    "role": "Mahasiswa",
+                    "nim": "2144000",
+                    "nidn": null,
+                    "created_at": "2025-04-24T03:09:32.000000Z",
+                    "updated_at": "2025-04-29T07:43:00.000000Z"
+                },
+                "task": {
+                    "id": 104,
+                    "card_id": 135,
+                    "name": "Pendahuluan",
+                    "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                    "position": 1,
+                    "start_time": "2025-04-28 21:05:00",
+                    "end_time": "2025-04-29 21:15:00",
+                    "created_at": "2025-04-13T05:26:10.000000Z",
+                    "updated_at": "2025-04-29T03:27:50.000000Z"
+                }
+            }
+        ],
+        "first_page_url": "https://helpful-caiman-formally.ngrok-free.app/api/notifications?page=1",
+        "from": 1,
+        "last_page": 28,
+        "last_page_url": "https://helpful-caiman-formally.ngrok-free.app/api/notifications?page=28",
+        "links": [
+            {
+                "url": null,
+                "label": "&laquo; Previous",
+                "active": false
+            },
+            {
+                "url": "https://helpful-caiman-formally.ngrok-free.app/api/notifications?page=1",
+                "label": "1",
+                "active": true
+            },
+            {
+                "url": "https://helpful-caiman-formally.ngrok-free.app/api/notifications?page=2",
+                "label": "2",
+                "active": false
+            },
+            {
+                "url": "https://helpful-caiman-formally.ngrok-free.app/api/notifications?page=3",
+                "label": "3",
+                "active": false
+            },
+            {
+                "url": "https://helpful-caiman-formally.ngrok-free.app/api/notifications?page=4",
+                "label": "4",
+                "active": false
+            },
+            {
+                "url": "https://helpful-caiman-formally.ngrok-free.app/api/notifications?page=5",
+                "label": "5",
+                "active": false
+            },
+            {
+                "url": "https://helpful-caiman-formally.ngrok-free.app/api/notifications?page=6",
+                "label": "6",
+                "active": false
+            },
+            {
+                "url": "https://helpful-caiman-formally.ngrok-free.app/api/notifications?page=7",
+                "label": "7",
+                "active": false
+            },
+            {
+                "url": "https://helpful-caiman-formally.ngrok-free.app/api/notifications?page=8",
+                "label": "8",
+                "active": false
+            },
+            {
+                "url": "https://helpful-caiman-formally.ngrok-free.app/api/notifications?page=9",
+                "label": "9",
+                "active": false
+            },
+            {
+                "url": "https://helpful-caiman-formally.ngrok-free.app/api/notifications?page=10",
+                "label": "10",
+                "active": false
+            },
+            {
+                "url": null,
+                "label": "...",
+                "active": false
+            },
+            {
+                "url": "https://helpful-caiman-formally.ngrok-free.app/api/notifications?page=27",
+                "label": "27",
+                "active": false
+            },
+            {
+                "url": "https://helpful-caiman-formally.ngrok-free.app/api/notifications?page=28",
+                "label": "28",
+                "active": false
+            },
+            {
+                "url": "https://helpful-caiman-formally.ngrok-free.app/api/notifications?page=2",
+                "label": "Next &raquo;",
+                "active": false
+            }
+        ],
+        "next_page_url": "https://helpful-caiman-formally.ngrok-free.app/api/notifications?page=2",
+        "path": "https://helpful-caiman-formally.ngrok-free.app/api/notifications",
+        "per_page": 10,
+        "prev_page_url": null,
+        "to": 10,
+        "total": 276
+    },
+    "unread_count": 168
+}
