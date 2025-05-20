@@ -6,23 +6,15 @@ class ModelNavBar {
 }
 
 List<ModelNavBar> contents = [
-  ModelNavBar (
-    title: 'Dasboard',
+  ModelNavBar(
+    title: 'Board',
     image: 'assets/dashboard.svg',
   ),
-  ModelNavBar (
-    title: 'Tugas',
-    image: 'assets/tugas.svg',
-  ),
-  ModelNavBar (
-    title: 'Tambah',
-    image: 'assets/tambahtugas.svg',
-  ),
-  ModelNavBar (
-    title: 'Laporan',
+  ModelNavBar(
+    title: 'Notifikasi',
     image: 'assets/notifikasi.svg',
   ),
-  ModelNavBar (
+  ModelNavBar(
     title: 'Profil',
     image: 'assets/akun.svg',
   ),

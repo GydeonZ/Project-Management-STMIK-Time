@@ -1,9 +1,16 @@
 // ignore_for_file: use_build_context_synchronously
+
+
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:projectmanagementstmiktime/model/model_sign_in.dart';
-import 'package:projectmanagementstmiktime/screen/view/board/board.dart';
+import 'package:projectmanagementstmiktime/screen/view/navigation/navigation_screen.dart';
 import 'package:projectmanagementstmiktime/screen/view/onboarding/onboarding.dart';
+import 'package:projectmanagementstmiktime/services/service_send_fcm.dart';
 import 'package:projectmanagementstmiktime/services/services_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,7 +19,9 @@ class SignInViewModel with ChangeNotifier {
   final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
   bool showErrorMessage = false;
+  bool isSukses = false;
   final service = SignInService();
+  final serviceFCM = SendFCMTokenService();
   bool rememberMe = false;
   bool heightContainer = false;
   ModelSignIn? dataLogin;
@@ -26,6 +35,7 @@ class SignInViewModel with ChangeNotifier {
   String nidnSharedPreference = '';
   String tokenSharedPreference = '';
   String fcm = "";
+  String? errorMessages;
   bool isPasswordVisible = false;
   bool isSudahLogin = false;
   bool isSuksesLogin = false;
@@ -91,6 +101,84 @@ class SignInViewModel with ChangeNotifier {
         print("⚠️ Error tidak terduga: $e");
         return 500; // ❌ Kesalahan server atau lainnya
       }
+    }
+  }
+
+  Future<String?> getTokenFcm() async {
+    String? token = await FirebaseMessaging.instance.getToken(
+        vapidKey:
+            'BNKkaUWxyP_yC_lki1kYazgca0TNhuzt2drsOrL6WrgGbqnMnr8ZMLzg_rSPDm6HKphABS0KzjPfSqCXHXEd06Y');
+    fcm = token!;
+    return token;
+  }
+
+  /// Mendapatkan tipe perangkat (platform) yang digunakan
+  Future<String> getDeviceType() async {
+    try {
+      String deviceType = 'unknown';
+
+      // Deteksi platform menggunakan dart:io
+      if (Platform.isAndroid) {
+        deviceType = 'android';
+      } else if (Platform.isIOS) {
+        deviceType = 'ios';
+      } else if (Platform.isWindows) {
+        deviceType = 'windows';
+      } else if (Platform.isMacOS) {
+        deviceType = 'macos';
+      } else if (Platform.isLinux) {
+        deviceType = 'linux';
+      } else if (Platform.isFuchsia) {
+        deviceType = 'fuchsia';
+      }
+      return deviceType;
+    } catch (e) {
+      print("Error mendapatkan tipe perangkat: $e");
+      return 'unknown';
+    }
+  }
+
+  Future<int> sendFCMDevice({
+    required String token,
+  }) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      // Dapatkan FCM token
+      final fcmToken = await getTokenFcm();
+
+      // Dapatkan informasi device type
+      final deviceType = await getDeviceType();
+
+      final response = await serviceFCM.sendFCMTokenDevice(
+        token: token,
+        deviceToken: fcmToken!,
+        deviceType: deviceType,
+      );
+
+      isLoading = false;
+
+      if (response != null) {
+        isSukses = true;
+        notifyListeners();
+        return 200;
+      } else {
+        isSukses = false;
+        notifyListeners();
+        return 500;
+      }
+    } on DioException catch (e) {
+      isLoading = false;
+      notifyListeners();
+
+      if (e.response != null && e.response!.statusCode == 400) {
+        errorMessages = e.message;
+        return 400;
+      }
+
+      errorMessages = "Terjadi kesalahan: ${e.message}";
+      return 500;
     }
   }
 
@@ -188,7 +276,7 @@ class SignInViewModel with ChangeNotifier {
       Future.delayed(Duration.zero, () {
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const BoardScreen()),
+          MaterialPageRoute(builder: (context) => const NavigationScreen()),
           (route) => false,
         );
       });
@@ -203,6 +291,43 @@ class SignInViewModel with ChangeNotifier {
       });
     }
   }
+
+  // Future<void> checkLogin(BuildContext context) async {
+  //   try {
+  //     // Periksa data dari SharedPreferences
+  //     await checkSharedPreferences();
+
+  //     // Set status login
+  //     setSudahLogin();
+
+  //     print("Token: $tokenSharedPreference");
+  //     print("Remember Me: $rememberMe");
+  //     print("Is Sudah Login: $isSudahLogin");
+
+  //     // Delay untuk menampilkan splash screen
+  //     await Future.delayed(const Duration(seconds: 2));
+
+  //     if (context.mounted) {
+  //       if (tokenSharedPreference.isNotEmpty && rememberMe) {
+  //         // Navigasi ke NavigationScreen (bottom navbar)
+  //         Navigator.pushAndRemoveUntil(
+  //           context,
+  //           MaterialPageRoute(builder: (context) => const NavigationScreen()),
+  //           (route) => false,
+  //         );
+  //       } else {
+  //         // Navigasi ke Onboarding
+  //         Navigator.pushAndRemoveUntil(
+  //           context,
+  //           MaterialPageRoute(builder: (context) => const OnboardingScreen()),
+  //           (route) => false,
+  //         );
+  //       }
+  //     }
+  //   } catch (e) {
+  //     print("Error checking login status: $e");
+  //   }
+  // }
 
 
   /// ✅ **Fungsi logout: Hapus data login**

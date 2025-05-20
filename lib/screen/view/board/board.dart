@@ -69,19 +69,7 @@ class _BoardScreenState extends State<BoardScreen> {
 
     // Tampilkan loading screen jika belum terinisialisasi
 
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
-        if (!mounted) return;
-
-        Future.delayed(Duration.zero, () {
-          if (mounted) {
-            SystemNavigator.pop();
-          }
-        });
-      },
-      child: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           elevation: 0,
           backgroundColor: Colors.transparent,
@@ -479,8 +467,7 @@ class _BoardScreenState extends State<BoardScreen> {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 
   void _showCreateBoardBottomSheet() {

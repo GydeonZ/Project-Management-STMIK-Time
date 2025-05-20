@@ -22,11 +22,14 @@ import 'package:quickalert/models/quickalert_type.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CustomDetailCardTugas extends StatefulWidget {
-  final int boardId;
+  // final int boardId;
   final int? taskId;
 
-  const CustomDetailCardTugas(
-      {super.key, required this.boardId, required this.taskId});
+  const CustomDetailCardTugas({
+    super.key,
+    // required this.boardId,
+    required this.taskId,
+  });
 
   @override
   State<CustomDetailCardTugas> createState() => _CustomDetailCardTugasState();
@@ -943,80 +946,87 @@ class _CustomDetailCardTugasState extends State<CustomDetailCardTugas> {
           iconPath: "assets/komentar.svg",
           colorText: Colors.black,
         ),
-        canEdit ? SizedBox(
-          height: activities.isEmpty ? size.height * 0.20 : size.height * 0.20,
-          child: activities.isEmpty
-              ? const Center(
-                  child: Text(
-                    "Belum ada aktivitas",
-                    style: TextStyle(
-                      fontStyle: FontStyle.italic,
-                      color: Colors.grey,
-                    ),
-                  ),
-                )
-              : ListView.builder(
-                  itemCount: activities.length,
-                  itemBuilder: (context, index) {
-                    // Calculate reversed index: start from the end of the list
-                    final reversedIndex = activities.length - 1 - index;
-                    final activity = activities[reversedIndex];
-
-                    final userName = activity.user.name;
-                    final initial =
-                        cardTugasViewModel.getMemberInitials(activity.user);
-
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          CircleAvatar(
-                            backgroundColor: Colors.primaries[
-                                userName.hashCode % Colors.primaries.length],
-                            child: Text(
-                              initial,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+        canEdit
+            ? SizedBox(
+                height: activities.isEmpty
+                    ? size.height * 0.20
+                    : size.height * 0.20,
+                child: activities.isEmpty
+                    ? const Center(
+                        child: Text(
+                          "Belum ada aktivitas",
+                          style: TextStyle(
+                            fontStyle: FontStyle.italic,
+                            color: Colors.grey,
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: activities.length,
+                        itemBuilder: (context, index) {
+                          // Calculate reversed index: start from the end of the list
+                          final reversedIndex = activities.length - 1 - index;
+                          final activity = activities[reversedIndex];
+
+                          final userName = activity.user.name;
+                          final initial = cardTugasViewModel
+                              .getMemberInitials(activity.user);
+
+                          return Padding(
+                            padding:
+                                const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Text(
-                                  userName,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: 'helvetica',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
+                                CircleAvatar(
+                                  backgroundColor: Colors.primaries[
+                                      userName.hashCode %
+                                          Colors.primaries.length],
+                                  child: Text(
+                                    initial,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                                cardTugasViewModel
-                                    .formatActivityText(activity.activity),
-                                SizedBox(height: size.height * 0.005),
-                                Text(
-                                  cardTugasViewModel
-                                      .formatDateTime(activity.createdAt),
-                                  style: const TextStyle(
-                                    color: Colors.grey,
-                                    fontFamily: 'helvetica',
-                                    fontSize: 12,
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        userName,
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontFamily: 'helvetica',
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      cardTugasViewModel.formatActivityText(
+                                          activity.activity),
+                                      SizedBox(height: size.height * 0.005),
+                                      Text(
+                                        cardTugasViewModel
+                                            .formatDateTime(activity.createdAt),
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                          fontFamily: 'helvetica',
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
-                          ),
-                        ],
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
-        ) : const SizedBox.shrink()
+              )
+            : const SizedBox.shrink()
       ],
     );
   }

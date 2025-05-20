@@ -15,12 +15,12 @@ import 'package:provider/provider.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 
 class DetailTugasScreen extends StatefulWidget {
-  final int boardId;
+  // final int boardId;
   final int taskId;
 
   const DetailTugasScreen({
     super.key,
-    required this.boardId,
+    // required this.boardId,
     required this.taskId,
   });
 
@@ -268,7 +268,7 @@ class _DetailTugasScreenState extends State<DetailTugasScreen> {
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: CustomDetailCardTugas(
-            boardId: widget.boardId,
+            // boardId: widget.boardId,
             taskId: widget.taskId,
           ),
         ),

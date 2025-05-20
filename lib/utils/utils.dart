@@ -21,4 +21,8 @@ class Urls {
   static const String downloadFileUrls = "/tasks/files/";
   static const String delBoardMember = "/members/remove";
   static const String contactSupport = "https://wa.me/6281360944846";
+  static const String fcmToken = "/api/fcm/token";
+  static const String notificationList = "/api/notifications/show";
+  static const String markNotif = "/api/notifications/";
+  static const String deleteNotif = "/api/notifications/delete-all";
 }

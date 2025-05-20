@@ -4,8 +4,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:projectmanagementstmiktime/main.dart';
-import 'package:projectmanagementstmiktime/screen/view/board/board.dart';
 import 'package:projectmanagementstmiktime/screen/view/forgotpassword/forgot_password_screen.dart';
+import 'package:projectmanagementstmiktime/screen/view/navigation/navigation_screen.dart';
 import 'package:projectmanagementstmiktime/screen/view/signin_signup/signupscreen.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
 import 'package:projectmanagementstmiktime/view_model/navigation/view_model_navigation.dart';
@@ -195,9 +195,9 @@ class _SignInScreenState extends State<SignInScreen> {
                                             navigatorKey.currentState?.pop();
 
                                             if (response == 200) {
-                                              // await _registerDeviceToken(
-                                              //     viewModel
-                                              //         .tokenSharedPreference);
+                                              await viewModel.sendFCMDevice(
+                                                  token: viewModel
+                                                      .tokenSharedPreference);
                                               customAlert(
                                                 alertType:
                                                     QuickAlertType.success,
@@ -206,11 +206,9 @@ class _SignInScreenState extends State<SignInScreen> {
                                                   Navigator.pushAndRemoveUntil(
                                                     context,
                                                     MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          const BoardScreen(),
-                                                    ),
-                                                    (Route<dynamic> route) =>
-                                                        false,
+                                                        builder: (context) =>
+                                                            const NavigationScreen()),
+                                                    (route) => false,
                                                   );
                                                 },
                                               );

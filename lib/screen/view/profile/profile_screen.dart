@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:projectmanagementstmiktime/screen/view/board/board.dart';
 import 'package:projectmanagementstmiktime/screen/view/onboarding/onboarding.dart';
 import 'package:projectmanagementstmiktime/screen/view/profile/profile_change_password_screen.dart';
 import 'package:projectmanagementstmiktime/screen/widget/customshowdialog.dart';
@@ -53,224 +52,206 @@ class ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return PopScope(
-      canPop: false, // Mencegah pop otomatis, hanya memungkinkan pop manual
-      onPopInvokedWithResult: (didPop, result) {
-        if (!didPop) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const BoardScreen()),
-          );
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          centerTitle: true,
-          title: const Text(
-            'Profile',
-            style: TextStyle(
-              color: Color(0xFF293066),
-              fontFamily: 'Helvetica',
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading:
+            false, // Tetap false karena dihandle oleh navigation bar
+        centerTitle: true,
+        title: const Text(
+          'Profile',
+          style: TextStyle(
+            color: Color(0xFF293066),
+            fontFamily: 'Helvetica',
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
           ),
-          leading: IconButton(
-            icon: const Icon(
-              Icons.close,
-              color: Color(0xff293066),
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          elevation: 0,
-          backgroundColor: Colors.transparent,
         ),
-        body: Consumer<SignInViewModel>(
-          builder: (context, viewModel, child) {
-            return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const BannerSetting(),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 20),
-                        const Text(
-                          'Akun',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Helvetica',
-                            color: Color(0xff293066),
+        // Hapus tombol close, karena kita menggunakan bottom navigation
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+      ),
+      body: Consumer<SignInViewModel>(
+        builder: (context, viewModel, child) {
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const BannerSetting(),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Akun',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Helvetica',
+                          color: Color(0xff293066),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const GantiPasswordScreen()),
+                          );
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(
+                              color: const Color(0xff293066),
+                              width: 1,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                              size.width * 0.04,
+                              0,
+                              0,
+                              0,
+                            ),
+                            child: Row(
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/pencil.svg',
+                                  width: size.width * 0.05,
+                                  height: size.height * 0.02,
+                                ),
+                                SizedBox(width: size.width * 0.04),
+                                const Text(
+                                  'Ubah Kata Sandi',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontFamily: 'Helvetica',
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
+                      ),
+                      const SizedBox(height: 10),
+                      GestureDetector(
+                        onTap: () {
+                          launchURL();
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(
+                              color: const Color(0xff293066),
+                              width: 1,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                              size.width * 0.04,
+                              0,
+                              0,
+                              0,
+                            ),
+                            child: Row(
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/Phone.svg',
+                                  width: size.width * 0.05,
+                                  height: size.height * 0.02,
+                                ),
+                                SizedBox(width: size.width * 0.04),
+                                const Text(
+                                  'Layanan Bantuan',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontFamily: 'Helvetica',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      GestureDetector(
+                        onTap: () {
+                          customShowDialog(
+                            context: context,
+                            useForm: false,
+                            text1: 'Oh tidak! Anda pergi...',
+                            text2: 'Apa kamu yakin?',
+                            txtButtonL: 'Batal',
+                            txtButtonR: 'Ya, Tentu',
+                            onPressedBtnL: () {
+                              Navigator.pop(context);
+                            },
+                            onPressedBtnR: () {
+                              logindata.setBool('login', true);
+                              viewModel.keluar();
+                              Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(
                                   builder: (context) =>
-                                      const GantiPasswordScreen()),
-                            );
-                          },
-                          child: Container(
-                            width: double.infinity,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              border: Border.all(
-                                color: const Color(0xff293066),
-                                width: 1,
-                              ),
+                                      const OnboardingScreen(),
+                                ),
+                                (route) => false,
+                              );
+                            },
+                          );
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(
+                              color: const Color(0xff293066),
+                              width: 1,
                             ),
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                size.width * 0.04,
-                                0,
-                                0,
-                                0,
-                              ),
-                              child: Row(
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/pencil.svg',
-                                    width: size.width * 0.05,
-                                    height: size.height * 0.02,
+                          ),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                              size.width * 0.04,
+                              0,
+                              0,
+                              0,
+                            ),
+                            child: Row(
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/logout.svg',
+                                  width: size.width * 0.05,
+                                  height: size.height * 0.02,
+                                ),
+                                SizedBox(width: size.width * 0.04),
+                                const Text(
+                                  'Keluar',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontFamily: 'Helvetica',
                                   ),
-                                  SizedBox(width: size.width * 0.04),
-                                  const Text(
-                                    'Ubah Kata Sandi',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontFamily: 'Helvetica',
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        GestureDetector(
-                          onTap: () {
-                            launchURL();
-                          },
-                          child: Container(
-                            width: double.infinity,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              border: Border.all(
-                                color: const Color(0xff293066),
-                                width: 1,
-                              ),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                size.width * 0.04,
-                                0,
-                                0,
-                                0,
-                              ),
-                              child: Row(
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/Phone.svg',
-                                    width: size.width * 0.05,
-                                    height: size.height * 0.02,
-                                  ),
-                                  SizedBox(width: size.width * 0.04),
-                                  const Text(
-                                    'Layanan Bantuan',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontFamily: 'Helvetica',
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        GestureDetector(
-                          onTap: () {
-                            customShowDialog(
-                              context: context,
-                              useForm: false,
-                              text1: 'Oh tidak! Anda pergi...',
-                              text2: 'Apa kamu yakin?',
-                              txtButtonL: 'Batal',
-                              txtButtonR: 'Ya, Tentu',
-                              onPressedBtnL: () {
-                                Navigator.pop(context);
-                              },
-                              onPressedBtnR: () {
-                                logindata.setBool('login', true);
-                                viewModel.keluar();
-                                Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const OnboardingScreen(),
-                                  ),
-                                  (route) => false,
-                                );
-                              },
-                            );
-                          },
-                          child: Container(
-                            width: double.infinity,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              border: Border.all(
-                                color: const Color(0xff293066),
-                                width: 1,
-                              ),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                size.width * 0.04,
-                                0,
-                                0,
-                                0,
-                              ),
-                              child: Row(
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/logout.svg',
-                                    width: size.width * 0.05,
-                                    height: size.height * 0.02,
-                                  ),
-                                  SizedBox(width: size.width * 0.04),
-                                  const Text(
-                                    'Keluar',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontFamily: 'Helvetica',
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }

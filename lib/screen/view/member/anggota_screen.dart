@@ -53,12 +53,6 @@ class _AnggotaTaskScreenState extends State<AnggotaTaskScreen> {
   }
 
   @override
-  void dispose() {
-    anggotaListViewModel.searchController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
