@@ -290,7 +290,7 @@ class SignInViewModel with ChangeNotifier {
 
   /// ✅ **Fungsi logout: Hapus data login**
   Future<void> keluar() async {
-    final prefs = await SharedPreferences.getInstance();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.clear(); // ❌ Hapus semua data login
     rememberMe = false; // ❌ Reset Remember Me
     notifyListeners();
