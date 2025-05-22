@@ -111,8 +111,6 @@ class Task {
             json["members"], (x) => Member.fromJson(x)),
       );
     } catch (e) {
-      print("Error parsing task: $e");
-      // Return a default task object in case of error
       return Task(
         id: json["id"] ?? 0,
         cardId: json["card_id"] ?? 0,
@@ -120,7 +118,7 @@ class Task {
         description: json["description"] ?? "",
         position: json["position"] ?? 0,
         startTime: DateTime.now(),
-        endTime: DateTime.now().add(Duration(days: 1)),
+        endTime: DateTime.now().add(const Duration(days: 1)),
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
         membersInvite: [],
@@ -160,12 +158,10 @@ class Task {
         try {
           return fromJson(x);
         } catch (e) {
-          print("Error parsing item in list: $e");
           return null;
         }
       }).where((x) => x != null));
     } catch (e) {
-      print("Error parsing list: $e");
       return [];
     }
   }

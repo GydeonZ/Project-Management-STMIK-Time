@@ -721,7 +721,7 @@ class CardTugasViewModel with ChangeNotifier {
   String formatDateTime(DateTime dateTime) {
     try {
       // Mengkonversi ke timezone Jakarta (UTC+7)
-      final jakartaOffset = const Duration(hours: 7);
+      const jakartaOffset = Duration(hours: 7);
       final jakartaDateTime = dateTime.toUtc().add(jakartaOffset);
 
       // Format bulan dalam bahasa Indonesia
@@ -866,6 +866,35 @@ class CardTugasViewModel with ChangeNotifier {
       }
 
       errorMessages = "Terjadi kesalahan: ${e.message}";
+      return 500;
+    }
+  }
+
+  Future<int> dupeTask({
+    required String token,
+  }) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      final success = await editTaskService.dupeDetailTask(
+        token: token,
+        taskId: savedTaskId,
+      );
+      isLoading = false;
+      notifyListeners();
+
+      if (success) {
+        errorMessages = null;
+        return 200;
+      } else {
+        errorMessages = "Gagal mengupdate notifikasi";
+        return 400;
+      }
+    } catch (e) {
+      isLoading = false;
+      errorMessages = e.toString();
+      notifyListeners();
       return 500;
     }
   }

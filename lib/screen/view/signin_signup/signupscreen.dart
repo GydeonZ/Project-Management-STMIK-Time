@@ -253,7 +253,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             );
 
                             try {
-                              final statusCode = await viewModel.signUp(); // ✅ Tutup loading alert
+                              final statusCode = await viewModel
+                                  .signUp(); // ✅ Tutup loading alert
                               navigatorKey.currentState?.pop();
                               if (statusCode == 200) {
                                 // ✅ Registrasi sukses
@@ -303,14 +304,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 );
                               }
                             } on SocketException {
-                              Navigator.pop(context);
+                              navigatorKey.currentState!.pop();
                               customAlert(
                                 alertType: QuickAlertType.warning,
                                 text:
                                     'Tidak ada koneksi internet. Periksa jaringan Anda.',
                               );
                             } catch (e) {
-                              Navigator.pop(context);
+                              navigatorKey.currentState!.pop();
                               customAlert(
                                 alertType: QuickAlertType.error,
                                 text: 'Terjadi kesalahan: ${e.toString()}',

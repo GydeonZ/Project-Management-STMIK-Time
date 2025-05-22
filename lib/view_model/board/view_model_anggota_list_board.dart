@@ -27,8 +27,39 @@ class BoardAnggotaListViewModel with ChangeNotifier {
   String get searchQuery => _searchQuery;
   List<Datum> get filteredMembers => _filteredMembers;
 
+  String _searchQueryForMembers = "";
+  List<Member> _filteredBoardMembers = [];
+  String get searchQueryForMembers => _searchQueryForMembers;
+  List<Member> get filteredBoardMembers => _filteredBoardMembers;
+
   BoardAnggotaListViewModel() {
     searchController.addListener(_onSearchChanged);
+  }
+
+  void searchBoardMembers(String query) {
+    _searchQueryForMembers = query.toLowerCase().trim();
+
+    if (_searchQueryForMembers.isEmpty) {
+      // Jika pencarian kosong, tampilkan semua member
+      _filteredBoardMembers = modelFetchBoardMember?.members ?? [];
+    } else {
+      // Filter berdasarkan nama, email, atau role
+      _filteredBoardMembers =
+          (modelFetchBoardMember?.members ?? []).where((member) {
+        final user = member.user;
+        return user.name.toLowerCase().contains(_searchQueryForMembers) ||
+            user.email.toLowerCase().contains(_searchQueryForMembers) ||
+            user.role.toLowerCase().contains(_searchQueryForMembers);
+      }).toList();
+    }
+
+    notifyListeners();
+  }
+
+  void clearBoardMemberSearch() {
+    _searchQueryForMembers = "";
+    _filteredBoardMembers = modelFetchBoardMember?.members ?? [];
+    notifyListeners();
   }
 
   Future<void> getBoardAnggotaList({required String token}) async {
@@ -44,7 +75,7 @@ class BoardAnggotaListViewModel with ChangeNotifier {
       modelFetchBoardMember = result;
 
       // Initialize filtered list with all members
-      // _filteredMembers = modelAnggotaList?.members ?? [];
+      _filteredBoardMembers = result?.members ?? [];
 
       isLoading = false;
       notifyListeners();
@@ -59,7 +90,8 @@ class BoardAnggotaListViewModel with ChangeNotifier {
       isLoading = true;
       notifyListeners();
 
-      final result = await serviceAvailableMember.fetchAvailableBoardAnggotaList(
+      final result =
+          await serviceAvailableMember.fetchAvailableBoardAnggotaList(
         token: token,
         boardId: savedBoardId,
       );
@@ -74,6 +106,50 @@ class BoardAnggotaListViewModel with ChangeNotifier {
     } catch (e) {
       isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<int> editAnggotaRole({
+    required String token,
+    String? level,
+  }) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      final userLevel = level ?? _selectedMemberLevel;
+      final response = await services.editAnggotaList(
+        token: token,
+        boardId: savedBoardId,
+        userId: savedUserId,
+        userLevel: userLevel,
+      );
+
+      isLoading = false;
+
+      if (response != null) {
+        successMessage = response.message;
+        errorMessages = null;
+        isSukses = true;
+        _selectedMemberLevel = userLevel;
+        notifyListeners();
+        return 200;
+      } else {
+        isSukses = false;
+        notifyListeners();
+        return 500;
+      }
+    } on DioException catch (e) {
+      isLoading = false;
+      notifyListeners();
+
+      if (e.response != null && e.response!.statusCode == 400) {
+        errorMessages = e.message; // ✅ Ambil langsung message dari DioException
+        return 400;
+      }
+
+      errorMessages = "Terjadi kesalahan: ${e.message}";
+      return 500;
     }
   }
 
@@ -122,10 +198,19 @@ class BoardAnggotaListViewModel with ChangeNotifier {
       isLoading = true;
       notifyListeners();
 
-      final result = await services.fetchBoardAnggotaList(token: token, boardId: savedBoardId);
+      final result = await services.fetchBoardAnggotaList(
+          token: token, boardId: savedBoardId);
 
       if (result != null) {
         modelFetchBoardMember = result;
+        // Perbarui filtered list agar mencerminkan perubahan role
+        _filteredBoardMembers = modelFetchBoardMember?.members ?? [];
+
+        // Jika pencarian aktif, aplikasikan kembali filter
+        if (_searchQueryForMembers.isNotEmpty) {
+          searchBoardMembers(_searchQueryForMembers);
+        }
+
         isSukses = true;
         errorMessages = '';
         return true;
@@ -190,50 +275,6 @@ class BoardAnggotaListViewModel with ChangeNotifier {
       return 500;
     }
   }
-
-  // Future<int> editAnggotaList({
-  //   required String token,
-  //   String? level,
-  // }) async {
-  //   try {
-  //     isLoading = true;
-  //     notifyListeners();
-
-  //     final userLevel = level ?? _selectedMemberLevel;
-  //     final response = await services.editAnggotaList(
-  //       token: token,
-  //       taskId: savedTaskId,
-  //       userId: savedUserId,
-  //       userLevel: userLevel,
-  //     );
-
-  //     isLoading = false;
-
-  //     if (response != null) {
-  //       successMessage = response.message;
-  //       errorMessages = null;
-  //       isSukses = true;
-  //       savedUserId = "";
-  //       notifyListeners();
-  //       return 200;
-  //     } else {
-  //       isSukses = false;
-  //       notifyListeners();
-  //       return 500;
-  //     }
-  //   } on DioException catch (e) {
-  //     isLoading = false;
-  //     notifyListeners();
-
-  //     if (e.response != null && e.response!.statusCode == 400) {
-  //       errorMessages = e.message; // ✅ Ambil langsung message dari DioException
-  //       return 400;
-  //     }
-
-  //     errorMessages = "Terjadi kesalahan: ${e.message}";
-  //     return 500;
-  //   }
-  // }
 
   void setTaskId(String boardId) {
     savedBoardId = boardId;

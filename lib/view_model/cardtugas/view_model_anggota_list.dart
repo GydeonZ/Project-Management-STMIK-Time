@@ -128,10 +128,19 @@ class AnggotaListViewModel with ChangeNotifier {
       isLoading = true;
       notifyListeners();
 
-      final result = await services.fetchAnggotaList(token: token, taskId: savedTaskId);
+      final result =
+          await services.fetchAnggotaList(token: token, taskId: savedTaskId);
 
       if (result != null) {
         modelAnggotaList = result;
+        // Perbarui filtered list agar mencerminkan perubahan role
+        _filteredBoardMembers = modelAnggotaList?.members ?? [];
+
+        // Jika pencarian aktif, aplikasikan kembali filter
+        if (_searchQueryForMembers.isNotEmpty) {
+          searchBoardMembers(_searchQueryForMembers);
+        }
+
         isSukses = true;
         errorMessages = '';
         return true;
@@ -220,6 +229,7 @@ class AnggotaListViewModel with ChangeNotifier {
         errorMessages = null;
         isSukses = true;
         savedUserId = "";
+        _selectedMemberLevel = userLevel;
         notifyListeners();
         return 200;
       } else {
@@ -279,8 +289,7 @@ class AnggotaListViewModel with ChangeNotifier {
       _filteredMembers = modelAvailableAnggotaList?.data ?? [];
     } else {
       _filteredMembers = (modelAvailableAnggotaList?.data ?? [])
-          .where((user) =>
-              user.name.toLowerCase().contains(_searchQuery))
+          .where((user) => user.name.toLowerCase().contains(_searchQuery))
           .toList();
     }
 

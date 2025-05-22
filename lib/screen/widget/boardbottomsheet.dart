@@ -228,60 +228,6 @@ class CreateBoardrBottomSheetState extends State<CreateBoardBottomSheet> {
       },
     );
   }
-
-  Widget _buildFilterOption(String title, List<String> options) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-          horizontal:
-              26.0), // Sesuaikan dengan kebutuhan ruang di atas dan di bawah
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16.0,
-              color: Color(0xFF293066), // Warna biru untuk judul
-            ),
-          ),
-          const SizedBox(height: 4.0),
-          Row(
-            children: [
-              Expanded(
-                child: Wrap(
-                  spacing: 8.0,
-                  runSpacing: 4.0,
-                  children: options.map((option) {
-                    return ChoiceChip(
-                      label: Text(option),
-                      selected: selectedOptions.contains(option),
-                      onSelected: (bool selected) {},
-                      labelStyle: TextStyle(
-                        color: selectedOptions.contains(option)
-                            ? const Color(0xFF293066)
-                            : Colors.grey,
-                      ),
-                      backgroundColor: Colors.white,
-                      selectedColor: const Color(0xFF293066).withOpacity(0.2),
-                      shape: StadiumBorder(
-                        side: BorderSide(
-                          color: selectedOptions.contains(option)
-                              ? const Color(0xFF293066)
-                              : Colors.grey.withOpacity(0.5),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16.0),
-        ],
-      ),
-    );
-  }
 }
 
 // Menampilkan BottomSheet utama untuk menambahkan Board

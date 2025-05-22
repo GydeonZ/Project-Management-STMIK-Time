@@ -165,6 +165,31 @@ class _DetailTugasScreenState extends State<DetailTugasScreen> {
                           }
                         },
                       );
+                    } else if (value == 'dupe') {
+                      try {
+                        final response = await viewModel.dupeTask(
+                            token: sp.tokenSharedPreference);
+                        navigatorKey.currentState?.pop();
+
+                        if (response == 200) {
+                          // Refresh task data to show updated checklists
+                          await viewModel.refreshCardTugasData(
+                            token: sp.tokenSharedPreference,
+                          );
+                        } else {
+                          customAlert(
+                            alertType: QuickAlertType.error,
+                            text: viewModel.errorMessages ??
+                                "Gagal Menghapus Notifikasi",
+                          );
+                        }
+                      } catch (e) {
+                        navigatorKey.currentState?.pop();
+                        customAlert(
+                          alertType: QuickAlertType.error,
+                          text: "Terjadi kesalahan Silahkan Coba Lagi",
+                        );
+                      }
                     } else if (value == 'delete') {
                       // Delete action
                       final token = sp.tokenSharedPreference;
@@ -234,6 +259,30 @@ class _DetailTugasScreenState extends State<DetailTugasScreen> {
                       ),
                     ),
                     PopupMenuItem<String>(
+                      value: 'dupe',
+                      child: Row(
+                        children: [
+                          SvgPicture.asset(
+                            "assets/dupe.svg",
+                            height: size.height * 0.02,
+                            colorFilter: const ColorFilter.mode(
+                              Colors.green,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          const Text(
+                            'Duplikat',
+                            style: TextStyle(
+                              color: Colors.green,
+                              fontFamily: 'Helvetica',
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem<String>(
                       value: 'delete',
                       child: Row(
                         children: [
@@ -265,11 +314,19 @@ class _DetailTugasScreenState extends State<DetailTugasScreen> {
           elevation: 0,
           backgroundColor: Colors.transparent,
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: CustomDetailCardTugas(
-            // boardId: widget.boardId,
-            taskId: widget.taskId,
+        body: RefreshIndicator(
+          onRefresh: () async {
+            // Refresh task data ketika user melakukan pull-to-refresh
+            final token = sp.tokenSharedPreference;
+            await cardTugasViewModel.refreshTaskListById(token: token);
+            return;
+          },
+          color: const Color(0xFF293066), // Sesuaikan dengan tema aplikasi
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: CustomDetailCardTugas(
+              taskId: widget.taskId,
+            ),
           ),
         ),
         bottomNavigationBar: canEdit

@@ -128,216 +128,231 @@ class _AnggotaTaskScreenState extends State<AnggotaTaskScreen> {
                 viewModel.searchQueryForMembers.isNotEmpty &&
                     filteredMembers.isEmpty;
 
-            return Column(
-              children: [
-                customTextFormField(
-                  controller: viewModel.searchController,
-                  labelText: "Pencarian",
-                  prefixIcon: const Icon(Icons.search),
-                  onChanged: (value) {
-                    // Panggil search dari ViewModel
-                    viewModel.searchBoardMembers(value);
-                  },
-                  suffixIcon: viewModel.searchQueryForMembers.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            viewModel.searchController.clear();
-                            viewModel.clearBoardMemberSearch();
-                          },
-                        )
-                      : null,
-                ),
-                const SizedBox(height: 16),
-
-                // Owner card selalu muncul jika pencarian kosong
-                if (viewModel.searchQueryForMembers.isEmpty &&
-                    boardOwner != null)
-                  customCardAnggotaList(
-                    context: context,
-                    useIcon: false,
-                    namaUser: boardOwner.name,
-                    roleUser: boardOwner.role,
-                    emailUser: boardOwner.email,
-                    nomorIndukuser: boardOwner.nidn,
-                    levelUser: "Owner",
+            return RefreshIndicator(
+              onRefresh: () async {
+                final token = sp.tokenSharedPreference;
+                await viewModel.refreshAnggotaList(token: token);
+                return;
+              },
+              color: const Color(0xFF293066), // Warna sesuai tema
+              child: Column(
+                children: [
+                  customTextFormField(
+                    controller: viewModel.searchController,
+                    labelText: "Pencarian",
+                    prefixIcon: const Icon(Icons.search),
+                    onChanged: (value) {
+                      // Panggil search dari ViewModel
+                      viewModel.searchBoardMembers(value);
+                    },
+                    suffixIcon: viewModel.searchQueryForMembers.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              viewModel.searchController.clear();
+                              viewModel.clearBoardMemberSearch();
+                            },
+                          )
+                        : null,
                   ),
-
-                if (viewModel.searchQueryForMembers.isEmpty)
                   const SizedBox(height: 16),
 
-                // Tampilkan pesan jika hasil pencarian kosong
-                if (showNoResults)
+                  // Semua konten lain dalam scrollable container
                   Expanded(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.search_off,
-                            size: 64,
-                            color: Colors.grey,
+                    child: ListView(
+                      physics:
+                          const AlwaysScrollableScrollPhysics(), // Penting untuk refresh
+                      children: [
+                        // Owner card selalu muncul jika pencarian kosong
+                        if (viewModel.searchQueryForMembers.isEmpty &&
+                            boardOwner != null)
+                          customCardAnggotaList(
+                            context: context,
+                            useIcon: false,
+                            namaUser: boardOwner.name,
+                            roleUser: boardOwner.role,
+                            emailUser: boardOwner.email,
+                            nomorIndukuser: boardOwner.nidn,
+                            levelUser: "Owner",
                           ),
+
+                        if (viewModel.searchQueryForMembers.isEmpty)
                           const SizedBox(height: 16),
-                          Text(
-                            "Tidak ada member yang cocok dengan '${viewModel.searchQueryForMembers}'",
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: Colors.grey,
-                              fontSize: 16,
+
+                        // Tampilkan pesan jika hasil pencarian kosong
+                        if (showNoResults)
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height / 2,
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.search_off,
+                                    size: 64,
+                                    color: Colors.grey,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    "Tidak ada member yang cocok dengan '${viewModel.searchQueryForMembers}'",
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
 
-                // List hasil pencarian member
-                if (!showNoResults)
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: filteredMembers.length,
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) {
-                        final member = filteredMembers[index];
-                        final user = member.user;
-                        return customCardAnggotaList(
-                          context: context,
-                          useIcon: _checkUserCanEdit(),
-                          namaUser: user.name,
-                          roleUser: user.role,
-                          emailUser: user.email,
-                          nomorIndukuser:
-                              user.role == "Mahasiswa" ? user.nim : user.nidn,
-                          levelUser: member.level,
-                          onTapIcon: () async {
-                            customShowDialog(
-                              useForm: false,
+                        // List hasil pencarian member
+                        if (!showNoResults)
+                          ...filteredMembers.map((member) {
+                            final user = member.user;
+                            return customCardAnggotaList(
                               context: context,
-                              text1:
-                                  "Apakah anda yakin ingin menghapus user ini?",
-                              txtButtonL: "Batal",
-                              txtButtonR: "Hapus",
-                              onPressedBtnL: () {
-                                Navigator.pop(context);
-                              },
-                              onPressedBtnR: () async {
-                                Navigator.pop(context);
-                                viewModel.savedUserId = user.id.toString();
-                                final token = sp.tokenSharedPreference;
+                              useIcon: _checkUserCanEdit(),
+                              namaUser: user.name,
+                              roleUser: user.role,
+                              emailUser: user.email,
+                              nomorIndukuser: user.role == "Mahasiswa"
+                                  ? user.nim
+                                  : user.nidn,
+                              levelUser: member.level,
+                              onTapIcon: () async {
+                                // Existing delete functionality
+                                customShowDialog(
+                                  useForm: false,
+                                  context: context,
+                                  text1:
+                                      "Apakah anda yakin ingin menghapus user ini?",
+                                  txtButtonL: "Batal",
+                                  txtButtonR: "Hapus",
+                                  onPressedBtnL: () {
+                                    Navigator.pop(context);
+                                  },
+                                  onPressedBtnR: () async {
+                                    Navigator.pop(context);
+                                    viewModel.savedUserId = user.id.toString();
+                                    final token = sp.tokenSharedPreference;
 
-                                await customAlert(
-                                  alertType: QuickAlertType.loading,
-                                  text: "Mohon tunggu...",
-                                  autoClose: false,
-                                );
-                                final response =
-                                    await viewModel.deleteAnggota(token: token);
-                                navigatorKey.currentState?.pop();
-
-                                if (response == 200) {
-                                  final success = await viewModel
-                                      .refreshAnggotaList(token: token);
-                                  await cardTugasViewModel.refreshTaskListById(
-                                      token: token);
-
-                                  if (success) {
-                                    customAlert(
-                                      alertType: QuickAlertType.success,
-                                      title: "Anggota berhasil dihapus!",
-                                    );
-                                  } else {
-                                    navigatorKey.currentState?.pop();
-                                    customAlert(
-                                      alertType: QuickAlertType.error,
-                                      text: viewModel.errorMessages,
-                                    );
-                                  }
-                                } else {
-                                  customAlert(
-                                    alertType: QuickAlertType.error,
-                                    text:
-                                        "Gagal menghapus Anggota. Coba lagi nanti.",
-                                  );
-                                }
-                              },
-                            );
-                          },
-                          onTap: () {
-                            selectedLevel = viewModel.selectedMemberLevel;
-                            viewModel.savedUserId = user.id.toString();
-                            customShowDialog(
-                              context: context,
-                              useForm: true,
-                              customWidget:
-                                  StatefulBuilder(builder: (context, setState) {
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const SizedBox(height: 16),
-                                    levelDropdownWidget(
-                                      context,
-                                      selectedLevel ?? "Member",
-                                      (value) {
-                                        setState(() {
-                                          selectedLevel = value;
-                                        });
-                                      },
-                                    ),
-                                  ],
-                                );
-                              }),
-                              txtButtonL: "Batal",
-                              txtButtonR: "Simpan",
-                              onPressedBtnL: () {
-                                Navigator.pop(context);
-                              },
-                              onPressedBtnR: () async {
-                                final token = sp.tokenSharedPreference;
-
-                                Navigator.pop(
-                                    context); // Tutup form/modal sebelumnya
-                                customAlert(
-                                  alertType: QuickAlertType.loading,
-                                  text: "Mohon tunggu...",
-                                  autoClose: false,
-                                );
-
-                                final response =
-                                    await viewModel.editAnggotaList(
-                                  token: token,
-                                  level: selectedLevel,
-                                );
-                                navigatorKey.currentState?.pop();
-                                if (response == 200) {
-                                  final success = await viewModel
-                                      .refreshAnggotaList(token: token);
-                                  await cardTugasViewModel.refreshTaskListById(
-                                      token: token);
-                                  if (success) {
-                                  } else {
                                     await customAlert(
-                                      alertType: QuickAlertType.error,
-                                      text: viewModel.errorMessages,
+                                      alertType: QuickAlertType.loading,
+                                      text: "Mohon tunggu...",
+                                      autoClose: false,
                                     );
-                                  }
-                                } else {
-                                  navigatorKey.currentState?.pop();
-                                  await customAlert(
-                                    alertType: QuickAlertType.error,
-                                    text:
-                                        "Gagal menambahkan tugas. Coba lagi nanti.",
-                                  );
-                                }
+                                    final response = await viewModel
+                                        .deleteAnggota(token: token);
+                                    navigatorKey.currentState?.pop();
+
+                                    if (response == 200) {
+                                      final success = await viewModel
+                                          .refreshAnggotaList(token: token);
+                                      await cardTugasViewModel
+                                          .refreshTaskListById(token: token);
+
+                                      if (success) {
+                                        customAlert(
+                                          alertType: QuickAlertType.success,
+                                          title: "Anggota berhasil dihapus!",
+                                        );
+                                      } else {
+                                        navigatorKey.currentState?.pop();
+                                        customAlert(
+                                          alertType: QuickAlertType.error,
+                                          text: viewModel.errorMessages,
+                                        );
+                                      }
+                                    } else {
+                                      customAlert(
+                                        alertType: QuickAlertType.error,
+                                        text:
+                                            "Gagal menghapus Anggota. Coba lagi nanti.",
+                                      );
+                                    }
+                                  },
+                                );
+                              },
+                              onTap: () {
+                                // Existing edit functionality
+                                selectedLevel = viewModel.selectedMemberLevel;
+                                viewModel.savedUserId = user.id.toString();
+                                customShowDialog(
+                                  context: context,
+                                  useForm: true,
+                                  customWidget: StatefulBuilder(
+                                      builder: (context, setState) {
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const SizedBox(height: 16),
+                                        levelDropdownWidget(
+                                          context,
+                                          selectedLevel ?? "Member",
+                                          (value) {
+                                            setState(() {
+                                              selectedLevel = value;
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  }),
+                                  txtButtonL: "Batal",
+                                  txtButtonR: "Simpan",
+                                  onPressedBtnL: () {
+                                    Navigator.pop(context);
+                                  },
+                                  onPressedBtnR: () async {
+                                    final token = sp.tokenSharedPreference;
+
+                                    Navigator.pop(
+                                        context); // Tutup form/modal sebelumnya
+                                    customAlert(
+                                      alertType: QuickAlertType.loading,
+                                      text: "Mohon tunggu...",
+                                      autoClose: false,
+                                    );
+
+                                    final response =
+                                        await viewModel.editAnggotaList(
+                                      token: token,
+                                      level: selectedLevel,
+                                    );
+                                    navigatorKey.currentState?.pop();
+                                    if (response == 200) {
+                                      final success = await viewModel
+                                          .refreshAnggotaList(token: token);
+                                      await cardTugasViewModel
+                                          .refreshTaskListById(token: token);
+                                      if (success) {
+                                      } else {
+                                        await customAlert(
+                                          alertType: QuickAlertType.error,
+                                          text: viewModel.errorMessages,
+                                        );
+                                      }
+                                    } else {
+                                      navigatorKey.currentState?.pop();
+                                      await customAlert(
+                                        alertType: QuickAlertType.error,
+                                        text:
+                                            "Gagal mengubah role. Coba lagi nanti.",
+                                      );
+                                    }
+                                  },
+                                );
                               },
                             );
-                          },
-                        );
-                      },
+                          }),
+                      ],
                     ),
                   ),
-              ],
+                ],
+              ),
             );
           },
         ),
@@ -350,9 +365,15 @@ class _AnggotaTaskScreenState extends State<AnggotaTaskScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (_) => AddAnggotaScreen(taskId: widget.taskId)),
-                );
-              })
+                    builder: (_) => AddAnggotaScreen(taskId: widget.taskId),
+                  ),
+                ).then((_) async {
+                  // Refresh data when returning from add member screen
+                  final token = sp.tokenSharedPreference;
+                  await anggotaListViewModel.refreshAnggotaList(token: token);
+                });
+              },
+            )
           : null,
     );
   }

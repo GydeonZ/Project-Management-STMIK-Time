@@ -169,4 +169,24 @@ class EditDetailTaskService {
       rethrow;
     }
   }
+
+  Future<bool> dupeDetailTask({
+    required String token,
+    required String taskId,
+  }) async {
+    try {
+      final response = await _dio.post(
+        "${Urls.apiTugas}/$taskId${Urls.dupeLink}",
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+      print(response.statusCode);
+      return response.statusCode == 200;
+    } on DioException catch (_) {
+      rethrow;
+    }
+  }
 }

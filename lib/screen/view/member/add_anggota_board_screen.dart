@@ -219,23 +219,21 @@ class _AddAnggotaBoardScreenState extends State<AddAnggotaBoardScreen> {
                                     );
                                     navigatorKey.currentState?.pop();
                                     if (response == 200) {
-                                      final success = await viewModel
+                                      await viewModel
                                           .refreshAnggotaList(token: token);
-                                      await cardTugasViewModel
-                                          .refreshTaskListById(token: token);
                                       navigatorKey.currentState?.pop();
 
-                                      if (success) {
-                                        await customAlert(
-                                          alertType: QuickAlertType.success,
-                                          title: "Tugas berhasil ditambahkan!",
-                                        );
-                                      } else {
-                                        await customAlert(
-                                          alertType: QuickAlertType.error,
-                                          text: viewModel.errorMessages,
-                                        );
-                                      }
+                                      // if (success) {
+                                      //   await customAlert(
+                                      //     alertType: QuickAlertType.success,
+                                      //     title: "Tugas berhasil ditambahkan!",
+                                      //   );
+                                      // } else {
+                                      //   await customAlert(
+                                      //     alertType: QuickAlertType.error,
+                                      //     text: viewModel.errorMessages,
+                                      //   );
+                                      // }
                                     } else {
                                       navigatorKey.currentState?.pop();
                                       await customAlert(

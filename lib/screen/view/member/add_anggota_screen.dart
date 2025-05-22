@@ -54,7 +54,7 @@ class _AddAnggotaScreenState extends State<AddAnggotaScreen> {
         automaticallyImplyLeading: false,
         centerTitle: true,
         title: const Text(
-          'Tambah Anggota',
+          'Tambah Anggota Tugas',
           style: TextStyle(
             color: Color(0xFF293066),
             fontFamily: 'Helvetica',
@@ -135,111 +135,129 @@ class _AddAnggotaScreenState extends State<AddAnggotaScreen> {
                 ),
                 const SizedBox(height: 16),
                 Expanded(
-                  child: filteredUsers.isEmpty
-                      ? const Center(
-                          child: Text(
-                            "Tidak ada anggota yang sesuai dengan pencarian",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                              fontFamily: 'Helvetica',
-                            ),
-                          ),
-                        )
-                      : ListView.separated(
-                          itemCount: filteredUsers.length,
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(height: 8),
-                          itemBuilder: (context, index) {
-                            final user = filteredUsers[index];
-                            return customCardAnggotaList(
-                              addAnggota: true,
-                              context: context,
-                              useIcon: false,
-                              namaUser: user.name,
-                              onTap: () {
-                                selectedLevel = viewModel.selectedMemberLevel;
-                                viewModel.savedUserId = user.id.toString();
-                                customShowDialog(
-                                  context: context,
-                                  useForm: true,
-                                  customWidget: StatefulBuilder(
-                                      builder: (context, setState) {
-                                    return Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const SizedBox(height: 16),
-                                        levelDropdownWidget(
-                                          context,
-                                          selectedLevel ?? "Member",
-                                          (value) {
-                                            setState(() {
-                                              selectedLevel = value;
-                                            });
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  }),
-                                  txtButtonL: "Batal",
-                                  txtButtonR: "Tambah",
-                                  onPressedBtnL: () {
-                                    viewModel.savedUserId = "";
-                                    Navigator.pop(context);
-                                  },
-                                  onPressedBtnR: () async {
-                                    final token = sp.tokenSharedPreference;
+                  // Tambahkan RefreshIndicator di sini
+                  child: RefreshIndicator(
+                    onRefresh: () async {
+                      final token = sp.tokenSharedPreference;
+                      await viewModel.refreshAnggotaList(token: token);
+                      return;
+                    },
+                    color: const Color(0xFF293066), // Warna sesuai tema
+                    child: filteredUsers.isEmpty
+                        ? ListView(
+                            // Gunakan ListView agar refresh berfungsi di layar kosong
+                            children: [
+                              SizedBox(
+                                height: MediaQuery.of(context).size.height / 2,
+                                child: const Center(
+                                  child: Text(
+                                    "Tidak ada anggota yang sesuai dengan pencarian",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                      fontFamily: 'Helvetica',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                        : ListView.separated(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            itemCount: filteredUsers.length,
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 8),
+                            itemBuilder: (context, index) {
+                              final user = filteredUsers[index];
+                              return customCardAnggotaList(
+                                addAnggota: true,
+                                context: context,
+                                useIcon: false,
+                                namaUser: user.name,
+                                onTap: () {
+                                  selectedLevel = viewModel.selectedMemberLevel;
+                                  viewModel.savedUserId = user.id.toString();
+                                  customShowDialog(
+                                    context: context,
+                                    useForm: true,
+                                    customWidget: StatefulBuilder(
+                                        builder: (context, setState) {
+                                      return Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const SizedBox(height: 16),
+                                          levelDropdownWidget(
+                                            context,
+                                            selectedLevel ?? "Member",
+                                            (value) {
+                                              setState(() {
+                                                selectedLevel = value;
+                                              });
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    }),
+                                    txtButtonL: "Batal",
+                                    txtButtonR: "Tambah",
+                                    onPressedBtnL: () {
+                                      viewModel.savedUserId = "";
+                                      Navigator.pop(context);
+                                    },
+                                    onPressedBtnR: () async {
+                                      final token = sp.tokenSharedPreference;
 
-                                    Navigator.pop(
-                                        context); // Tutup form/modal sebelumnya
-                                    customAlert(
-                                      alertType: QuickAlertType.loading,
-                                      text: "Mohon tunggu...",
-                                      autoClose: false,
-                                    );
+                                      Navigator.pop(
+                                          context); // Tutup form/modal sebelumnya
+                                      customAlert(
+                                        alertType: QuickAlertType.loading,
+                                        text: "Mohon tunggu...",
+                                        autoClose: false,
+                                      );
 
-                                    final response =
-                                        await viewModel.tambahAnggotaList(
-                                      token: token,
-                                      level: selectedLevel,
-                                    );
-                                    navigatorKey.currentState?.pop();
-                                    if (response == 200) {
-                                      final success = await viewModel
-                                          .refreshAnggotaList(token: token);
-                                      await cardTugasViewModel
-                                          .refreshTaskListById(token: token);
+                                      final response =
+                                          await viewModel.tambahAnggotaList(
+                                        token: token,
+                                        level: selectedLevel,
+                                      );
                                       navigatorKey.currentState?.pop();
+                                      if (response == 200) {
+                                        final success = await viewModel
+                                            .refreshAnggotaList(token: token);
+                                        await cardTugasViewModel
+                                            .refreshTaskListById(token: token);
+                                        navigatorKey.currentState?.pop();
 
-                                      if (success) {
-                                        await customAlert(
-                                          alertType: QuickAlertType.success,
-                                          title:
-                                              "Anggota berhasil ditambahkan!",
-                                        );
+                                        if (success) {
+                                          await customAlert(
+                                            alertType: QuickAlertType.success,
+                                            title:
+                                                "Anggota berhasil ditambahkan!",
+                                          );
+                                        } else {
+                                          await customAlert(
+                                            alertType: QuickAlertType.error,
+                                            text: viewModel.errorMessages,
+                                          );
+                                        }
                                       } else {
+                                        navigatorKey.currentState?.pop();
                                         await customAlert(
                                           alertType: QuickAlertType.error,
-                                          text: viewModel.errorMessages,
+                                          text:
+                                              "Gagal menambahkan Anggota. Coba lagi nanti.",
                                         );
                                       }
-                                    } else {
-                                      navigatorKey.currentState?.pop();
-                                      await customAlert(
-                                        alertType: QuickAlertType.error,
-                                        text:
-                                            "Gagal menambahkan Anggota. Coba lagi nanti.",
-                                      );
-                                    }
-                                  },
-                                );
-                              },
-                            );
-                          },
-                        ),
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                  ),
                 ),
               ],
             );

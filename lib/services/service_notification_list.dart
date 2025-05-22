@@ -41,7 +41,7 @@ class NotificationListService {
     } on DioException catch (e) {
       // ✅ Pastikan error dari API tetap ditampilkan
       if (e.response != null && e.response!.statusCode == 400) {
-        throw e; // Lempar kembali error untuk ditangani di ViewModel
+        rethrow; // Lempar kembali error untuk ditangani di ViewModel
       }
       throw DioException(
         requestOptions: RequestOptions(path: Urls.notificationList),
@@ -78,7 +78,7 @@ class NotificationListService {
     } on DioException catch (e) {
       // ✅ Pastikan error dari API tetap ditampilkan
       if (e.response != null && e.response!.statusCode == 400) {
-        throw e; // Lempar kembali error untuk ditangani di ViewModel
+        rethrow; // Lempar kembali error untuk ditangani di ViewModel
       }
       throw DioException(
         requestOptions: RequestOptions(path: "${Urls.markNotif}$notifId/mark-as-read"),

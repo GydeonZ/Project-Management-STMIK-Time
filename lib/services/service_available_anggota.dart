@@ -28,11 +28,6 @@ class AvailableAnggotaListService {
           },
         ),
       );
-
-      // For debugging
-      print("Response status code: ${response.statusCode}");
-      print("Response type: ${response.data.runtimeType}");
-
       if (response.statusCode == 200) {
         try {
           // Check if response.data is already a Map
@@ -53,8 +48,6 @@ class AvailableAnggotaListService {
             return ModelAvailableAnggotaList.fromJson(jsonData);
           }
         } catch (e) {
-          print("Error parsing response data: $e");
-          print("Raw response: ${response.data}");
           throw Exception("Failed to parse API response: $e");
         }
       } else {
@@ -66,13 +59,13 @@ class AvailableAnggotaListService {
         );
       }
     } on DioException catch (e) {
-      print("DioException: ${e.message}");
+      // print("DioException: ${e.message}");
       if (e.response != null) {
-        print("Response data: ${e.response!.data}");
+        // print("Response data: ${e.response!.data}");
       }
-      throw e;
+      rethrow;
     } catch (e) {
-      print("Unexpected error: $e");
+      // print("Unexpected error: $e");
       throw Exception("Terjadi kesalahan: $e");
     }
   }

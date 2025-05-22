@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class BoardViewModel with ChangeNotifier {
   ModelBoard? modelBoard;
   TextEditingController judulBoard = TextEditingController();
+  TextEditingController searchController = TextEditingController();
   final services = BoardService();
   String _tanggalTerformat = '';
   bool isLoading = false;
@@ -21,13 +22,52 @@ class BoardViewModel with ChangeNotifier {
   String? errorMessages;
   final formKey = GlobalKey<FormState>();
   final List<String> availableBoardVisibility = ["Public", "Private"];
-  String _selectedBoardVisibility = "Public";
+  final String _selectedBoardVisibility = "Public";
   String get selectedBoardVisibility => _selectedBoardVisibility;
   String get tanggalTerformat => _tanggalTerformat;
+
+  String _searchQuery = "";
+  List<Datum> _filteredBoards = [];
+
+  String get searchQuery => _searchQuery;
+  List<Datum> get filteredBoards => _filteredBoards;
 
   BoardViewModel() {
     _loadUserName();
     _perbaruiTanggal();
+    searchController.addListener(_onSearchChanged);
+    _filteredBoards = [];
+  }
+
+  void _onSearchChanged() {
+    searchBoards(searchController.text);
+  }
+
+  void searchBoards(String query) {
+    _searchQuery = query.toLowerCase().trim();
+
+    if (_searchQuery.isEmpty) {
+      // Jika pencarian kosong, tampilkan semua board
+      _filteredBoards = modelBoard?.data ?? [];
+    } else {
+      // Filter board berdasarkan nama board atau nama user
+      _filteredBoards = (modelBoard?.data ?? []).where((board) {
+        final boardName = board.name.toLowerCase();
+        final userName = board.user.name.toLowerCase();
+
+        return boardName.contains(_searchQuery) ||
+            userName.contains(_searchQuery);
+      }).toList();
+    }
+
+    notifyListeners();
+  }
+
+  void clearSearch() {
+    searchController.clear();
+    _searchQuery = "";
+    _filteredBoards = modelBoard?.data ?? [];
+    notifyListeners();
   }
 
   Future<int> editBoard({
@@ -82,6 +122,7 @@ class BoardViewModel with ChangeNotifier {
       notifyListeners();
 
       modelBoard = await services.fetchBoard(token: token);
+      _filteredBoards = modelBoard?.data ?? [];
 
       isLoading = false;
     } catch (e) {
@@ -101,6 +142,11 @@ class BoardViewModel with ChangeNotifier {
 
       if (result != null) {
         modelBoard = result;
+        if (_searchQuery.isNotEmpty) {
+          searchBoards(_searchQuery);
+        } else {
+          _filteredBoards = modelBoard?.data ?? [];
+        }
         isSukses = true;
         errorMessages = '';
         return true;
@@ -286,7 +332,7 @@ class BoardViewModel with ChangeNotifier {
       return canUserEditBoard(board, userId);
     } catch (e) {
       // Board tidak ditemukan
-      print("Board dengan ID $boardId tidak ditemukan: $e");
+      // print("Board dengan ID $boardId tidak ditemukan: $e");
       return false;
     }
   }

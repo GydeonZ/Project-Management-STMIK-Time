@@ -120,7 +120,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   Widget _buildNavIcon(String iconPath, int index) {
     return Column(
       children: [
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         SvgPicture.asset(
           iconPath,
           height: 25,
@@ -132,7 +132,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
             BlendMode.srcIn,
           ),
         ),
-        SizedBox(height: 5),
+        const SizedBox(height: 5),
         index == _selectedIndex
             ? Container(
                 margin: const EdgeInsets.only(top: 3),

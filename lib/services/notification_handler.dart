@@ -65,7 +65,7 @@ class NotificationHandler {
               AwesomeNotifications()
                   .requestPermissionToSendNotifications()
                   .then((_) {
-                Navigator.pop(context);
+                navigatorKey.currentState!.pop();
               });
             },
             child: const Text('Izinkan'),
@@ -93,24 +93,20 @@ class NotificationHandler {
       case 'new_task':
         if (boardId != null) {
           // Navigate to board with this task
-          print('Navigate to task: boardId=$boardId, taskId=$taskId');
         }
         break;
       case 'task_comment':
         if (taskId != null) {
           // Navigate to task comments
-          print('Navigate to comment: taskId=$taskId');
         }
         break;
       case 'board_invitation':
         if (boardId != null) {
           // Navigate to board
-          print('Navigate to board: boardId=$boardId');
         }
         break;
       default:
         // Handle generic notification
-        print('Handle generic notification with payload: $payload');
         break;
     }
   }

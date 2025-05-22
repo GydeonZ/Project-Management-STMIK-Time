@@ -92,13 +92,10 @@ class SignInViewModel with ChangeNotifier {
 
       // ✅ Tangani error berdasarkan pesan exception
       if (e.toString().contains("401")) {
-        print("❌ Password salah");
         return 401;
       } else if (e.toString().contains("403")) {
-        print("❌ Email belum diverifikasi");
         return 403;
       } else {
-        print("⚠️ Error tidak terduga: $e");
         return 500; // ❌ Kesalahan server atau lainnya
       }
     }
@@ -133,7 +130,6 @@ class SignInViewModel with ChangeNotifier {
       }
       return deviceType;
     } catch (e) {
-      print("Error mendapatkan tipe perangkat: $e");
       return 'unknown';
     }
   }
@@ -291,44 +287,6 @@ class SignInViewModel with ChangeNotifier {
       });
     }
   }
-
-  // Future<void> checkLogin(BuildContext context) async {
-  //   try {
-  //     // Periksa data dari SharedPreferences
-  //     await checkSharedPreferences();
-
-  //     // Set status login
-  //     setSudahLogin();
-
-  //     print("Token: $tokenSharedPreference");
-  //     print("Remember Me: $rememberMe");
-  //     print("Is Sudah Login: $isSudahLogin");
-
-  //     // Delay untuk menampilkan splash screen
-  //     await Future.delayed(const Duration(seconds: 2));
-
-  //     if (context.mounted) {
-  //       if (tokenSharedPreference.isNotEmpty && rememberMe) {
-  //         // Navigasi ke NavigationScreen (bottom navbar)
-  //         Navigator.pushAndRemoveUntil(
-  //           context,
-  //           MaterialPageRoute(builder: (context) => const NavigationScreen()),
-  //           (route) => false,
-  //         );
-  //       } else {
-  //         // Navigasi ke Onboarding
-  //         Navigator.pushAndRemoveUntil(
-  //           context,
-  //           MaterialPageRoute(builder: (context) => const OnboardingScreen()),
-  //           (route) => false,
-  //         );
-  //       }
-  //     }
-  //   } catch (e) {
-  //     print("Error checking login status: $e");
-  //   }
-  // }
-
 
   /// ✅ **Fungsi logout: Hapus data login**
   Future<void> keluar() async {

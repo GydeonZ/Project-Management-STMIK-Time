@@ -10,7 +10,6 @@ import '../../firebase_options.dart';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  print('Handling a background message ${message.messageId}');
 
   // Create an Awesome Notification from the FCM message
   await AwesomeNotifications().createNotification(
@@ -90,8 +89,6 @@ class NotificationService {
     String? token = await FirebaseMessaging.instance.getToken(
         vapidKey:
             'BNKkaUWxyP_yC_lki1kYazgca0TNhuzt2drsOrL6WrgGbqnMnr8ZMLzg_rSPDm6HKphABS0KzjPfSqCXHXEd06Y');
-
-    print("FCM Token: $token");
     return token;
   }
 

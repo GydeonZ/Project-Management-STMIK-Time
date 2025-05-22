@@ -117,7 +117,7 @@ class NotificationViewModel with ChangeNotifier {
         ),
       ];
     } catch (e) {
-      print('Error loading notifications: $e');
+      // print('Error loading notifications: $e');
     } finally {
       isLoading = false;
       notifyListeners();

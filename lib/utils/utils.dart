@@ -1,10 +1,9 @@
 class Urls {
-  static const String baseUrls ="https://helpful-caiman-formally.ngrok-free.app";
-  // static const String baseUrls ="https://bursting-ferret-yearly.ngrok-free.app";
+  static const String baseUrls ="https://manprokampus.com";
   static const String login = "/api/login";
   static const String register = "/api/register";
   static const String board = "/api/boards";
-  static const String dupeBoard = "/duplicate";
+  static const String dupeLink = "/duplicate";
   static const String fetchUser = "/api/users";
   static const String reqOTP = "/api/send-otp";
   static const String resetPassword = "/api/reset-password";

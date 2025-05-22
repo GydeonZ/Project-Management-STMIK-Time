@@ -131,7 +131,7 @@ class BoardService {
   }) async {
     try {
       final response = await _dio.post(
-        '${Urls.board}/$encryptedId${Urls.dupeBoard}',
+        '${Urls.board}/$encryptedId${Urls.dupeLink}',
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',
@@ -156,7 +156,7 @@ class BoardService {
       }
       throw DioException(
         requestOptions:
-            RequestOptions(path: "${Urls.board}/$encryptedId${Urls.dupeBoard}"),
+            RequestOptions(path: "${Urls.board}/$encryptedId${Urls.dupeLink}"),
         message: "Kesalahan jaringan: ${e.message}",
         type: DioExceptionType.connectionError,
       );
