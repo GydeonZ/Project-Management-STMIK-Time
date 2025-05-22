@@ -19,18 +19,6 @@ Project Management STMIK Time is a mobile application developed using Flutter fr
 - **Framework**: Flutter
 - **Architecture**: [Your architecture pattern, e.g., MVVM, BLoC]
 
-## Installation
-```bash
-# Download the files from
-Google Drive link: [https://drive.google.com/file/d/1J8S9n0hQJEeU3pSQWhpmY-PNBg3Tnnny/view?usp=sharing]
+## Download the files from
 
-```
-
-## Screenshots
-[Add your app screenshots here]
-
-## Contributors
-[List project contributors]
-
-## License
-[Specify your license]
+[Google Drive](https://drive.google.com/file/d/1J8S9n0hQJEeU3pSQWhpmY-PNBg3Tnnny/view?usp=sharing)
