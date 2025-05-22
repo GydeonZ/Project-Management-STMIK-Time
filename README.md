@@ -17,7 +17,14 @@ Project Management STMIK Time is a mobile application developed using Flutter fr
 ## Technology Stack
 - **Programming Language**: Dart
 - **Framework**: Flutter
-- **Architecture**: [Your architecture pattern, e.g., MVVM, BLoC]
+- **Architecture**: MVVM (Model-View-ViewModel) with Provider for State Management
+
+- **Model**: Data classes representing the business objects and API responses
+- **View**: UI components and screens presenting data to users
+- **ViewModel**: Business logic and state management using ChangeNotifier and Provider
+- **Services**: API communication layer handling network requests with Dio
+
+The app follows separation of concerns with clear boundaries between UI, business logic, and data layers.
 
 ## Download the files from
 
