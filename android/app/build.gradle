@@ -42,14 +42,21 @@ kotlinOptions {
         targetSdk = 34
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // Tambahkan multidex support
+        multiDexEnabled true
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.debug
-        }
+        // Tambahkan konfigurasi minify
+        minifyEnabled false
+        shrinkResources false
+        proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        
+        // Tetap gunakan debug signing config jika belum punya release key
+        signingConfig signingConfigs.debug
+    }
     }
 }
 
@@ -59,4 +66,7 @@ flutter {
 dependencies {
     implementation 'androidx.browser:browser:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.0'
+
+    // Tambahkan dependency multidex
+    implementation 'androidx.multidex:multidex:2.0.1'
 }
