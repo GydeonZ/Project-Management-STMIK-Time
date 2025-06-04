@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/screen/widget/button.dart';
 import 'package:projectmanagementstmiktime/screen/widget/formfield.dart';
 import 'package:projectmanagementstmiktime/view_model/forgot_password/view_model_reset_password.dart';
@@ -10,8 +11,7 @@ import 'package:provider/provider.dart';
 class ResetPasswordScreen extends StatefulWidget {
   final String resetUrl;
 
-  const ResetPasswordScreen(
-      {super.key, required this.resetUrl});
+  const ResetPasswordScreen({super.key, required this.resetUrl});
 
   @override
   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
@@ -19,7 +19,7 @@ class ResetPasswordScreen extends StatefulWidget {
 
 class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   late ResetPasswordViewModel viewModel;
-  
+
   @override
   void initState() {
     viewModel = Provider.of<ResetPasswordViewModel>(context, listen: false);
@@ -66,14 +66,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             fit: BoxFit.fill,
                           ),
                         ),
-                        const Padding(
-                          padding: EdgeInsets.all(20),
+                        Padding(
+                          padding: const EdgeInsets.all(20),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 'Kata Sandi Baru',
-                                style: TextStyle(
+                                style: GoogleFonts.figtree(
                                   color: Colors.white,
                                   fontSize: 26,
                                   fontWeight: FontWeight.bold,
@@ -81,7 +81,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                               ),
                               Text(
                                 'Kata Sandi Baru harus berbeda dari kata sandi sebelumnya.',
-                                style: TextStyle(
+                                style: GoogleFonts.figtree(
                                   color: Colors.white,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w400,
@@ -135,11 +135,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                             controller: viewModel.password,
                                             titleText: 'Password',
                                             labelText: "Masukkan password anda",
-                                            obscureText:
-                                                !viewModel.isPasswordVisiblePasswordBaru,
+                                            obscureText: !viewModel
+                                                .isPasswordVisiblePasswordBaru,
                                             suffixIcon: IconButton(
                                               icon: Icon(
-                                                viewModel.isPasswordVisiblePasswordBaru
+                                                viewModel
+                                                        .isPasswordVisiblePasswordBaru
                                                     ? Icons.visibility
                                                     : Icons.visibility_off,
                                                 color: const Color(0xFF484F88),
@@ -159,11 +160,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                               titleText: "Konfirmasi Pasword",
                                               labelText:
                                                   "Ketik Ulang password anda",
-                                              obscureText:
-                                                  !viewModel.isPasswordVisiblePasswordLama,
+                                              obscureText: !viewModel
+                                                  .isPasswordVisiblePasswordLama,
                                               suffixIcon: IconButton(
                                                 icon: Icon(
-                                                  viewModel.isPasswordVisiblePasswordLama
+                                                  viewModel
+                                                          .isPasswordVisiblePasswordLama
                                                       ? Icons.visibility
                                                       : Icons.visibility_off,
                                                   color:

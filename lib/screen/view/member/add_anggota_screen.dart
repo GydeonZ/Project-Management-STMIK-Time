@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/main.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
 import 'package:projectmanagementstmiktime/screen/widget/customshowdialog.dart';
@@ -35,13 +36,13 @@ class _AddAnggotaScreenState extends State<AddAnggotaScreen> {
     cardTugasViewModel =
         Provider.of<CardTugasViewModel>(context, listen: false);
 
-    final token = sp.tokenSharedPreference;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.taskId != null) {
-        anggotaListViewModel.setTaskId(widget.taskId.toString());
-        anggotaListViewModel.getAvailableAnggotaList(token: token);
-        cardTugasViewModel.getCardTugasList(token: token);
-      }
+      final String taskIdString = widget.taskId.toString();
+      anggotaListViewModel.setTaskId(taskIdString);
+
+      // Cek apakah perlu fetch data baru
+      final token = sp.tokenSharedPreference;
+      anggotaListViewModel.getAvailableAnggotaList(token: token);
     });
   }
 
@@ -53,11 +54,10 @@ class _AddAnggotaScreenState extends State<AddAnggotaScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'Tambah Anggota Tugas',
-          style: TextStyle(
-            color: Color(0xFF293066),
-            fontFamily: 'Helvetica',
+          style: GoogleFonts.figtree(
+            color: const Color(0xFF293066),
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -68,7 +68,7 @@ class _AddAnggotaScreenState extends State<AddAnggotaScreen> {
             color: Color(0xff293066),
           ),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pop(context, true);
           },
         ),
         elevation: 0,
@@ -98,7 +98,7 @@ class _AddAnggotaScreenState extends State<AddAnggotaScreen> {
                         itemBuilder: (context, builder) {
                           return customCardAnggotaList(
                             context: context,
-                            useIcon: false,
+                            canEdit: false,
                             namaUser: "Farhan Maulana",
                             roleUser: "Mahasiswa",
                             emailUser: "aaaaa.aaaaa@zzzzz.com",
@@ -149,14 +149,13 @@ class _AddAnggotaScreenState extends State<AddAnggotaScreen> {
                             children: [
                               SizedBox(
                                 height: MediaQuery.of(context).size.height / 2,
-                                child: const Center(
+                                child: Center(
                                   child: Text(
                                     "Tidak ada anggota yang sesuai dengan pencarian",
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(
+                                    style: GoogleFonts.figtree(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black,
-                                      fontFamily: 'Helvetica',
                                     ),
                                   ),
                                 ),
@@ -173,7 +172,7 @@ class _AddAnggotaScreenState extends State<AddAnggotaScreen> {
                               return customCardAnggotaList(
                                 addAnggota: true,
                                 context: context,
-                                useIcon: false,
+                                canEdit: false,
                                 namaUser: user.name,
                                 onTap: () {
                                   selectedLevel = viewModel.selectedMemberLevel;
@@ -229,7 +228,7 @@ class _AddAnggotaScreenState extends State<AddAnggotaScreen> {
                                             .refreshAnggotaList(token: token);
                                         await cardTugasViewModel
                                             .refreshTaskListById(token: token);
-                                        navigatorKey.currentState?.pop();
+                                        navigatorKey.currentState?.pop(true);
 
                                         if (success) {
                                           await customAlert(

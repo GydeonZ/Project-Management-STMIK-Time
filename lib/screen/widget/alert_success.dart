@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:projectmanagementstmiktime/main.dart';
 import 'package:projectmanagementstmiktime/screen/view/board/board.dart';
 
 void showCustomDialog(BuildContext context, Size size) {
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
-      title: const Column(
+      title: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             'Selamat!',
-            style: TextStyle(
-              fontFamily: 'Helvetica',
+            style: GoogleFonts.figtree(
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
             'Board Berhasil dibuat',
-            style: TextStyle(
-              fontFamily: 'Helvetica',
-              color: Color(0xff4B4B4B),
+            style: GoogleFonts.figtree(
+              color: const Color(0xff4B4B4B),
             ),
           ),
         ],
@@ -43,7 +43,7 @@ void showCustomDialog(BuildContext context, Size size) {
   ).then((_) {
     // Setelah dialog ditutup, arahkan ke halaman beranda
     Navigator.pushReplacement(
-      context,
+      navigatorKey.currentContext!,
       MaterialPageRoute(
         builder: (context) => const BoardScreen(),
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 Future customShowDialog({
   required BuildContext context,
@@ -33,15 +34,13 @@ Future customShowDialog({
               children: [
                 Text(
                   text1 ?? '',
-                  style: const TextStyle(
-                    fontFamily: 'Helvetica',
+                  style: GoogleFonts.figtree(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
                   text2 ?? '',
-                  style: const TextStyle(
-                    fontFamily: 'Helvetica',
+                  style: GoogleFonts.figtree(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -89,11 +88,10 @@ Future customShowDialog({
                     ),
                     child: Text(
                       txtButtonL!,
-                      style: const TextStyle(
-                        fontFamily: 'Helvetica',
+                      style: GoogleFonts.figtree(
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
-                        color: Color(0xff293066),
+                        color: const Color(0xff293066),
                       ),
                     ),
                   ),
@@ -115,8 +113,7 @@ Future customShowDialog({
                   ),
                   child: Text(
                     txtButtonR!,
-                    style: const TextStyle(
-                      fontFamily: 'Helvetica',
+                    style: GoogleFonts.figtree(
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                       color: Colors.white,
@@ -192,8 +189,7 @@ Future customShowDialogDeskripsi({
                 child: Text(
                   text1 ?? '',
                   textAlign: TextAlign.justify,
-                  style: const TextStyle(
-                    fontFamily: 'Helvetica',
+                  style: GoogleFonts.figtree(
                     fontSize: 16,
                   ),
                 ),
@@ -228,11 +224,10 @@ Future customShowDialogDeskripsi({
                         ),
                         child: Text(
                           txtButtonL!,
-                          style: const TextStyle(
-                            fontFamily: 'Helvetica',
+                          style: GoogleFonts.figtree(
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
-                            color: Color(0xff293066),
+                            color: const Color(0xff293066),
                           ),
                         ),
                       ),
@@ -261,11 +256,10 @@ Future customShowDialogDeskripsi({
                           ),
                           child: Text(
                             txtButtonL!,
-                            style: const TextStyle(
-                              fontFamily: 'Helvetica',
+                            style: GoogleFonts.figtree(
                               fontWeight: FontWeight.bold,
                               fontSize: 12,
-                              color: Color(0xff293066),
+                              color: const Color(0xff293066),
                             ),
                           ),
                         ),
@@ -287,8 +281,7 @@ Future customShowDialogDeskripsi({
                           ),
                           child: Text(
                             txtButtonR!,
-                            style: const TextStyle(
-                              fontFamily: 'Helvetica',
+                            style: GoogleFonts.figtree(
                               fontWeight: FontWeight.bold,
                               fontSize: 12,
                               color: Colors.white,

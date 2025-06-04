@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/screen/view/forgotpassword/ubah_password_screen.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
 import 'package:projectmanagementstmiktime/screen/widget/button.dart';
@@ -64,14 +65,14 @@ class _VerifikasiOtpScreenState extends State<VerifikasiOtpScreen> {
                           fit: BoxFit.fill,
                         ),
                       ),
-                      const Padding(
-                        padding: EdgeInsets.all(20),
+                      Padding(
+                        padding: const EdgeInsets.all(20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               'OTP Kata Sandi',
-                              style: TextStyle(
+                              style: GoogleFonts.figtree(
                                 color: Colors.white,
                                 fontSize: 26,
                                 fontWeight: FontWeight.bold,
@@ -79,7 +80,7 @@ class _VerifikasiOtpScreenState extends State<VerifikasiOtpScreen> {
                             ),
                             Text(
                               'Silahkan Masukkan 6 Digit Kode yang dikirim ke Alamat Email Anda',
-                              style: TextStyle(
+                              style: GoogleFonts.figtree(
                                 color: Colors.white,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w400,
@@ -144,17 +145,17 @@ class _VerifikasiOtpScreenState extends State<VerifikasiOtpScreen> {
                                   child: RichText(
                                     text: TextSpan(
                                       children: [
-                                        const TextSpan(
+                                        TextSpan(
                                           text: 'Tidak menerima kode? ',
-                                          style: TextStyle(
-                                              color: Color(0xFF293066),
+                                          style: GoogleFonts.figtree(
+                                              color: const Color(0xFF293066),
                                               fontWeight: FontWeight.w400,
                                               fontSize: 13),
                                         ),
                                         TextSpan(
                                           text: 'Kirim ulang',
-                                          style: const TextStyle(
-                                            color: Color(0xFF8CA2CE),
+                                          style: GoogleFonts.figtree(
+                                            color: const Color(0xFF8CA2CE),
                                             fontWeight: FontWeight.w400,
                                             fontSize: 13,
                                             decoration:
@@ -216,7 +217,7 @@ class _VerifikasiOtpScreenState extends State<VerifikasiOtpScreen> {
                                                   alertType:
                                                       QuickAlertType.error,
                                                   text:
-                                                      'Terjadi kesalahan: ${e.toString()}',
+                                                      'Terjadi kesalahan Silahkan Coba lagi nanti',
                                                 );
                                               }
                                             },
@@ -290,7 +291,8 @@ class _VerifikasiOtpScreenState extends State<VerifikasiOtpScreen> {
                                     // ❌ Jangan pop context saat error terjadi
                                     customAlert(
                                       alertType: QuickAlertType.error,
-                                      text: 'Terjadi kesalahan ${e.toString()}',
+                                      text:
+                                          'Terjadi kesalahan Silahkan Coba lagi nanti',
                                     );
                                   }
                                 }

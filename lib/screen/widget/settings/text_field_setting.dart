@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 Widget textFieldSetting({
   required TextEditingController controller,
@@ -22,10 +23,10 @@ Widget textFieldSetting({
     decoration: InputDecoration(
       fillColor: fill,
       hintText: labelText,
-      hintStyle:  TextStyle(
-        color:  colorhintext,
+      hintStyle: GoogleFonts.figtree(
+        color: colorhintext,
       ),
-      labelStyle: const TextStyle(
+      labelStyle: GoogleFonts.figtree(
         color: Colors.blueGrey,
       ),
       border: InputBorder.none,

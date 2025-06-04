@@ -316,11 +316,35 @@ class BoardViewModel with ChangeNotifier {
   }
 
   bool canUserEditBoard(Datum board, int userId) {
+    // Super Admin can edit any board regardless of role
+    if (isSuperAdmin()) {
+      return true;
+    }
+    
+    // Original logic for other roles
     final role = getUserRoleFromBoard(board, userId);
     return role == RoleUserInBoard.owner || role == RoleUserInBoard.admin;
   }
 
-  bool checkUserCanEditBoardById(int? boardId, int userId) {
+  // Helper method to check if current user is a Super Admin
+  bool isSuperAdmin() {
+    // Get role from SharedPreferences
+    try {
+      SharedPreferences prefs = SharedPreferences.getInstance().asStream().first as SharedPreferences;
+      final role = prefs.getString('role') ?? "";
+      return role.toLowerCase() == "super admin";
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // More reliable way to check Super Admin role using a passed parameter
+  bool canUserEditBoardById(int? boardId, int userId, {String? userRole}) {
+    // If user is a Super Admin, they can edit any board
+    if (userRole?.toLowerCase() == "super admin") {
+      return true;
+    }
+    
     if (modelBoard == null) return false;
 
     try {
@@ -332,7 +356,6 @@ class BoardViewModel with ChangeNotifier {
       return canUserEditBoard(board, userId);
     } catch (e) {
       // Board tidak ditemukan
-      // print("Board dengan ID $boardId tidak ditemukan: $e");
       return false;
     }
   }

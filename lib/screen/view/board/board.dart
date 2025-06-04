@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/main.dart';
 import 'package:projectmanagementstmiktime/screen/view/cardtugas/card_tugas_screen.dart';
 import 'package:projectmanagementstmiktime/screen/view/member/board_anggota_screen.dart';
-import 'package:projectmanagementstmiktime/screen/view/profile/profile_screen.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
 import 'package:projectmanagementstmiktime/screen/widget/boardbottomsheet.dart';
 import 'package:projectmanagementstmiktime/screen/widget/board/card_board.dart';
@@ -78,7 +78,7 @@ class _BoardScreenState extends State<BoardScreen> {
               padding: EdgeInsets.only(top: size.height * 0.02),
               child: Text(
                 "Hello ${contactModel.nameSharedPreference}!",
-                style: const TextStyle(
+                style: GoogleFonts.figtree(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.black),
@@ -95,24 +95,14 @@ class _BoardScreenState extends State<BoardScreen> {
                       .toUpperCase()
                   : "??"; // Default jika kosong
 
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ProfileScreen(),
-                    ),
-                  );
-                },
-                child: Padding(
-                  padding: EdgeInsets.only(top: size.height * 0.02),
-                  child: CircleAvatar(
-                    backgroundColor: Colors.blue,
-                    child: Text(
-                      initials,
-                      style: const TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
+              return Padding(
+                padding: EdgeInsets.only(top: size.height * 0.02),
+                child: CircleAvatar(
+                  backgroundColor: Colors.blue,
+                  child: Text(
+                    initials,
+                    style: GoogleFonts.figtree(
+                        color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                 ),
               );
@@ -163,7 +153,7 @@ class _BoardScreenState extends State<BoardScreen> {
                   builder: (context, boardViewModel, child) {
                 return Text(
                   "Tugas Anda pada hari ${boardViewModel.tanggalTerformat}",
-                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  style: GoogleFonts.figtree(fontSize: 14, color: Colors.grey),
                 );
               }),
               const SizedBox(height: 16),
@@ -214,7 +204,7 @@ class _BoardScreenState extends State<BoardScreen> {
                               child: Text(
                                 "Tidak ada board yang sesuai dengan '${boardViewModel.searchQuery}'",
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
+                                style: GoogleFonts.figtree(
                                   fontSize: 16,
                                   color: Colors.grey[600],
                                 ),
@@ -250,6 +240,29 @@ class _BoardScreenState extends State<BoardScreen> {
                           return _buildAddBoardCard(); // "Tambah Board" at the end
                         }
                         final board = filteredBoards[index];
+                        bool checkUserCanEditBoard(int boardOwnerId) {
+                          if (sp == null) return false;
+
+                          // Check if user is Super Admin
+                          if (sp!.roleSharedPreference.toLowerCase() ==
+                              "super admin") {
+                            return true;
+                          }
+
+                          // Original logic - check if user is board owner
+                          final currentUserId = sp!.idSharedPreference;
+
+                          // For non-board owners, check admin rights via BoardViewModel
+                          if (currentUserId != boardOwnerId) {
+                            return boardViewModel.canUserEditBoardById(
+                                board.id, // You need to pass the board ID here
+                                currentUserId,
+                                userRole: sp!.roleSharedPreference);
+                          }
+
+                          return currentUserId == boardOwnerId;
+                        }
+
                         return GestureDetector(
                           onTap: () {
                             final cardTugasViewModel =
@@ -275,7 +288,7 @@ class _BoardScreenState extends State<BoardScreen> {
                                   .substring(0, min(2, board.user.name.length)),
                               context: context,
                               boardId: board.id,
-                              canEdit: _checkUserCanEditBoard(board.user.id),
+                              canEdit: checkUserCanEditBoard(board.user.id),
                               onTap: (value) async {
                                 if (value == 'edit') {
                                   // Edit board name
@@ -283,31 +296,42 @@ class _BoardScreenState extends State<BoardScreen> {
                                   selectedVisibility =
                                       boardViewModel.selectedBoardVisibility;
                                   boardViewModel.judulBoard.text = board.name;
+                                  // Pastikan dialog ditampilkan dengan StatefulBuilder untuk memastikan state diperbarui dengan benar
                                   customShowDialog(
                                     useForm: true,
                                     context: context,
-                                    customWidget: Column(
-                                      children: [
-                                        customTextFormField(
-                                          keyForm: boardViewModel.formKey,
-                                          titleText: "Update Nama Board",
-                                          controller: boardViewModel.judulBoard,
-                                          labelText:
-                                              "Masukkan Nama Board yang Baru",
-                                          validator: (value) => boardViewModel
-                                              .validateBoardName(value!),
-                                        ),
-                                        visibilityDropdownWidget(
-                                          context,
-                                          selectedVisibility ?? "Public",
-                                          (value) {
-                                            setState(() {
-                                              selectedVisibility = value;
-                                            });
-                                          },
-                                        ),
-                                      ],
-                                    ),
+                                    customWidget: StatefulBuilder(
+                                        // Tambahkan StatefulBuilder di sini
+                                        builder: (context, setDialogState) {
+                                      return Column(
+                                        children: [
+                                          customTextFormField(
+                                            keyForm: boardViewModel.formKey,
+                                            titleText: "Update Nama Board",
+                                            controller:
+                                                boardViewModel.judulBoard,
+                                            labelText:
+                                                "Masukkan Nama Board yang Baru",
+                                            validator: (value) => boardViewModel
+                                                .validateBoardName(value!),
+                                          ),
+                                          visibilityDropdownWidget(
+                                            context,
+                                            selectedVisibility ?? "Public",
+                                            (value) {
+                                              // Gunakan setDialogState untuk memastikan UI dropdown diperbarui
+                                              setDialogState(() {
+                                                selectedVisibility = value;
+                                              });
+                                              // Perbarui juga state di parent widget
+                                              setState(() {
+                                                selectedVisibility = value;
+                                              });
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    }),
                                     txtButtonL: "Batal",
                                     txtButtonR: "Update",
                                     onPressedBtnL: () {
@@ -316,9 +340,8 @@ class _BoardScreenState extends State<BoardScreen> {
                                     },
                                     onPressedBtnR: () async {
                                       final token = sp?.tokenSharedPreference;
+                                      Navigator.pop(context);
 
-                                      Navigator.pop(
-                                          context); // Tutup form/modal sebelumnya
                                       if (boardViewModel.formKey.currentState!
                                           .validate()) {
                                         customAlert(
@@ -332,7 +355,8 @@ class _BoardScreenState extends State<BoardScreen> {
                                               await boardViewModel.editBoard(
                                             token: token,
                                             encryptId: board.encryptedId,
-                                            visibility: selectedVisibility,
+                                            visibility:
+                                                selectedVisibility, // Pastikan nilainya dilewatkan dengan benar
                                           );
                                           navigatorKey.currentState?.pop();
                                           if (response == 200) {
@@ -540,7 +564,9 @@ class _BoardScreenState extends State<BoardScreen> {
   }
 
   Widget _buildAddBoardCard() {
-    if (sp == null || sp!.roleSharedPreference != "Dosen") {
+    if (sp == null ||
+        sp!.roleSharedPreference != "Dosen" &&
+            sp!.roleSharedPreference != "Super Admin") {
       return const SizedBox.shrink();
     }
     return GestureDetector(
@@ -549,24 +575,18 @@ class _BoardScreenState extends State<BoardScreen> {
       },
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        child: const Center(
+        child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.add, color: Colors.grey, size: 32),
-              SizedBox(height: 8),
-              Text("Buat Board", style: TextStyle(color: Colors.grey)),
+              const Icon(Icons.add, color: Colors.grey, size: 32),
+              const SizedBox(height: 8),
+              Text("Buat Board",
+                  style: GoogleFonts.figtree(color: Colors.grey)),
             ],
           ),
         ),
       ),
     );
-  }
-
-  bool _checkUserCanEditBoard(int boardOwnerId) {
-    if (sp == null) return false;
-
-    final currentUserId = sp!.idSharedPreference;
-    return currentUserId == boardOwnerId;
   }
 }

@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/main.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
 import 'package:projectmanagementstmiktime/screen/widget/formfield.dart';
@@ -55,9 +56,9 @@ class CreateBoardrBottomSheetState extends State<CreateBoardBottomSheet> {
                 children: [
                   Padding(
                     padding: EdgeInsets.only(left: size.width * 0.295),
-                    child: const Text(
+                    child: Text(
                       'Tambah Board',
-                      style: TextStyle(
+                      style: GoogleFonts.figtree(
                         fontSize: 20.0,
                         fontWeight: FontWeight.bold,
                       ),
@@ -78,9 +79,9 @@ class CreateBoardrBottomSheetState extends State<CreateBoardBottomSheet> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Visibilitas',
-                    style: TextStyle(fontSize: 16.0),
+                    style: GoogleFonts.figtree(fontSize: 16.0),
                   ),
                   GestureDetector(
                     onTap: () {
@@ -96,9 +97,9 @@ class CreateBoardrBottomSheetState extends State<CreateBoardBottomSheet> {
                                 ? addBoardViewModel.selectedVisibility.text =
                                     "Public" // Default jika kosong
                                 : addBoardViewModel.selectedVisibility.text,
-                            style: const TextStyle(
+                            style: GoogleFonts.figtree(
                               fontSize: 16.0,
-                              color: Color(0xff939393),
+                              color: const Color(0xff939393),
                             ),
                           ),
                         );

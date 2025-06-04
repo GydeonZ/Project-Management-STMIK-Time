@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'package:projectmanagementstmiktime/screen/view/board/board.dart';
 import 'package:projectmanagementstmiktime/screen/view/notification/notification_screen.dart';
 import 'package:projectmanagementstmiktime/screen/view/profile/profile_screen.dart';
+import 'package:projectmanagementstmiktime/view_model/notification/view_model_notification.dart';
 
 class NavigationScreen extends StatefulWidget {
   const NavigationScreen({super.key});
@@ -59,6 +61,10 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Dapatkan unread count dari NotificationViewModel
+    final notificationViewModel = Provider.of<NotificationViewModel>(context);
+    final unreadCount = notificationViewModel.unreadNotificationsCount;
+
     return PopScope(
       canPop: false,
       onPopInvoked: (didPop) async {
@@ -98,15 +104,16 @@ class _NavigationScreenState extends State<NavigationScreen> {
               onTap: _onItemTapped,
               items: [
                 BottomNavigationBarItem(
-                  icon: _buildNavIcon("assets/dashboard.svg", 0),
+                  icon: _buildNavIconWithBadge("assets/dashboard.svg", 0, 0),
                   label: 'Board',
                 ),
                 BottomNavigationBarItem(
-                  icon: _buildNavIcon("assets/notifikasi.svg", 1),
+                  icon: _buildNavIconWithBadge(
+                      "assets/notifikasi.svg", 1, unreadCount),
                   label: 'Notifikasi',
                 ),
                 BottomNavigationBarItem(
-                  icon: _buildNavIcon("assets/akun.svg", 2),
+                  icon: _buildNavIconWithBadge("assets/akun.svg", 2, 0),
                   label: 'Profil',
                 ),
               ],
@@ -117,7 +124,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
     );
   }
 
-  Widget _buildNavIcon(String iconPath, int index) {
+  Widget buildNavIcon(String iconPath, int index) {
     return Column(
       children: [
         const SizedBox(height: 8),
@@ -144,6 +151,68 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 ),
               )
             : const SizedBox(height: 6),
+      ],
+    );
+  }
+
+  Widget _buildNavIconWithBadge(String iconPath, int index, int unreadCount) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Column(
+          children: [
+            const SizedBox(height: 8),
+            SvgPicture.asset(
+              iconPath,
+              height: 25,
+              width: 25,
+              colorFilter: ColorFilter.mode(
+                index == _selectedIndex
+                    ? const Color(0xFF293066)
+                    : const Color(0xFF293066).withOpacity(0.5),
+                BlendMode.srcIn,
+              ),
+            ),
+            const SizedBox(height: 5),
+            index == _selectedIndex
+                ? Container(
+                    margin: const EdgeInsets.only(top: 3),
+                    height: 3,
+                    width: 25,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF293066),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  )
+                : const SizedBox(height: 6),
+          ],
+        ),
+        // Badge untuk notifikasi yang belum dibaca
+        if (index == 1 && unreadCount > 0)
+          Positioned(
+            top: 0,
+            right: -5,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
+              ),
+              constraints: const BoxConstraints(
+                minWidth: 16,
+                minHeight: 16,
+              ),
+              child: Text(
+                unreadCount > 9 ? '9+' : unreadCount.toString(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
       ],
     );
   }

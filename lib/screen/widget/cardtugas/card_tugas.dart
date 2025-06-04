@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/main.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
 import 'package:projectmanagementstmiktime/screen/widget/cardtugas/customskeletoncard.dart';
@@ -38,20 +39,27 @@ class _CustomCardTugasState extends State<CustomCardTugas> {
         Provider.of<CardTugasViewModel>(context, listen: false);
     sp = Provider.of<SignInViewModel>(context, listen: false);
     final token = sp.tokenSharedPreference;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       cardTugasViewModel.getCardTugasList(token: token);
     });
   }
 
   bool _checkUserCanEdit() {
-    // Mendapatkan user ID dari SharedPreferences
+    // Get the current user ID from SharedPreferences
     final currentUserId = sp.idSharedPreference;
 
-    // Mendapatkan board view model
+    // Check if user is a Super Admin (they can edit anything)
+    if (sp.roleSharedPreference.toLowerCase() == "super admin") {
+      return true;
+    }
+
+    // Get the board view model
     final boardVm = Provider.of<BoardViewModel>(context, listen: false);
 
-    // Menggunakan fungsi yang baru dibuat
-    return boardVm.checkUserCanEditBoardById(widget.boardId, currentUserId);
+    // Check user permissions for this specific board
+    return boardVm.canUserEditBoardById(widget.boardId, currentUserId,
+        userRole: sp.roleSharedPreference);
   }
 
   // Function untuk menangani perpindahan card
@@ -81,14 +89,14 @@ class _CustomCardTugasState extends State<CustomCardTugas> {
       if (response == 200) {
         await cardTugasViewModel.refreshCardTugasData(token: token);
 
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
           const SnackBar(
             content: Text('Posisi card berhasil diubah'),
             backgroundColor: Colors.green,
           ),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
           SnackBar(
             content: Text(
                 cardTugasViewModel.errorMessages ?? 'Gagal memindahkan card'),
@@ -98,7 +106,7 @@ class _CustomCardTugasState extends State<CustomCardTugas> {
       }
     } catch (e) {
       navigatorKey.currentState?.pop();
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
         const SnackBar(
           content: Text('Terjadi Kesalahan, Coba lagi beberapa saat'),
           backgroundColor: Colors.red,
@@ -132,14 +140,14 @@ class _CustomCardTugasState extends State<CustomCardTugas> {
       if (response == 200) {
         await cardTugasViewModel.refreshCardTugasData(token: token);
 
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
           const SnackBar(
             content: Text('Posisi tugas berhasil diubah'),
             backgroundColor: Colors.green,
           ),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
           SnackBar(
             content: Text(
                 cardTugasViewModel.errorMessages ?? 'Gagal memindahkan tugas'),
@@ -149,7 +157,7 @@ class _CustomCardTugasState extends State<CustomCardTugas> {
       }
     } catch (e) {
       navigatorKey.currentState?.pop();
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
         const SnackBar(
           content: Text('Terjadi Kesalahan, Coba lagi beberapa saat'),
           backgroundColor: Colors.red,
@@ -186,14 +194,14 @@ class _CustomCardTugasState extends State<CustomCardTugas> {
       if (response == 200) {
         await cardTugasViewModel.refreshCardTugasData(token: token);
 
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
           const SnackBar(
             content: Text('Tugas berhasil dipindahkan ke card lain'),
             backgroundColor: Colors.green,
           ),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
           SnackBar(
             content: Text(
                 cardTugasViewModel.errorMessages ?? 'Gagal memindahkan tugas'),
@@ -203,7 +211,7 @@ class _CustomCardTugasState extends State<CustomCardTugas> {
       }
     } catch (e) {
       navigatorKey.currentState?.pop();
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
         const SnackBar(
           content: Text('Terjadi kesalahan saat memindahkan tugas'),
           backgroundColor: Colors.red,
@@ -252,10 +260,10 @@ class _CustomCardTugasState extends State<CustomCardTugas> {
             physics: const AlwaysScrollableScrollPhysics(),
             child: SizedBox(
               height: size.height * 0.8,
-              child: const Center(
+              child: Center(
                 child: Text(
                   'Card tidak ditemukan',
-                  style: TextStyle(color: Colors.red),
+                  style: GoogleFonts.figtree(color: Colors.red),
                 ),
               ),
             ),
@@ -418,14 +426,14 @@ class _CustomCardTugasState extends State<CustomCardTugas> {
                         if (success) {
                           customAlert(
                             alertType: QuickAlertType.success,
-                            title: "Board berhasil dihapus!",
+                            title: "Card berhasil dihapus!",
                           );
                         } else {
                           // Error saat refresh
                           customAlert(
                             alertType: QuickAlertType.error,
                             text: viewModel.errorMessages ??
-                                "Gagal merefresh data board",
+                                "Gagal merefresh data Card",
                           );
                         }
                       } else {
@@ -433,14 +441,14 @@ class _CustomCardTugasState extends State<CustomCardTugas> {
                         customAlert(
                           alertType: QuickAlertType.error,
                           text: viewModel.errorMessages ??
-                              "Gagal menghapus board",
+                              "Gagal menghapus Card",
                         );
                       }
                     } catch (e) {
                       navigatorKey.currentState?.pop(); // Tutup loading alert
                       customAlert(
                         alertType: QuickAlertType.error,
-                        text: "Terjadi kesalahan: $e",
+                        text: "Terjadi kesalahan Silahkan Coba lagi nanti",
                       );
                     }
                   },

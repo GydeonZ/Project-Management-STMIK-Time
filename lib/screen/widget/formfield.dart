@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 Widget customTextFormField({
   required TextEditingController controller,
@@ -33,8 +34,8 @@ Widget customTextFormField({
               padding: const EdgeInsets.only(left: 5),
               child: Text(
                 titleText ?? "",
-                style: const TextStyle(
-                  fontFamily: "Helvetica",
+                style: GoogleFonts.figtree(
+                  
                   fontSize: 14,
                 ),
               ),
@@ -58,14 +59,14 @@ Widget customTextFormField({
                   filled: true,
                   fillColor: const Color(0xFFECECEC),
                   hintText: labelText,
-                  hintStyle: const TextStyle(
-                    fontFamily: "Helvetica",
+                  hintStyle: GoogleFonts.figtree(
+                    
                     fontSize: 14,
-                    color: Color(0xFFB0B0B0),
+                    color: const Color(0xFFB0B0B0),
                   ),
-                  labelStyle: const TextStyle(
-                    color: Color(0xffBFBFBF),
-                    fontFamily: "Helvetica",
+                  labelStyle: GoogleFonts.figtree(
+                    color: const Color(0xffBFBFBF),
+                    
                   ),
                   prefixIcon: prefixIcon,
                   suffixIcon: suffixIcon,
@@ -105,14 +106,14 @@ Widget customTextFormField({
                     obscureText: obscureText ?? false,
                     decoration: InputDecoration(
                       hintText: labelText,
-                      hintStyle: const TextStyle(
-                        fontFamily: "Helvetica",
+                      hintStyle: GoogleFonts.figtree(
+                        
                         fontSize: 14,
-                        color: Color(0xFFB0B0B0),
+                        color: const Color(0xFFB0B0B0),
                       ),
-                      labelStyle: const TextStyle(
-                        color: Color(0xffBFBFBF),
-                        fontFamily: "Helvetica",
+                      labelStyle: GoogleFonts.figtree(
+                        color: const Color(0xffBFBFBF),
+                        
                       ),
                       // Tambahkan prefixIconConstraints untuk mengontrol ukuran area icon
                       prefixIconConstraints: BoxConstraints(
@@ -209,8 +210,8 @@ Widget customFormDetailTugas({
                             padding: const EdgeInsets.only(left: 15.0),
                             child: Text(
                               labelText ?? "",
-                              style: TextStyle(
-                                fontFamily: "Helvetica",
+                              style: GoogleFonts.figtree(
+                                
                                 fontSize: 14,
                                 color: colorText ?? const Color(0xFFB0B0B0),
                                 fontWeight: textBold == true
@@ -245,10 +246,9 @@ Widget customFormDetailTugas({
                             SizedBox(width: size.width * 0.04),
                             Text(
                               listDataTitle ?? "",
-                              style: const TextStyle(
+                              style: GoogleFonts.figtree(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14,
-                                fontFamily: 'Helvetica',
                               ),
                             ),
                           ],
@@ -302,12 +302,12 @@ Widget customFormDetailTugas({
                                 const SizedBox(
                                   height: 10,
                                 ),
-                                const Text(
+                                Text(
                                   "Tidak ada data",
-                                  style: TextStyle(
-                                    fontFamily: "Helvetica",
+                                  style: GoogleFonts.figtree(
+                                    
                                     fontSize: 14,
-                                    color: Color(0xFFB0B0B0),
+                                    color: const Color(0xFFB0B0B0),
                                   ),
                                 ),
                               ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/screen/view/signin_signup/signscreen.dart';
 import 'package:projectmanagementstmiktime/screen/view/signin_signup/signupscreen.dart';
 import 'package:projectmanagementstmiktime/screen/widget/button.dart';
@@ -36,10 +37,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 width: size.width * 1,
                 height: size.height * 0.4,
               ),
-              const Text(
+              Text(
                 "Kerja team lebih cepat",
-                style: TextStyle(
-                  fontFamily: "Inter",
+                style: GoogleFonts.figtree(
+                  
                   color: Colors.white,
                   fontSize: 25,
                   fontWeight: FontWeight.bold,
@@ -48,11 +49,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               SizedBox(
                 height: size.height * 0.01,
               ),
-              const Text(
+              Text(
                 "Buat dan kelola rencana Anda \ndengan sederhana",
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: "Inter",
+                style: GoogleFonts.figtree(
+                  
                   color: Colors.white,
                   fontSize: 14,
                 ),
@@ -102,10 +103,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
+                  Text(
                     "dikelola oleh",
-                    style: TextStyle(
-                      fontFamily: "Inter",
+                    style: GoogleFonts.figtree(
+                      
                       color: Colors.white,
                       fontSize: 14,
                     ),
@@ -113,10 +114,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   SizedBox(
                     width: size.width * 0.01,
                   ),
-                  const Text(
+                  Text(
                     "STMIK TIME",
-                    style: TextStyle(
-                      fontFamily: "Inter",
+                    style: GoogleFonts.figtree(
+                      
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 14,

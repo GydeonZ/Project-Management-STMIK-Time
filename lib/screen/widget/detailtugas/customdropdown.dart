@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 Widget levelDropdownWidget(
     BuildContext context, String initialValue, ValueChanged<String> onChanged) {
@@ -11,13 +12,12 @@ Widget levelDropdownWidget(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
+          Text(
             "Pilih Role User",
-            style: TextStyle(
+            style: GoogleFonts.figtree(
               fontSize: 14,
               fontWeight: FontWeight.w400,
               color: Colors.black,
-              fontFamily: 'Helvetica',
             ),
           ),
           const SizedBox(height: 8),
@@ -42,8 +42,7 @@ Widget levelDropdownWidget(
                   children: [
                     Text(
                       initialValue,
-                      style: const TextStyle(
-                        fontFamily: 'Helvetica',
+                      style: GoogleFonts.figtree(
                         fontSize: 16,
                       ),
                     ),
@@ -118,13 +117,12 @@ Widget visibilityDropdownWidget(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
+          Text(
             "Visibilitas",
-            style: TextStyle(
+            style: GoogleFonts.figtree(
               fontSize: 14,
               fontWeight: FontWeight.w400,
               color: Colors.black,
-              fontFamily: 'Helvetica',
             ),
           ),
           const SizedBox(height: 8),
@@ -149,8 +147,7 @@ Widget visibilityDropdownWidget(
                   children: [
                     Text(
                       initialValue,
-                      style: const TextStyle(
-                        fontFamily: 'Helvetica',
+                      style: GoogleFonts.figtree(
                         fontSize: 16,
                       ),
                     ),
@@ -225,8 +222,7 @@ Widget _buildMenuItem(String value, String selectedValue, VoidCallback onTap) {
       color: isSelected ? const Color(0xFFE3F2FD) : Colors.transparent,
       child: Text(
         value,
-        style: TextStyle(
-          fontFamily: 'Helvetica',
+        style: GoogleFonts.figtree(
           fontSize: 16,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           color: isSelected ? const Color(0xFF293066) : Colors.black,

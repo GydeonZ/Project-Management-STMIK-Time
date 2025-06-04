@@ -29,8 +29,8 @@ class User {
   String name;
   String email;
   String role;
-  dynamic nim;
-  dynamic nidn;
+  String? nim;
+  String? nidn;
   DateTime updatedAt;
   DateTime createdAt;
   int id;
@@ -39,8 +39,8 @@ class User {
     required this.name,
     required this.email,
     required this.role,
-    required this.nim,
-    required this.nidn,
+    this.nim,
+    this.nidn,
     required this.updatedAt,
     required this.createdAt,
     required this.id,
@@ -50,8 +50,8 @@ class User {
         name: json["name"],
         email: json["email"],
         role: json["role"],
-        nim: json["nim"],
-        nidn: json["nidn"],
+        nim: json["nim"] ?? "",
+        nidn: json["nidn"] ?? "",
         updatedAt: DateTime.parse(json["updated_at"]),
         createdAt: DateTime.parse(json["created_at"]),
         id: json["id"],
@@ -61,8 +61,8 @@ class User {
         "name": name,
         "email": email,
         "role": role,
-        "nim": nim,
-        "nidn": nidn,
+        "nim": nim ?? "",
+        "nidn": nidn ?? "",
         "updated_at": updatedAt.toIso8601String(),
         "created_at": createdAt.toIso8601String(),
         "id": id,

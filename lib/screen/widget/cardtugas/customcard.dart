@@ -2,6 +2,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 Widget customCard({
   required BuildContext context,
@@ -34,7 +35,7 @@ Widget customCard({
               Expanded(
                 child: Text(
                   cardTitle,
-                  style: const TextStyle(
+                  style: GoogleFonts.figtree(
                     fontWeight: FontWeight.bold,
                     fontSize: 17,
                   ),
@@ -48,10 +49,10 @@ Widget customCard({
                         children: [
                           TextSpan(
                             text: '+ Tambah Tugas',
-                            style: const TextStyle(
-                              color: Color(0xff293066),
+                            style: GoogleFonts.figtree(
+                              color: const Color(0xff293066),
                               fontSize: 13,
-                              fontFamily: "Helvetica",
+                              
                             ),
                             recognizer: TapGestureRecognizer()
                               ..onTap = onTapTambahTugas,
@@ -101,11 +102,11 @@ Widget customCard({
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Center(
+                          child: Center(
                             child: Text(
                               "Letakkan tugas di sini",
-                              style: TextStyle(
-                                color: Color(0xff293066),
+                              style: GoogleFonts.figtree(
+                                color: const Color(0xff293066),
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -175,11 +176,10 @@ Widget buildCardDropdown(
               ),
             ),
             const SizedBox(width: 16),
-            const Text(
+            Text(
               'Ubah',
-              style: TextStyle(
+              style: GoogleFonts.figtree(
                 color: Colors.blue,
-                fontFamily: 'Helvetica',
                 fontSize: 14,
               ),
             ),
@@ -199,11 +199,10 @@ Widget buildCardDropdown(
               ),
             ),
             const SizedBox(width: 16),
-            const Text(
+            Text(
               'Anggota',
-              style: TextStyle(
+              style: GoogleFonts.figtree(
                 color: Colors.purple,
-                fontFamily: 'Helvetica',
                 fontSize: 14,
               ),
             ),
@@ -223,11 +222,10 @@ Widget buildCardDropdown(
               ),
             ),
             const SizedBox(width: 16),
-            const Text(
+            Text(
               'Duplikat',
-              style: TextStyle(
+              style: GoogleFonts.figtree(
                 color: Colors.green,
-                fontFamily: 'Helvetica',
                 fontSize: 14,
               ),
             ),
@@ -247,11 +245,10 @@ Widget buildCardDropdown(
               ),
             ),
             const SizedBox(width: 16),
-            const Text(
+            Text(
               'Hapus',
-              style: TextStyle(
+              style: GoogleFonts.figtree(
                 color: Colors.red,
-                fontFamily: 'Helvetica',
                 fontSize: 14,
               ),
             ),

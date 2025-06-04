@@ -40,7 +40,7 @@ class ResetPasswordViewModel with ChangeNotifier {
       }
       return 500;
     } catch (e) {
-      errorMessages = "Terjadi kesalahan: ${e.toString()}";
+      errorMessages = "Terjadi kesalahan Silahkan Coba lagi nanti";
       notifyListeners();
       return 500;
     }

@@ -55,8 +55,8 @@ class BoardOwner {
     required this.emailVerifiedAt,
     required this.active,
     required this.role,
-    required this.nim,
-    required this.nidn,
+    this.nim,
+    this.nidn,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -68,8 +68,8 @@ class BoardOwner {
         emailVerifiedAt: DateTime.parse(json["email_verified_at"]),
         active: json["active"],
         role: json["role"],
-        nim: json["nim"],
-        nidn: json["nidn"],
+        nim: json["nim"] ?? "",
+        nidn: json["nidn"] ?? "",
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),
       );
@@ -81,8 +81,8 @@ class BoardOwner {
         "email_verified_at": emailVerifiedAt.toIso8601String(),
         "active": active,
         "role": role,
-        "nim": nim,
-        "nidn": nidn,
+        "nim": nim ?? "",
+        "nidn": nidn ?? "",
         "created_at": createdAt.toIso8601String(),
         "updated_at": updatedAt.toIso8601String(),
       };

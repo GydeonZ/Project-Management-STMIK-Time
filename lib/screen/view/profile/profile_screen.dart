@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/screen/view/onboarding/onboarding.dart';
 import 'package:projectmanagementstmiktime/screen/view/profile/profile_change_password_screen.dart';
 import 'package:projectmanagementstmiktime/screen/widget/customshowdialog.dart';
@@ -57,11 +58,10 @@ class ProfileScreenState extends State<ProfileScreen> {
         automaticallyImplyLeading:
             false, // Tetap false karena dihandle oleh navigation bar
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'Profile',
-          style: TextStyle(
-            color: Color(0xFF293066),
-            fontFamily: 'Helvetica',
+          style: GoogleFonts.figtree(
+            color: const Color(0xFF293066),
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -84,13 +84,12 @@ class ProfileScreenState extends State<ProfileScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 20),
-                      const Text(
+                      Text(
                         'Akun',
-                        style: TextStyle(
+                        style: GoogleFonts.figtree(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'Helvetica',
-                          color: Color(0xff293066),
+                          color: const Color(0xff293066),
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -128,11 +127,10 @@ class ProfileScreenState extends State<ProfileScreen> {
                                   height: size.height * 0.02,
                                 ),
                                 SizedBox(width: size.width * 0.04),
-                                const Text(
+                                Text(
                                   'Ubah Kata Sandi',
-                                  style: TextStyle(
+                                  style: GoogleFonts.figtree(
                                     fontSize: 12,
-                                    fontFamily: 'Helvetica',
                                   ),
                                 ),
                               ],
@@ -170,11 +168,10 @@ class ProfileScreenState extends State<ProfileScreen> {
                                   height: size.height * 0.02,
                                 ),
                                 SizedBox(width: size.width * 0.04),
-                                const Text(
+                                Text(
                                   'Layanan Bantuan',
-                                  style: TextStyle(
+                                  style: GoogleFonts.figtree(
                                     fontSize: 12,
-                                    fontFamily: 'Helvetica',
                                   ),
                                 ),
                               ],
@@ -233,11 +230,10 @@ class ProfileScreenState extends State<ProfileScreen> {
                                   height: size.height * 0.02,
                                 ),
                                 SizedBox(width: size.width * 0.04),
-                                const Text(
+                                Text(
                                   'Keluar',
-                                  style: TextStyle(
+                                  style: GoogleFonts.figtree(
                                     fontSize: 12,
-                                    fontFamily: 'Helvetica',
                                   ),
                                 ),
                               ],

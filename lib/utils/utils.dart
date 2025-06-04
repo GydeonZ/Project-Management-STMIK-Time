@@ -24,4 +24,6 @@ class Urls {
   static const String notificationList = "/api/notifications/show";
   static const String markNotif = "/api/notifications/";
   static const String deleteNotif = "/api/notifications/delete-all";
+  static const String deleteComment = "/api/tasks/comments";
+  static const String editComment = "/api/tasks/comments";
 }

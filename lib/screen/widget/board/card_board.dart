@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 Widget customCardBoard({
   required String title,
@@ -27,7 +28,7 @@ Widget customCardBoard({
                 backgroundColor: color,
                 child: Text(
                   nickname ?? '',
-                  style: const TextStyle(
+                  style: GoogleFonts.figtree(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
@@ -36,23 +37,23 @@ Widget customCardBoard({
               const SizedBox(height: 8),
               Text(
                 title,
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: GoogleFonts.figtree(
+                    fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 4),
               Text(subtitle,
-                  style: const TextStyle(
+                  style: GoogleFonts.figtree(
                     color: Colors.grey,
                   )),
             ],
           ),
         ),
       ),
-      if (canEdit)
-        Positioned(
-          right: size.width * 0.006,
-          child: _buildBoardDropdown(context, boardId ?? 0, size, onTap),
-        ),
+      // Always show the dropdown, but content will differ based on canEdit
+      Positioned(
+        right: size.width * 0.006,
+        child: _buildBoardDropdown(context, boardId ?? 0, size, onTap, canEdit),
+      ),
     ],
   );
 }
@@ -62,6 +63,7 @@ Widget _buildBoardDropdown(
   int boardId,
   Size size,
   PopupMenuItemSelected<String>? onTap,
+  bool canEdit,
 ) {
   return PopupMenuButton<String>(
     icon: const Icon(
@@ -74,32 +76,9 @@ Widget _buildBoardDropdown(
       borderRadius: BorderRadius.circular(12),
     ),
     onSelected: onTap,
-    itemBuilder: (context) => [
-      PopupMenuItem<String>(
-        value: 'edit',
-        child: Row(
-          children: [
-            SvgPicture.asset(
-              "assets/pencil.svg",
-              height: size.height * 0.02,
-              colorFilter: const ColorFilter.mode(
-                Colors.blue,
-                BlendMode.srcIn,
-              ),
-            ),
-            const SizedBox(width: 16),
-            const Text(
-              'Ubah',
-              style: TextStyle(
-                color: Colors.blue,
-                fontFamily: 'Helvetica',
-                fontSize: 14,
-              ),
-            ),
-          ],
-        ),
-      ),
-      PopupMenuItem<String>(
+    itemBuilder: (context) {
+      // Create the anggota menu item that will always be shown
+      final anggotaMenuItem = PopupMenuItem<String>(
         value: 'anggota',
         child: Row(
           children: [
@@ -112,65 +91,95 @@ Widget _buildBoardDropdown(
               ),
             ),
             const SizedBox(width: 16),
-            const Text(
+            Text(
               'Anggota',
-              style: TextStyle(
+              style: GoogleFonts.figtree(
                 color: Colors.purple,
-                fontFamily: 'Helvetica',
                 fontSize: 14,
               ),
             ),
           ],
         ),
-      ),
-      PopupMenuItem<String>(
-        value: 'duplicate',
-        child: Row(
-          children: [
-            SvgPicture.asset(
-              "assets/dupe.svg",
-              height: size.height * 0.02,
-              colorFilter: const ColorFilter.mode(
-                Colors.green,
-                BlendMode.srcIn,
-              ),
+      );
+
+      // If user can edit, show all options
+      if (canEdit) {
+        return [
+          PopupMenuItem<String>(
+            value: 'edit',
+            child: Row(
+              children: [
+                SvgPicture.asset(
+                  "assets/pencil.svg",
+                  height: size.height * 0.02,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.blue,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  'Ubah',
+                  style: GoogleFonts.figtree(
+                    color: Colors.blue,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 16),
-            const Text(
-              'Duplikat',
-              style: TextStyle(
-                color: Colors.green,
-                fontFamily: 'Helvetica',
-                fontSize: 14,
-              ),
+          ),
+          anggotaMenuItem, // Reuse the anggota menu item
+          PopupMenuItem<String>(
+            value: 'duplicate',
+            child: Row(
+              children: [
+                SvgPicture.asset(
+                  "assets/dupe.svg",
+                  height: size.height * 0.02,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.green,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  'Duplikat',
+                  style: GoogleFonts.figtree(
+                    color: Colors.green,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-      PopupMenuItem<String>(
-        value: 'delete',
-        child: Row(
-          children: [
-            SvgPicture.asset(
-              "assets/tongsampah.svg",
-              height: size.height * 0.02,
-              colorFilter: const ColorFilter.mode(
-                Colors.red,
-                BlendMode.srcIn,
-              ),
+          ),
+          PopupMenuItem<String>(
+            value: 'delete',
+            child: Row(
+              children: [
+                SvgPicture.asset(
+                  "assets/tongsampah.svg",
+                  height: size.height * 0.02,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.red,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  'Hapus',
+                  style: GoogleFonts.figtree(
+                    color: Colors.red,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 16),
-            const Text(
-              'Hapus',
-              style: TextStyle(
-                color: Colors.red,
-                fontFamily: 'Helvetica',
-                fontSize: 14,
-              ),
-            ),
-          ],
-        ),
-      ),
-    ],
+          ),
+        ];
+      } else {
+        // If user cannot edit, show only anggota
+        return [anggotaMenuItem];
+      }
+    },
   );
 }

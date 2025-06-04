@@ -30,6 +30,7 @@ dependencies:
   firebase_auth: ^4.15.2
   firebase_messaging: ^14.7.8
   awesome_notifications: ^0.8.2
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:

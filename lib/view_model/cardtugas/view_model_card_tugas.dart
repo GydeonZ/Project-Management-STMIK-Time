@@ -1,26 +1,34 @@
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:projectmanagementstmiktime/main.dart';
 import 'package:projectmanagementstmiktime/model/model_fetch_card_tugas.dart';
-import 'package:projectmanagementstmiktime/model/model_fetch_tasklist_id.dart';
+import 'package:projectmanagementstmiktime/model/model_fetch_tasklist_id.dart'
+    as task_model;
 import 'package:projectmanagementstmiktime/services/service_add_tugas.dart';
 import 'package:projectmanagementstmiktime/services/service_card_tugas.dart';
 import 'package:projectmanagementstmiktime/services/service_checklist.dart';
+import 'package:projectmanagementstmiktime/services/service_comment.dart';
 import 'package:projectmanagementstmiktime/services/service_delete_task_detail.dart';
 import 'package:projectmanagementstmiktime/services/service_edit_task_detail.dart';
 import 'package:projectmanagementstmiktime/services/service_fetch_tasklist_id.dart';
 import 'package:projectmanagementstmiktime/services/service_tambah_card_tugas.dart';
 import 'dart:io';
 import 'package:projectmanagementstmiktime/services/service_task_attachment.dart';
+import 'package:projectmanagementstmiktime/utils/state/finite_state.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CardTugasViewModel with ChangeNotifier {
+  task_model.ModelFetchTaskId? modelFetchTaskId;
   ModelFetchCardTugas? modelFetchCardTugas;
-  ModelFetchTaskId? modelFetchTaskId;
   TextEditingController namaCard = TextEditingController();
   TextEditingController namaTugas = TextEditingController();
   TextEditingController deskripsiTugas = TextEditingController();
   TextEditingController clName = TextEditingController();
+  TextEditingController commentController = TextEditingController();
   final services = CardTugasService();
+  final cmService = CommentService();
   final clService = ChecklistService();
   final service = TambahCardTugasService();
   final deleteDetailTugasService = DeleteDetailTaskService();
@@ -67,30 +75,43 @@ class CardTugasViewModel with ChangeNotifier {
   }
 
   /// 🔹 Fetch Board List (dengan token)
+  String _lastFetchedBoardId = "";
+  bool _isBoardDataFetching = false;
+
   Future<int> getCardTugasList({required String token}) async {
+    // Cegah multiple fetch bersamaan
+    if (_isBoardDataFetching) return 200;
+
     try {
+      // Cek jika data untuk board yang sama sudah dimuat
+      if (modelFetchCardTugas != null && _lastFetchedBoardId == savedBoardId) {
+        // Data sudah ada, gunakan cache
+        return 200;
+      }
+
+      _isBoardDataFetching = true;
       isLoading = true;
       notifyListeners();
+
       modelFetchCardTugas = await services.fetchCardTugas(token: token);
-      isLoading = false;
+
       if (modelFetchCardTugas != null) {
+        // Simpan boardId yang baru di-fetch
+        _lastFetchedBoardId = savedBoardId;
         isSukses = true;
         namaCard.clear();
         heightContainer = false;
-        notifyListeners();
         return 200;
       } else {
         isSukses = false;
-        notifyListeners();
         return 500;
       }
     } on DioException catch (e) {
-      isLoading = false;
-      notifyListeners();
       errorMessages = "Terjadi kesalahan: ${e.message}";
       return 500;
     } finally {
-      isLoading = false; // Pastikan loading diatur ke false setelah selesai
+      _isBoardDataFetching = false;
+      isLoading = false;
       notifyListeners();
     }
   }
@@ -165,6 +186,17 @@ class CardTugasViewModel with ChangeNotifier {
       heightContainer = true;
       notifyListeners();
       return 'Nama tugas tidak boleh kosong';
+    }
+    heightContainer = false;
+    notifyListeners();
+    return null;
+  }
+
+  String? validateEditComment(String value) {
+    if (value.trim().isEmpty) {
+      heightContainer = true;
+      notifyListeners();
+      return 'Komentar tidak boleh kosong';
     }
     heightContainer = false;
     notifyListeners();
@@ -510,7 +542,7 @@ class CardTugasViewModel with ChangeNotifier {
     if (picked != null) {
       // Setelah tanggal dipilih, tampilkan time picker
       final TimeOfDay? pickedTime = await showTimePicker(
-        context: context,
+        context: navigatorKey.currentContext!,
         initialTime: TimeOfDay.fromDateTime(
             isEndDateSelected ? end : start.add(const Duration(hours: 1))),
       );
@@ -533,7 +565,7 @@ class CardTugasViewModel with ChangeNotifier {
           notifyListeners();
         } else {
           // Tampilkan pesan error jika tanggal akhir sebelum tanggal mulai
-          ScaffoldMessenger.of(context).showSnackBar(
+          ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
             const SnackBar(
               content: Text("Waktu selesai harus setelah waktu mulai"),
               backgroundColor: Colors.red,
@@ -573,7 +605,7 @@ class CardTugasViewModel with ChangeNotifier {
     if (picked != null) {
       // Setelah tanggal dipilih, tampilkan time picker
       final TimeOfDay? pickedTime = await showTimePicker(
-        context: context,
+        context: navigatorKey.currentContext!,
         initialTime: TimeOfDay.fromDateTime(
             isStartDateSelected ? start : DateTime.now()),
       );
@@ -639,36 +671,43 @@ class CardTugasViewModel with ChangeNotifier {
     }
   }
 
-  Future<int> getTaskListById({required String token}) async {
+  bool _isFetching = false;
+
+  Future<bool> getTaskListById({required String token}) async {
+    // Cegah multiple fetch bersamaan
+    if (_isFetching) return false;
+
     try {
+      _isFetching = true; // Set flag fetch aktif
       isLoading = true;
       notifyListeners();
 
-      // Fix: Use savedTaskId to fetch the task
+      // Cek apakah sudah ada data dan ID sama (hindari re-fetch)
+      if (modelFetchTaskId != null &&
+          modelFetchTaskId!.task.id.toString() == savedTaskId) {
+        return true;
+      }
+
       modelFetchTaskId = await fetchTaskListService.fetchTaskListId(
         token: token,
         taskId: savedTaskId,
       );
 
-      isLoading = false;
-
-      // Fix: Check modelFetchTaskId instead of modelFetchCardTugas
       if (modelFetchTaskId != null) {
         isSukses = true;
-        notifyListeners();
-        return 200;
+        return true;
       } else {
         isSukses = false;
-        notifyListeners();
-        return 500;
+        return false;
       }
-    } on DioException catch (e) {
-      isLoading = false;
-      notifyListeners();
-      errorMessages = "Terjadi kesalahan: ${e.message}";
-      return 500;
+    } catch (e) {
+      isSukses = false;
+      errorMessages =
+          "Terjadi kesalahan saat memuat data: Silahkan Coba lagi nanti";
+      return false;
     } finally {
-      isLoading = false; // Pastikan loading diatur ke false setelah selesai
+      _isFetching = false; // Reset flag fetch
+      isLoading = false;
       notifyListeners();
     }
   }
@@ -677,7 +716,7 @@ class CardTugasViewModel with ChangeNotifier {
   String getMemberInitials(dynamic member) {
     try {
       // Check if member has a name property
-      if (member is Member) {
+      if (member is task_model.Member) {
         // Direct access to name as string
         return getInitialsFromName(member.user.name);
       }
@@ -989,6 +1028,49 @@ class CardTugasViewModel with ChangeNotifier {
     }
   }
 
+  Future<int> updateComment({
+    required String token,
+    required String commentId,
+  }) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      final response = await cmService.hitEditComment(
+        token: token,
+        comment: commentController.text,
+        commentId: commentId,
+      );
+
+      isLoading = false;
+
+      if (response != null) {
+        successMessage = response.message;
+        errorMessages = null;
+        isSukses = true;
+        namaTugas.clear();
+        heightContainer = false;
+        notifyListeners();
+        return 200;
+      } else {
+        isSukses = false;
+        notifyListeners();
+        return 500;
+      }
+    } on DioException catch (e) {
+      isLoading = false;
+      notifyListeners();
+
+      if (e.response != null && e.response!.statusCode == 400) {
+        errorMessages = e.message; // ✅ Ambil langsung message dari DioException
+        return 400;
+      }
+
+      errorMessages = "Terjadi kesalahan: ${e.message}";
+      return 500;
+    }
+  }
+
   // Add to your CardTugasViewModel class
 
   Future<int> toggleChecklistStatus({
@@ -1260,9 +1342,8 @@ class CardTugasViewModel with ChangeNotifier {
     if (!quotePattern.hasMatch(activityText)) {
       return Text(
         activityText,
-        style: const TextStyle(
+        style: GoogleFonts.figtree(
           color: Colors.black,
-          fontFamily: 'helvetica',
           fontSize: 14,
         ),
       );
@@ -1277,16 +1358,15 @@ class CardTugasViewModel with ChangeNotifier {
 
       return RichText(
         text: TextSpan(
-          style: const TextStyle(
+          style: GoogleFonts.figtree(
             color: Colors.black,
-            fontFamily: 'helvetica',
             fontSize: 14,
           ),
           children: [
             TextSpan(text: beforeQuote),
             TextSpan(
               text: quotedText, // Tanpa tanda kutip
-              style: const TextStyle(
+              style: GoogleFonts.figtree(
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -1297,12 +1377,166 @@ class CardTugasViewModel with ChangeNotifier {
     } else {
       return Text(
         activityText,
-        style: const TextStyle(
+        style: GoogleFonts.figtree(
           color: Colors.black,
-          fontFamily: 'helvetica',
           fontSize: 14,
         ),
       );
+    }
+  }
+
+  RoleUserInTask getUserRoleFromTask(task_model.Task taskMember,
+      task_model.BoardOwner boardOwner, int userId) {
+    // Cek apakah user adalah owner board (dari field user)
+    if (boardOwner.id == userId) {
+      return RoleUserInTask.owner;
+    }
+
+    // Cek apakah user ada dalam daftar member
+    try {
+      // Cari member dengan user_id yang cocok
+      final member = taskMember.members.firstWhere(
+        (member) => member.userId == userId,
+      );
+
+      // Jika menemukan member, periksa levelnya
+      if (member.level == "Admin") {
+        return RoleUserInTask.admin;
+      } else if (member.level == "Member") {
+        return RoleUserInTask.member;
+      }
+    } catch (e) {
+      // Jika tidak menemukan member dengan ID tersebut
+    }
+
+    // Default jika tidak ditemukan
+    return RoleUserInTask.unknown;
+  }
+
+  bool canUserEditTask(task_model.Task taskMember,
+      task_model.BoardOwner boardOwner, int userId) {
+    // Super Admin can edit any board regardless of role
+    if (isSuperAdmin()) {
+      return true;
+    }
+
+    // Original logic for other roles
+    final role = getUserRoleFromTask(taskMember, boardOwner, userId);
+    return role == RoleUserInTask.owner || role == RoleUserInTask.admin;
+  }
+
+  bool canUserReadTask(task_model.Task taskMember,
+      task_model.BoardOwner boardOwner, int userId) {
+    // Super Admin can edit any board regardless of role
+    if (isSuperAdmin()) {
+      return true;
+    }
+
+    // Original logic for other roles
+    final role = getUserRoleFromTask(taskMember, boardOwner, userId);
+    return role == RoleUserInTask.owner ||
+        role == RoleUserInTask.admin ||
+        role == RoleUserInTask.member;
+  }
+
+  bool isSuperAdmin() {
+    // Get role from SharedPreferences
+    try {
+      SharedPreferences prefs =
+          SharedPreferences.getInstance().asStream().first as SharedPreferences;
+      final role = prefs.getString('role') ?? "";
+      return role.toLowerCase() == "super admin";
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // More reliable way to check Super Admin role using a passed parameter
+  bool canUserEditTaskById(int? taskId, int userId, {String? userRole}) {
+    // If user is a Super Admin, they can edit any board
+    if (userRole?.toLowerCase() == "super admin") {
+      return true;
+    }
+
+    // Check if task data is loaded
+    if (modelFetchTaskId == null) {
+      return false;
+    }
+
+    try {
+      // Gunakan data task yang sudah diambil
+      final task = modelFetchTaskId!.task;
+      final boardOwner = modelFetchTaskId!.boardOwner;
+
+      // Periksa apakah taskId sesuai
+      if (task.id != taskId) {
+        return false; // Task ID tidak cocok dengan task yang dimuat
+      }
+
+      // Gunakan fungsi canUserEditBoard yang sudah ada
+      return canUserEditTask(task, boardOwner, userId);
+    } catch (e) {
+      // Tangani error jika terjadi
+      return false;
+    }
+  }
+
+  bool canUserReadTaskById(int taskId, int userId, {String? userRole}) {
+    // If user is a Super Admin, they can edit any board
+    if (userRole?.toLowerCase() == "super admin") {
+      return true;
+    }
+
+    // Check if task data is loaded
+    if (modelFetchTaskId == null) {
+      return false;
+    }
+
+    try {
+      // Gunakan data task yang sudah diambil
+      final task = modelFetchTaskId!.task;
+      final boardOwner = modelFetchTaskId!.boardOwner;
+
+      // Periksa apakah taskId sesuai
+      if (task.id != taskId) {
+        return false; // Task ID tidak cocok dengan task yang dimuat
+      }
+
+      // Gunakan fungsi canUserEditBoard yang sudah ada
+      return canUserReadTask(task, boardOwner, userId);
+    } catch (e) {
+      // Tangani error jika terjadi
+      return false;
+    }
+  }
+
+  Future<int> deleteComment({
+    required String token,
+    required String commentId,
+  }) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      final success = await cmService.deleteComment(
+        commentId: commentId,
+        token: token,
+      );
+      isLoading = false;
+      notifyListeners();
+
+      if (success) {
+        errorMessages = null;
+        return 200;
+      } else {
+        errorMessages = "Gagal mengupdate notifikasi";
+        return 400;
+      }
+    } catch (e) {
+      isLoading = false;
+      errorMessages = e.toString();
+      notifyListeners();
+      return 500;
     }
   }
 }

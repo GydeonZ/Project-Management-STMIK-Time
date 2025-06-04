@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/screen/view/detailtugas/detail_tugas_screen.dart';
 import 'package:projectmanagementstmiktime/model/model_fetch_card_tugas.dart'
     as model;
@@ -24,10 +25,10 @@ Widget buildDraggableTaskItem(model.Task task, Size size, BuildContext context,
             Expanded(
               child: Text(
                 task.name,
-                style: const TextStyle(
+                style: GoogleFonts.figtree(
                   color: Colors.white,
                   fontSize: 13,
-                  fontFamily: "Helvetica",
+                  
                 ),
               ),
             ),
@@ -80,10 +81,10 @@ Widget buildDraggableTaskItem(model.Task task, Size size, BuildContext context,
               Expanded(
                 child: Text(
                   task.name,
-                  style: const TextStyle(
+                  style: GoogleFonts.figtree(
                     color: Colors.white,
                     fontSize: 13,
-                    fontFamily: "Helvetica",
+                    
                   ),
                 ),
               ),

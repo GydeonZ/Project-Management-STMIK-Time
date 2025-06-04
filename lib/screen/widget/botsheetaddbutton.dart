@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 Widget bottomSheetAddCard({
   required BuildContext context,
@@ -23,7 +24,7 @@ Widget bottomSheetAddCard({
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text("Tambah $judulBtn",
-                  style: const TextStyle(
+                  style: GoogleFonts.figtree(
                       color: Colors.black, fontWeight: FontWeight.bold)),
             ],
           ),

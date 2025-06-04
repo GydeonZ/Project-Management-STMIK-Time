@@ -8,22 +8,62 @@ String modelFetchTaskIdToJson(ModelFetchTaskId data) =>
 
 class ModelFetchTaskId {
   bool success;
+  BoardOwner boardOwner;
   Task task;
 
   ModelFetchTaskId({
     required this.success,
+    required this.boardOwner,
     required this.task,
   });
 
   factory ModelFetchTaskId.fromJson(Map<String, dynamic> json) =>
       ModelFetchTaskId(
         success: json["success"],
+        boardOwner: BoardOwner.fromJson(json["board_owner"]),
         task: Task.fromJson(json["task"]),
       );
 
   Map<String, dynamic> toJson() => {
         "success": success,
+        "board_owner": boardOwner.toJson(),
         "task": task.toJson(),
+      };
+}
+
+class BoardOwner {
+  int id;
+  String name;
+  String email;
+  String role;
+  String? nidn;
+  String? nim;
+
+  BoardOwner({
+    required this.id,
+    required this.name,
+    required this.email,
+    required this.role,
+    this.nidn,
+    this.nim,
+  });
+
+  factory BoardOwner.fromJson(Map<String, dynamic> json) => BoardOwner(
+        id: json["id"],
+        name: json["name"] ?? "Unknown User",
+        email: json["email"] ?? "unknown@example.com",
+        role: json["role"] ?? "Member",
+        nidn: json["nidn"] ?? "",
+        nim: json["nim"] ?? "",
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "email": email,
+        "role": role,
+        "nidn": nidn ?? "",
+        "nim": nim ?? "",
       };
 }
 
@@ -245,8 +285,8 @@ class MembersInvite {
     required this.email,
     required this.emailVerifiedAt,
     required this.role,
-    required this.nim,
-    required this.nidn,
+    this.nim,
+    this.nidn,
     required this.createdAt,
     required this.updatedAt,
     this.pivot,
@@ -260,8 +300,8 @@ class MembersInvite {
             ? DateTime.parse(json["email_verified_at"])
             : DateTime.now(),
         role: json["role"] ?? "Member", // Direct assignment
-        nim: json["nim"],
-        nidn: json["nidn"],
+        nim: json["nim"] ?? "",
+        nidn: json["nidn"] ?? "",
         createdAt: json["created_at"] != null
             ? DateTime.parse(json["created_at"])
             : DateTime.now(),
@@ -277,8 +317,8 @@ class MembersInvite {
         "email": email, // Direct use
         "email_verified_at": emailVerifiedAt.toIso8601String(),
         "role": role, // Direct use
-        "nim": nim,
-        "nidn": nidn,
+        "nim": nim ?? "",
+        "nidn": nidn ?? "",
         "created_at": createdAt.toIso8601String(),
         "updated_at": updatedAt.toIso8601String(),
         "pivot": pivot?.toJson(),

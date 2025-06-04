@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/main.dart';
 import 'package:projectmanagementstmiktime/screen/view/detailtugas/detail_tugas_screen.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
@@ -60,11 +61,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Notifikasi',
-          style: TextStyle(
-            color: Color(0xFF293066),
-            fontFamily: 'Helvetica',
+          style: GoogleFonts.figtree(
+            color: const Color(0xFF293066),
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -153,11 +153,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         ),
                       ),
                       const SizedBox(width: 16),
-                      const Text(
+                      Text(
                         'Tandai Semua',
-                        style: TextStyle(
+                        style: GoogleFonts.figtree(
                           color: Colors.blue,
-                          fontFamily: 'Helvetica',
                           fontSize: 14,
                         ),
                       ),
@@ -177,11 +176,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         ),
                       ),
                       const SizedBox(width: 16),
-                      const Text(
+                      Text(
                         'Hapus',
-                        style: TextStyle(
+                        style: GoogleFonts.figtree(
                           color: Colors.red,
-                          fontFamily: 'Helvetica',
                           fontSize: 14,
                         ),
                       ),
@@ -241,7 +239,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           const SizedBox(height: 16),
                           Text(
                             'Tidak ada notifikasi',
-                            style: TextStyle(
+                            style: GoogleFonts.figtree(
                               fontSize: 16,
                               color: Colors.grey[600],
                             ),
@@ -268,39 +266,62 @@ class _NotificationScreenState extends State<NotificationScreen> {
                             size: MediaQuery.of(context).size,
                             onTap: () async {
                               final notifId = item.id;
+                              final taskId = item.taskId;
 
-                              if (item.isRead == true) {
+                              if (item.isRead) {
+                                // Jika notifikasi sudah dibaca, langsung arahkan ke DetailTugasScreen
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (_) =>
-                                        DetailTugasScreen(taskId: item.taskId),
+                                        DetailTugasScreen(taskId: taskId),
                                   ),
                                 );
-                              }
-                              try {
-                                // Call view model method to update checklist status
-                                final response =
-                                    await viewModel.markNotification(
-                                        token: sp.tokenSharedPreference,
-                                        notifId: notifId);
+                              } else {
+                                // Jika belum dibaca, tandai sebagai dibaca tanpa navigasi
+                                try {
+                                  // Optimistic UI update: Update status di UI terlebih dahulu
+                                  viewModel.updateNotificationReadStatus(
+                                      notifId, true);
 
-                                if (response == 200) {
-                                  // Refresh tidak perlu lagi di sini karena sudah ditangani di dalam markNotification
-                                  // await viewModel.refreshNotificationList(token: sp.tokenSharedPreference);
-                                } else {
+                                  // Panggil API untuk menandai notifikasi sebagai dibaca
+                                  final response =
+                                      await viewModel.markNotification(
+                                          token: sp.tokenSharedPreference,
+                                          notifId: notifId);
+
+                                  if (response != 200) {
+                                    // Jika gagal, kembalikan status ke unread
+                                    viewModel.updateNotificationReadStatus(
+                                        notifId, false);
+
+                                    ScaffoldMessenger.of(
+                                            navigatorKey.currentContext!).showSnackBar(
+                                        SnackBar(
+                                            content: Text(viewModel
+                                                    .errorMessages ??
+                                                "Gagal menandai notifikasi")));
+                                  } else {
+                                    // Berhasil ditandai, tampilkan snackbar dengan informasi
+                                    ScaffoldMessenger.of(
+                                            navigatorKey.currentContext!)
+                                        .showSnackBar(const SnackBar(
+                                      content: Text(
+                                          "Notifikasi ditandai sebagai dibaca. Tap lagi untuk melihat detailnya."),
+                                      duration: Duration(seconds: 2),
+                                    ));
+                                  }
+                                } catch (e) {
+                                  // Jika error, kembalikan status ke unread
+                                  viewModel.updateNotificationReadStatus(
+                                      notifId, false);
+
                                   customAlert(
                                     alertType: QuickAlertType.error,
-                                    text: viewModel.errorMessages ??
-                                        "Gagal Menandai Notifikasi",
+                                    text:
+                                        "Terjadi kesalahan. Silahkan Coba Lagi",
                                   );
                                 }
-                              } catch (e) {
-                                navigatorKey.currentState?.pop();
-                                customAlert(
-                                  alertType: QuickAlertType.error,
-                                  text: "Terjadi kesalahan Silahkan Coba Lagi",
-                                );
                               }
                             },
                           );

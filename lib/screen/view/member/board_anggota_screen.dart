@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/main.dart';
 import 'package:projectmanagementstmiktime/screen/view/member/add_anggota_board_screen.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
@@ -63,14 +64,20 @@ class _BoardAnggotaTaskScreenState extends State<BoardAnggotaTaskScreen> {
   }
 
   bool _checkUserCanEdit() {
-    // Mendapatkan user ID dari SharedPreferences
+    // Get the current user ID from SharedPreferences
     final currentUserId = sp.idSharedPreference;
 
-    // Mendapatkan board view model
+    // Check if user is a Super Admin (they can edit anything)
+    if (sp.roleSharedPreference.toLowerCase() == "super admin") {
+      return true;
+    }
+
+    // Get the board view model
     final boardVm = Provider.of<BoardViewModel>(context, listen: false);
 
-    // Menggunakan fungsi yang baru dibuat
-    return boardVm.checkUserCanEditBoardById(widget.boardId, currentUserId);
+    // Check user permissions for this specific board
+    return boardVm.canUserEditBoardById(widget.boardId, currentUserId,
+        userRole: sp.roleSharedPreference);
   }
 
   @override
@@ -79,11 +86,10 @@ class _BoardAnggotaTaskScreenState extends State<BoardAnggotaTaskScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'Member',
-          style: TextStyle(
-            color: Color(0xFF293066),
-            fontFamily: 'Helvetica',
+          style: GoogleFonts.figtree(
+            color: const Color(0xFF293066),
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -123,7 +129,7 @@ class _BoardAnggotaTaskScreenState extends State<BoardAnggotaTaskScreen> {
                         itemBuilder: (context, builder) {
                           return customCardAnggotaList(
                             context: context,
-                            useIcon: false,
+                            canEdit: false,
                             namaUser: "Farhan Maulana",
                             roleUser: "Mahasiswa",
                             emailUser: "aaaaa.aaaaa@zzzzz.com",
@@ -183,7 +189,7 @@ class _BoardAnggotaTaskScreenState extends State<BoardAnggotaTaskScreen> {
                             boardOwner != null)
                           customCardAnggotaList(
                             context: context,
-                            useIcon: false,
+                            canEdit: false,
                             namaUser: boardOwner.name,
                             roleUser: boardOwner.role,
                             emailUser: boardOwner.email,
@@ -209,7 +215,7 @@ class _BoardAnggotaTaskScreenState extends State<BoardAnggotaTaskScreen> {
                                   Text(
                                     "Tidak ada member yang cocok dengan '${viewModel.searchQueryForMembers}'",
                                     textAlign: TextAlign.center,
-                                    style: const TextStyle(
+                                    style: GoogleFonts.figtree(
                                       color: Colors.grey,
                                       fontSize: 16,
                                     ),
@@ -226,14 +232,18 @@ class _BoardAnggotaTaskScreenState extends State<BoardAnggotaTaskScreen> {
                               final user = member.user;
                               return customCardAnggotaList(
                                 context: context,
-                                useIcon: _checkUserCanEdit(),
+                                canEdit: _checkUserCanEdit() &&
+                                    user.id != sp.idSharedPreference &&
+                                    user.role != "Super Admin",
                                 namaUser: user.name,
                                 roleUser: user.role,
                                 emailUser: user.email,
                                 nomorIndukuser: user.role == "Mahasiswa"
                                     ? user.nim
                                     : user.nidn,
-                                levelUser: member.level,
+                                levelUser: user.role == "Super Admin"
+                                    ? "Super Admin"
+                                    : member.level,
                                 onTapIcon: () async {
                                   // Existing delete functionality
                                   customShowDialog(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/main.dart';
 import 'package:projectmanagementstmiktime/screen/view/member/add_anggota_screen.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
@@ -7,7 +8,6 @@ import 'package:projectmanagementstmiktime/screen/widget/customshowdialog.dart';
 import 'package:projectmanagementstmiktime/screen/widget/detailtugas/customcardanggota.dart';
 import 'package:projectmanagementstmiktime/screen/widget/detailtugas/customdropdown.dart';
 import 'package:projectmanagementstmiktime/screen/widget/formfield.dart';
-import 'package:projectmanagementstmiktime/utils/state/finite_state.dart';
 import 'package:projectmanagementstmiktime/view_model/cardtugas/view_model_anggota_list.dart';
 import 'package:projectmanagementstmiktime/view_model/cardtugas/view_model_card_tugas.dart';
 import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signin.dart';
@@ -41,15 +41,39 @@ class _AnggotaTaskScreenState extends State<AnggotaTaskScreen> {
     sp = Provider.of<SignInViewModel>(context, listen: false);
     cardTugasViewModel =
         Provider.of<CardTugasViewModel>(context, listen: false);
-
-    final token = sp.tokenSharedPreference;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.taskId != null) {
-        anggotaListViewModel.setTaskId(widget.taskId.toString());
+      // Set task ID untuk viewModel
+      final String taskIdString = widget.taskId.toString();
+      anggotaListViewModel.setTaskId(taskIdString);
+
+      // Periksa apakah datanya sudah ada dan valid
+      if (anggotaListViewModel.modelAnggotaList == null ||
+          anggotaListViewModel.lastFetchedTaskId != taskIdString) {
+        // Hanya fetch jika data belum ada atau taskId berbeda
+        final token = sp.tokenSharedPreference;
         anggotaListViewModel.getAnggotaList(token: token);
-        cardTugasViewModel.getCardTugasList(token: token);
+      } else {
+        // Data sudah ada, pastikan UI yang ditampilkan up to date
+        anggotaListViewModel.loadCachedAnggotaList();
       }
     });
+  }
+
+  bool _checkUserCanEdit() {
+    // Get the current user ID from SharedPreferences
+    final currentUserId = sp.idSharedPreference;
+
+    // Check if user is a Super Admin (they can edit anything)
+    if (sp.roleSharedPreference.toLowerCase() == "super admin") {
+      return true;
+    }
+
+    // Get the board view model
+    final taskVm = Provider.of<CardTugasViewModel>(context, listen: false);
+
+    // Check user permissions for this specific board
+    return taskVm.canUserEditTaskById(widget.taskId, currentUserId,
+        userRole: sp.roleSharedPreference);
   }
 
   @override
@@ -58,11 +82,10 @@ class _AnggotaTaskScreenState extends State<AnggotaTaskScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'Member',
-          style: TextStyle(
-            color: Color(0xFF293066),
-            fontFamily: 'Helvetica',
+          style: GoogleFonts.figtree(
+            color: const Color(0xFF293066),
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -102,7 +125,7 @@ class _AnggotaTaskScreenState extends State<AnggotaTaskScreen> {
                         itemBuilder: (context, builder) {
                           return customCardAnggotaList(
                             context: context,
-                            useIcon: false,
+                            canEdit: false,
                             namaUser: "Farhan Maulana",
                             roleUser: "Mahasiswa",
                             emailUser: "aaaaa.aaaaa@zzzzz.com",
@@ -168,7 +191,7 @@ class _AnggotaTaskScreenState extends State<AnggotaTaskScreen> {
                             boardOwner != null)
                           customCardAnggotaList(
                             context: context,
-                            useIcon: false,
+                            canEdit: false,
                             namaUser: boardOwner.name,
                             roleUser: boardOwner.role,
                             emailUser: boardOwner.email,
@@ -196,7 +219,7 @@ class _AnggotaTaskScreenState extends State<AnggotaTaskScreen> {
                                   Text(
                                     "Tidak ada member yang cocok dengan '${viewModel.searchQueryForMembers}'",
                                     textAlign: TextAlign.center,
-                                    style: const TextStyle(
+                                    style: GoogleFonts.figtree(
                                       color: Colors.grey,
                                       fontSize: 16,
                                     ),
@@ -212,14 +235,18 @@ class _AnggotaTaskScreenState extends State<AnggotaTaskScreen> {
                             final user = member.user;
                             return customCardAnggotaList(
                               context: context,
-                              useIcon: _checkUserCanEdit(),
+                              canEdit: _checkUserCanEdit() &&
+                                  user.id != sp.idSharedPreference &&
+                                  user.role != "Super Admin",
                               namaUser: user.name,
                               roleUser: user.role,
                               emailUser: user.email,
                               nomorIndukuser: user.role == "Mahasiswa"
                                   ? user.nim
                                   : user.nidn,
-                              levelUser: member.level,
+                              levelUser: user.role == "Super Admin"
+                                  ? "Super Admin"
+                                  : member.level,
                               onTapIcon: () async {
                                 // Existing delete functionality
                                 customShowDialog(
@@ -367,41 +394,17 @@ class _AnggotaTaskScreenState extends State<AnggotaTaskScreen> {
                   MaterialPageRoute(
                     builder: (_) => AddAnggotaScreen(taskId: widget.taskId),
                   ),
-                ).then((_) async {
-                  // Refresh data when returning from add member screen
-                  final token = sp.tokenSharedPreference;
-                  await anggotaListViewModel.refreshAnggotaList(token: token);
+                ).then((refreshNeeded) async {
+                  if (refreshNeeded == true) {
+                    // User menekan tombol close atau ada perubahan data
+                    // Refresh data anggota untuk memastikan UI up-to-date
+                    final token = sp.tokenSharedPreference;
+                    await anggotaListViewModel.refreshAnggotaList(token: token);
+                  }
                 });
               },
             )
           : null,
     );
-  }
-
-  bool _checkUserCanEdit() {
-    // Get the current user ID from SharedPreferences
-    final userIdStr = sp.idSharedPreference;
-    final currentUserId = userIdStr;
-
-    if (currentUserId == 0) {
-      return false;
-    }
-
-    // Get anggota list view model
-    final anggotaViewModel =
-        Provider.of<AnggotaListViewModel>(context, listen: false);
-
-    // If anggota list is not loaded yet or is empty, default to false
-    if (anggotaViewModel.modelAnggotaList == null) {
-      return false;
-    }
-
-    // Check the user role using the existing method in AnggotaListViewModel
-    final userRole = anggotaViewModel.getUserRoleFromAnggota(
-        anggotaViewModel.modelAnggotaList!, currentUserId);
-    // Define which roles can edit - Owner and Admin can edit
-    final canEdit =
-        userRole == RoleUserInBoard.owner || userRole == RoleUserInBoard.admin;
-    return canEdit;
   }
 }

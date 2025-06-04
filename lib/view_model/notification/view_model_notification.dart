@@ -1,6 +1,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/model/model_fetch_notifikasi.dart';
 import 'package:projectmanagementstmiktime/services/service_notification_list.dart';
 
@@ -271,21 +272,38 @@ class NotificationViewModel with ChangeNotifier {
         notifId: notifId,
       );
 
-      isLoading = false;
-      notifyListeners();
-
       if (response != null) {
+        // Perbarui status notifikasi di model lokal
+        if (modelFetchNotifikasi != null) {
+          // Cari dan update notifikasi dengan ID yang sesuai di semua data
+          for (var notif in modelFetchNotifikasi!.data) {
+            if (notif.id == notifId) {
+              notif.isRead = true;
+              break;
+            }
+          }
+
+          // Perbarui juga data yang ada di paginatedData
+          for (var notif in _paginatedData) {
+            if (notif.id == notifId) {
+              notif.isRead = true;
+              break;
+            }
+          }
+        }
+
         errorMessages = null;
         return 200;
       } else {
-        errorMessages = "Gagal mengupdate checklist";
+        errorMessages = "Gagal mengupdate notifikasi";
         return 400;
       }
     } catch (e) {
-      isLoading = false;
       errorMessages = e.toString();
-      notifyListeners();
       return 500;
+    } finally {
+      isLoading = false;
+      notifyListeners(); // Akan memicu rebuild UI dengan data yang sudah diperbarui
     }
   }
 
@@ -354,9 +372,8 @@ class NotificationViewModel with ChangeNotifier {
     if (!quotePattern.hasMatch(activityText)) {
       return Text(
         activityText,
-        style: const TextStyle(
+        style: GoogleFonts.figtree(
           color: Colors.black,
-          fontFamily: 'helvetica',
           fontSize: 14,
         ),
       );
@@ -379,7 +396,7 @@ class NotificationViewModel with ChangeNotifier {
       final quotedText = match.group(1)!; // Teks dalam tanda kutip
       textSpans.add(TextSpan(
         text: quotedText, // Tanpa tanda kutip
-        style: const TextStyle(
+        style: GoogleFonts.figtree(
           fontWeight: FontWeight.bold,
         ),
       ));
@@ -396,9 +413,8 @@ class NotificationViewModel with ChangeNotifier {
 
     return RichText(
       text: TextSpan(
-        style: const TextStyle(
+        style: GoogleFonts.figtree(
           color: Colors.black,
-          fontFamily: 'helvetica',
           fontSize: 14,
         ),
         children: textSpans,
@@ -429,7 +445,7 @@ class NotificationViewModel with ChangeNotifier {
               children: [
                 Text(
                   formatNotificationTime(time),
-                  style: const TextStyle(
+                  style: GoogleFonts.figtree(
                     fontSize: 12,
                     color: Colors.grey,
                   ),
@@ -506,6 +522,45 @@ class NotificationViewModel with ChangeNotifier {
   // Tambahkan metode untuk mengecek apakah ada halaman sebelumnya
   bool hasPreviousPage() {
     return _currentPage > 1;
+  }
+
+  // Getter untuk menghitung notifikasi yang belum dibaca
+  int get unreadNotificationsCount {
+    if (modelFetchNotifikasi?.data == null) return 0;
+
+    return modelFetchNotifikasi!.data
+        .where((notification) => !notification.isRead)
+        .length;
+  }
+
+  // Metode untuk memastikan hitungan diperbarui saat status dibaca berubah
+  void updateNotificationReadStatus(int notifId, bool isRead) {
+    if (modelFetchNotifikasi != null) {
+      bool dataUpdated = false;
+
+      // Update di seluruh data notifikasi
+      for (var notif in modelFetchNotifikasi!.data) {
+        if (notif.id == notifId) {
+          notif.isRead = isRead;
+          dataUpdated = true;
+          break;
+        }
+      }
+
+      // Update di paginated data
+      for (var notif in _paginatedData) {
+        if (notif.id == notifId) {
+          notif.isRead = isRead;
+          dataUpdated = true;
+          break;
+        }
+      }
+
+      // Hanya notifyListeners jika data berubah
+      if (dataUpdated) {
+        notifyListeners();
+      }
+    }
   }
 }
 

@@ -41,9 +41,9 @@
 //         centerTitle: true,
 //         title: const Text(
 //           'Card',
-//           style: TextStyle(
+//           style: GoogleFonts.figtree(
 //             color: Color(0xFF293066),
-//             fontFamily: 'Helvetica',
+//             
 //             fontSize: 18,
 //             fontWeight: FontWeight.bold,
 //           ),
@@ -104,8 +104,8 @@
 //                           ),
 //                           child: const Text(
 //                             "Batal",
-//                             style: TextStyle(
-//                               fontFamily: 'Helvetica',
+//                             style: GoogleFonts.figtree(
+//                               
 //                               fontWeight: FontWeight.bold,
 //                               fontSize: 12,
 //                               color: Color(0xff293066),
@@ -169,7 +169,7 @@
 //                             } catch (e) {
 //                               customAlert(
 //                                 alertType: QuickAlertType.error,
-//                                 text: 'Terjadi kesalahan: ${e.toString()}',
+//                                 text: 'Terjadi kesalahan Silahkan Coba lagi nanti',
 //                               );
 //                             }
 //                           }
@@ -182,8 +182,8 @@
 //                         ),
 //                         child: const Text(
 //                           "Tambah",
-//                           style: TextStyle(
-//                             fontFamily: 'Helvetica',
+//                           style: GoogleFonts.figtree(
+//                             
 //                             fontWeight: FontWeight.bold,
 //                             fontSize: 12,
 //                             color: Colors.white,

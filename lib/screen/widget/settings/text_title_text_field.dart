@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 Widget textSetting({
   required String text,
@@ -7,9 +8,8 @@ Widget textSetting({
     alignment: Alignment.centerLeft,
     child: Text(
       text,
-      style: const TextStyle(
-        color: Color(0xff293066),
-        fontFamily: 'Helvetica',
+      style: GoogleFonts.figtree(
+        color: const Color(0xff293066),
         fontSize: 16,
         fontWeight: FontWeight.w600,
       ),

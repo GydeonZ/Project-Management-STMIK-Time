@@ -12,6 +12,8 @@ class AnggotaListViewModel with ChangeNotifier {
   final services = AnggotaListService();
   final servicesAvailableMember = AvailableAnggotaListService();
   bool isLoading = false;
+  bool _isFetching = false;
+  String lastFetchedTaskId = "";
   bool isSukses = false;
   String savedTaskId = "";
   String savedUserId = "";
@@ -29,16 +31,28 @@ class AnggotaListViewModel with ChangeNotifier {
   List<Datum> get filteredMembers => _filteredMembers;
 
   String _searchQueryForMembers = "";
-  List<Member> _filteredBoardMembers = [];
+  List<Member> _filteredTaskMembers = [];
   String get searchQueryForMembers => _searchQueryForMembers;
-  List<Member> get filteredBoardMembers => _filteredBoardMembers;
+  List<Member> get filteredBoardMembers => _filteredTaskMembers;
 
   AnggotaListViewModel() {
     searchController.addListener(_onSearchChanged);
   }
 
-  Future<void> getAnggotaList({required String token}) async {
+  Future<bool> getAnggotaList({required String token}) async {
+    // Cegah multiple fetch bersamaan
+    if (_isFetching) return false;
+
     try {
+      // Cek apakah data sudah ada dan untuk taskId yang sama
+      if (modelAnggotaList != null && lastFetchedTaskId == savedTaskId) {
+        // Data sudah ada, gunakan cache
+        _filteredTaskMembers = modelAnggotaList?.members ?? [];
+        notifyListeners();
+        return true;
+      }
+
+      _isFetching = true;
       isLoading = true;
       notifyListeners();
 
@@ -48,20 +62,42 @@ class AnggotaListViewModel with ChangeNotifier {
       );
 
       modelAnggotaList = result;
+      // Simpan ID task yang baru di-fetch
+      lastFetchedTaskId = savedTaskId;
 
       // Initialize filtered list with all members
-      _filteredBoardMembers = modelAnggotaList?.members ?? [];
+      _filteredTaskMembers = modelAnggotaList?.members ?? [];
 
-      isLoading = false;
-      notifyListeners();
+      if (modelAnggotaList != null) {
+        isSukses = true;
+        return true;
+      } else {
+        isSukses = false;
+        return false;
+      }
     } catch (e) {
+      errorMessages = "Terjadi kesalahan saat memuat data";
+      isSukses = false;
+      return false;
+    } finally {
+      _isFetching = false; // Reset flag fetch
       isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<void> getAvailableAnggotaList({required String token}) async {
+  Future<bool> getAvailableAnggotaList({required String token}) async {
+    if (_isFetching) return false;
+
     try {
+      if (modelAvailableAnggotaList != null &&
+          lastFetchedTaskId == savedTaskId) {
+        _filteredTaskMembers = modelAnggotaList?.members ?? [];
+        notifyListeners();
+        return true;
+      }
+
+      _isFetching = true;
       isLoading = true;
       notifyListeners();
 
@@ -71,13 +107,23 @@ class AnggotaListViewModel with ChangeNotifier {
       );
 
       modelAvailableAnggotaList = result;
-
+      lastFetchedTaskId = savedTaskId;
       // Initialize filtered list with all members
       _filteredMembers = modelAvailableAnggotaList?.data ?? [];
 
-      isLoading = false;
-      notifyListeners();
+      if (modelAvailableAnggotaList != null) {
+        isSukses = true;
+        return true;
+      } else {
+        isSukses = false;
+        return false;
+      }
     } catch (e) {
+      errorMessages = "Terjadi kesalahan saat memuat data";
+      isSukses = false;
+      return false;
+    } finally {
+      _isFetching = false; // Reset flag fetch
       isLoading = false;
       notifyListeners();
     }
@@ -124,17 +170,24 @@ class AnggotaListViewModel with ChangeNotifier {
   }
 
   Future<bool> refreshAnggotaList({required String token}) async {
+    // Reset flag fetching untuk memungkinkan refresh meskipun taskId sama
+    _isFetching = false;
+
     try {
       isLoading = true;
       notifyListeners();
 
-      final result =
-          await services.fetchAnggotaList(token: token, taskId: savedTaskId);
+      final result = await services.fetchAnggotaList(
+        token: token,
+        taskId: savedTaskId,
+      );
 
       if (result != null) {
         modelAnggotaList = result;
+        lastFetchedTaskId = savedTaskId;
+
         // Perbarui filtered list agar mencerminkan perubahan role
-        _filteredBoardMembers = modelAnggotaList?.members ?? [];
+        _filteredTaskMembers = modelAnggotaList?.members ?? [];
 
         // Jika pencarian aktif, aplikasikan kembali filter
         if (_searchQueryForMembers.isNotEmpty) {
@@ -149,11 +202,8 @@ class AnggotaListViewModel with ChangeNotifier {
         errorMessages = 'Data tidak ditemukan';
         return false;
       }
-    } on DioException catch (e) {
-      errorMessages = "Terjadi kesalahan: ${e.message}";
-      return false;
     } catch (e) {
-      errorMessages = "Error tidak terduga: $e";
+      errorMessages = "Terjadi kesalahan Silahkan Coba lagi nanti";
       return false;
     } finally {
       isLoading = false;
@@ -301,10 +351,10 @@ class AnggotaListViewModel with ChangeNotifier {
 
     if (_searchQueryForMembers.isEmpty) {
       // Jika pencarian kosong, tampilkan semua member
-      _filteredBoardMembers = modelAnggotaList?.members ?? [];
+      _filteredTaskMembers = modelAnggotaList?.members ?? [];
     } else {
       // Filter berdasarkan nama, email, atau role
-      _filteredBoardMembers = (modelAnggotaList?.members ?? []).where((member) {
+      _filteredTaskMembers = (modelAnggotaList?.members ?? []).where((member) {
         final user = member.user;
         return user.name.toLowerCase().contains(_searchQueryForMembers) ||
             user.email.toLowerCase().contains(_searchQueryForMembers) ||
@@ -317,7 +367,7 @@ class AnggotaListViewModel with ChangeNotifier {
 
   void clearBoardMemberSearch() {
     _searchQueryForMembers = "";
-    _filteredBoardMembers = modelAnggotaList?.members ?? [];
+    _filteredTaskMembers = modelAnggotaList?.members ?? [];
     notifyListeners();
   }
 
@@ -341,6 +391,19 @@ class AnggotaListViewModel with ChangeNotifier {
   void setSelectedMemberLevel(String level) {
     if (availableMemberLevels.contains(level)) {
       _selectedMemberLevel = level;
+      notifyListeners();
+    }
+  }
+
+  void loadCachedAnggotaList() {
+    if (modelAnggotaList != null) {
+      // Gunakan data yang sudah ada
+      _filteredTaskMembers = modelAnggotaList?.members ?? [];
+
+      // Terapkan filter jika ada pencarian aktif
+      if (_searchQueryForMembers.isNotEmpty) {
+        searchBoardMembers(_searchQueryForMembers);
+      }
       notifyListeners();
     }
   }

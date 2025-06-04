@@ -1,6 +1,7 @@
 // ignore_for_file: camel_case_types, prefer_typing_uninitialized_variables, use_super_parameters
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/screen/view/profile/edit_profile_screen.dart';
 import 'package:projectmanagementstmiktime/view_model/sign_in_sign_up/view_model_signin.dart';
 import 'package:provider/provider.dart';
@@ -45,8 +46,8 @@ class _BannerSettingState extends State<BannerSetting> {
                   backgroundColor: Colors.white,
                   child: Text(
                     initials,
-                    style: const TextStyle(
-                        color: Color(0xff293066),
+                    style: GoogleFonts.figtree(
+                        color: const Color(0xff293066),
                         fontWeight: FontWeight.bold,
                         fontSize: 35),
                   ),
@@ -58,9 +59,8 @@ class _BannerSettingState extends State<BannerSetting> {
                 children: [
                   Text(
                     sp.nameSharedPreference,
-                    style: const TextStyle(
+                    style: GoogleFonts.figtree(
                       color: Colors.white,
-                      fontFamily: 'Helvetica',
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                     ),
@@ -70,9 +70,8 @@ class _BannerSettingState extends State<BannerSetting> {
                   ),
                   Text(
                     sp.emailSharedPreference,
-                    style: const TextStyle(
-                      fontFamily: 'Helvetica',
-                      color: Color(0xffD1D1D1),
+                    style: GoogleFonts.figtree(
+                      color: const Color(0xffD1D1D1),
                       fontSize: 12,
                     ),
                   ),
@@ -83,9 +82,8 @@ class _BannerSettingState extends State<BannerSetting> {
                     sp.nimSharedPreference != ''
                         ? sp.nimSharedPreference
                         : sp.nidnSharedPreference,
-                    style: const TextStyle(
-                      fontFamily: 'Helvetica',
-                      color: Color(0xffD1D1D1),
+                    style: GoogleFonts.figtree(
+                      color: const Color(0xffD1D1D1),
                       fontSize: 12,
                     ),
                   ),
@@ -118,11 +116,10 @@ class _BannerSettingState extends State<BannerSetting> {
                             borderRadius: BorderRadius.circular(15),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Ubah Profile',
-                          style: TextStyle(
-                            color: Color(0xffA3A4A5),
-                            fontFamily: 'Helvetica',
+                          style: GoogleFonts.figtree(
+                            color: const Color(0xffA3A4A5),
                             fontWeight: FontWeight.bold,
                           ),
                         ),

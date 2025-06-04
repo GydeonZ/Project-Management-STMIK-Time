@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/main.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
 import 'package:projectmanagementstmiktime/screen/widget/customshowdialog.dart';
@@ -61,11 +62,10 @@ class _AddAnggotaBoardScreenState extends State<AddAnggotaBoardScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'Tambah Anggota',
-          style: TextStyle(
-            color: Color(0xFF293066),
-            fontFamily: 'Helvetica',
+          style: GoogleFonts.figtree(
+            color: const Color(0xFF293066),
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -106,7 +106,7 @@ class _AddAnggotaBoardScreenState extends State<AddAnggotaBoardScreen> {
                         itemBuilder: (context, builder) {
                           return customCardAnggotaList(
                             context: context,
-                            useIcon: false,
+                            canEdit: false,
                             namaUser: "Farhan Maulana",
                             roleUser: "Mahasiswa",
                             emailUser: "aaaaa.aaaaa@zzzzz.com",
@@ -147,14 +147,13 @@ class _AddAnggotaBoardScreenState extends State<AddAnggotaBoardScreen> {
                 const SizedBox(height: 16),
                 Expanded(
                   child: filteredUsers.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: Text(
                             "Tidak ada anggota yang sesuai dengan pencarian",
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: GoogleFonts.figtree(
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
-                              fontFamily: 'Helvetica',
                             ),
                           ),
                         )
@@ -167,7 +166,7 @@ class _AddAnggotaBoardScreenState extends State<AddAnggotaBoardScreen> {
                             return customCardAnggotaList(
                               addAnggota: true,
                               context: context,
-                              useIcon: false,
+                              canEdit: false,
                               namaUser: user.name,
                               onTap: () {
                                 selectedLevel = viewModel.selectedMemberLevel;
@@ -219,21 +218,22 @@ class _AddAnggotaBoardScreenState extends State<AddAnggotaBoardScreen> {
                                     );
                                     navigatorKey.currentState?.pop();
                                     if (response == 200) {
-                                      await viewModel
-                                          .refreshAnggotaList(token: token);
+                                      final success = await viewModel.refreshAnggotaList(
+                                          token: token);
                                       navigatorKey.currentState?.pop();
 
-                                      // if (success) {
-                                      //   await customAlert(
-                                      //     alertType: QuickAlertType.success,
-                                      //     title: "Tugas berhasil ditambahkan!",
-                                      //   );
-                                      // } else {
-                                      //   await customAlert(
-                                      //     alertType: QuickAlertType.error,
-                                      //     text: viewModel.errorMessages,
-                                      //   );
-                                      // }
+                                      if (success) {
+                                        await customAlert(
+                                          alertType: QuickAlertType.success,
+                                          title:
+                                              "Anggota berhasil ditambahkan!",
+                                        );
+                                      } else {
+                                        await customAlert(
+                                          alertType: QuickAlertType.error,
+                                          text: viewModel.errorMessages,
+                                        );
+                                      }
                                     } else {
                                       navigatorKey.currentState?.pop();
                                       await customAlert(

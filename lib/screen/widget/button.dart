@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 Widget customButton(
     {String? labelText,
@@ -26,11 +27,11 @@ Widget customButton(
         child: Center(
             child: Text(
           text ?? "",
-          style: TextStyle(
+          style: GoogleFonts.figtree(
               color: fntColor,
               fontSize: fntSize ?? 20,
               fontWeight: FontWeight.w500,
-              fontFamily: "Inter"),
+              ),
         ))),
   );
 }

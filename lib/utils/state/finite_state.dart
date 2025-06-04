@@ -11,3 +11,10 @@ enum RoleUserInBoard {
   member,
   unknown,
 }
+
+enum RoleUserInTask {
+  owner,
+  admin,
+  member,
+  unknown,
+}

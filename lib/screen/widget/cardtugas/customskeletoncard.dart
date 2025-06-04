@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 Widget customCardSkeleton({
   required BuildContext context,
@@ -28,7 +29,7 @@ Widget customCardSkeleton({
             children: [
               Text(
                 cardTitle ?? '',
-                style: const TextStyle(
+                style: GoogleFonts.figtree(
                   fontWeight: FontWeight.bold,
                   fontSize: 17,
                 ),
@@ -38,10 +39,10 @@ Widget customCardSkeleton({
                   children: [
                     TextSpan(
                       text: tambahTugas ?? '+ Tambah Task',
-                      style: TextStyle(
+                      style: GoogleFonts.figtree(
                         color: taskColor ?? const Color(0xff0088D1),
                         fontSize: 13,
-                        fontFamily: "Helvetica",
+                        
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = ontapTambahTugas,
@@ -70,10 +71,10 @@ Widget customCardSkeleton({
                       children: [
                         Text(
                           taskTitle ?? '',
-                          style: const TextStyle(
+                          style: GoogleFonts.figtree(
                             color: Colors.white,
                             fontSize: 13,
-                            fontFamily: "Helvetica",
+                            
                           ),
                         ),
                         const Icon(
@@ -107,19 +108,18 @@ Widget customCardSkeleton({
               : Padding(
                   padding: EdgeInsets.only(
                       top: size.height * 0.018, right: size.width * 0.023),
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        const Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          color: Colors.white,
-                        ),
-                        SizedBox(width: size.width * 0.05),
-                        const Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          color: Colors.white,
-                        ),
-                      ]),
+                  child:
+                      Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                    const Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      color: Colors.white,
+                    ),
+                    SizedBox(width: size.width * 0.05),
+                    const Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      color: Colors.white,
+                    ),
+                  ]),
                 )
         ],
       ),

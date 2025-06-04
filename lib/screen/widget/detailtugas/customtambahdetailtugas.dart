@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/main.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
 import 'package:projectmanagementstmiktime/screen/widget/button.dart';
@@ -48,11 +49,10 @@ class _CustomTambahDetailCardTugasState
       appBar: AppBar(
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'Tambah Tugas',
-          style: TextStyle(
-            color: Color(0xFF293066),
-            fontFamily: 'Helvetica',
+          style: GoogleFonts.figtree(
+            color: const Color(0xFF293066),
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -63,11 +63,7 @@ class _CustomTambahDetailCardTugasState
             color: Color(0xff293066),
           ),
           onPressed: () {
-            cardTugasViewModel.namaTugas.clear();
-            cardTugasViewModel.deskripsiTugas.clear();
-            cardTugasViewModel.deskripsiTugas.clear();
-            cardTugasViewModel.isStartDateSelected = false;
-            cardTugasViewModel.isEndDateSelected = false;
+            cardTugasViewModel.clearForm();
             Navigator.pop(context);
           },
         ),
@@ -194,7 +190,7 @@ class _CustomTambahDetailCardTugasState
                       navigatorKey.currentState?.pop();
                       await customAlert(
                         alertType: QuickAlertType.error,
-                        text: 'Terjadi kesalahan: ${e.toString()}',
+                        text: 'Terjadi kesalahan Silahkan Coba lagi nanti',
                       );
                     }
                   }

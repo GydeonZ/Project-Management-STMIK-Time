@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     
     <application
-        android:label="projectmanagementstmiktime"
+        android:label="Project Time"
         android:name="${applicationName}"
         android:icon="@mipmap/timelogo">
         <service

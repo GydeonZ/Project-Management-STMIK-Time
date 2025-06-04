@@ -1,10 +1,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 Widget customCardAnggotaList({
   required BuildContext context,
-  bool? useIcon,
+  bool? canEdit,
   bool? addAnggota,
   String? namaUser,
   String? emailUser,
@@ -21,8 +22,8 @@ Widget customCardAnggotaList({
           child: GestureDetector(
             onTap: onTap,
             child: Card(
-              shape:
-                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -31,9 +32,9 @@ Widget customCardAnggotaList({
                     padding: EdgeInsets.only(left: size.width * 0.04),
                     child: Text(
                       namaUser ?? "",
-                      style: const TextStyle(
+                      style: GoogleFonts.figtree(
                         fontWeight: FontWeight.bold,
-                        fontFamily: "Helvetica",
+                        
                         fontSize: 17,
                       ),
                     ),
@@ -59,14 +60,14 @@ Widget customCardAnggotaList({
                       // Add Expanded here to make the text take available space
                       child: Text(
                         namaUser ?? "",
-                        style: const TextStyle(
+                        style: GoogleFonts.figtree(
                           fontWeight: FontWeight.bold,
-                          fontFamily: "Helvetica",
+                          
                           fontSize: 17,
                         ),
                       ),
                     ),
-                    useIcon == false
+                    canEdit == false
                         ? const SizedBox()
                         : IconButton(
                             onPressed: onTapIcon,
@@ -88,24 +89,24 @@ Widget customCardAnggotaList({
                         children: [
                           Text(
                             roleUser ?? "",
-                            style: const TextStyle(
-                              fontFamily: "Helvetica",
+                            style: GoogleFonts.figtree(
+                              
                               fontSize: 14,
                             ),
                           ),
                           SizedBox(height: size.height * 0.009),
                           Text(
                             emailUser ?? "",
-                            style: const TextStyle(
-                              fontFamily: "Helvetica",
+                            style: GoogleFonts.figtree(
+                              
                               fontSize: 14,
                             ),
                           ),
                           SizedBox(height: size.height * 0.009),
                           Text(
                             nomorIndukuser ?? "",
-                            style: const TextStyle(
-                              fontFamily: "Helvetica",
+                            style: GoogleFonts.figtree(
+                              
                               fontSize: 14,
                             ),
                           ),
@@ -114,20 +115,30 @@ Widget customCardAnggotaList({
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(bottom: size.height * 0.035),
-                      child: RichText(
-                        text: TextSpan(
-                          text: levelUser,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                            fontFamily: "Helvetica",
-                          ),
-                          recognizer: TapGestureRecognizer()..onTap = onTap,
-                        ),
-                      ),
-                    )
+                        padding: EdgeInsets.only(bottom: size.height * 0.035),
+                        child: canEdit == true
+                            ? RichText(
+                                text: TextSpan(
+                                  text: levelUser,
+                                  style: GoogleFonts.figtree(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = onTap,
+                                ),
+                              )
+                            : Text(
+                                levelUser ?? "",
+                                style: GoogleFonts.figtree(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  
+                                ),
+                              ))
                   ],
                 ),
               ],

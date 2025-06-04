@@ -1,6 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -191,7 +190,6 @@ class SignInViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-
   Future<void> checkSharedPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     idSharedPreference = prefs.getInt('id') ?? 0;
@@ -204,7 +202,6 @@ class SignInViewModel with ChangeNotifier {
     rememberMe = prefs.getBool('rememberMe') ?? false; // ✅ Cek RememberMe
     notifyListeners();
   }
-
 
   void toggleError(bool value) {
     showErrorMessage = value;
@@ -260,6 +257,7 @@ class SignInViewModel with ChangeNotifier {
   void clearSignInForm() {
     email.clear();
     password.clear();
+    isPasswordVisible = false;
   }
 
   void checkLogin(BuildContext context) async {

@@ -58,4 +58,69 @@ class CommentService {
       );
     }
   }
+
+  Future<ModelKomentar?> hitEditComment({
+    required String token,
+    required String comment,
+    required String commentId,
+  }) async {
+    final FormData formData = FormData.fromMap({
+      'comment': comment,
+    });
+
+    try {
+      final response = await _dio.post(
+        "${Urls.editComment}/$commentId",
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+        data: formData,
+      );
+
+      if (response.statusCode == 200) {
+        return ModelKomentar.fromJson(response.data);
+      } else {
+        throw DioException(
+          response: response,
+          requestOptions: response.requestOptions,
+          message: "Terjadi kesalahan: ${response.statusMessage}",
+          type: DioExceptionType.badResponse,
+        );
+      }
+    } on DioException catch (e) {
+      // ✅ Pastikan error dari API tetap ditampilkan
+      if (e.response != null && e.response!.statusCode == 400) {
+        rethrow; // Lempar kembali error untuk ditangani di ViewModel
+      }
+      throw DioException(
+        requestOptions:
+            RequestOptions(path: "${Urls.editComment}/$commentId",
+        ),
+        message: "Kesalahan jaringan: ${e.message}",
+        type: DioExceptionType.connectionError,
+      );
+    }
+  }
+
+  Future<bool> deleteComment({
+    required String token,
+    required String commentId,
+  }) async {
+    try {
+      final response = await _dio.delete(
+        "${Urls.deleteComment}/$commentId",
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+      print(response.statusCode);
+      return response.statusCode == 200;
+    } on DioException catch (_) {
+      rethrow;
+    }
+  }
 }

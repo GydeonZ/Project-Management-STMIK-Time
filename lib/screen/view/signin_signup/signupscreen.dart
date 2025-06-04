@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/main.dart';
 import 'package:projectmanagementstmiktime/screen/view/signin_signup/signscreen.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
@@ -45,20 +46,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               child: Column(
                 children: [
-                  const Text(
+                  Text(
                     "Selamat datang di TIME",
-                    style: TextStyle(
+                    style: GoogleFonts.figtree(
                       fontSize: 28,
                       fontWeight: FontWeight.w700,
-                      fontFamily: "Inter",
                     ),
                   ),
                   SizedBox(height: size.height * 0.015),
-                  const Text(
+                  Text(
                     "Daftar untuk bergabung",
-                    style: TextStyle(
-                      color: Color(0xff939393),
-                      fontFamily: "Inter",
+                    style: GoogleFonts.figtree(
+                      color: const Color(0xff939393),
                     ),
                   ),
                 ],
@@ -93,16 +92,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       // 🔹 Role Selection
                       Padding(
                         padding: EdgeInsets.only(right: size.width * 0.7),
-                        child: const Text(
+                        child: Text(
                           "Role Anda",
-                          style: TextStyle(fontFamily: "Inter", fontSize: 14),
+                          style: GoogleFonts.figtree(fontSize: 14),
                         ),
                       ),
                       const SizedBox(height: 5),
                       Consumer<SignUpViewModel>(
                         builder: (context, contactModel, child) {
                           return DropdownButtonFormField<String>(
-                            style: TextStyle(
+                            style: GoogleFonts.figtree(
                               color: viewModel.selectedRole ==
                                       'Pilih Role Antara Dosen Atau Mahasiswa'
                                   ? Colors.grey
@@ -314,7 +313,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               navigatorKey.currentState!.pop();
                               customAlert(
                                 alertType: QuickAlertType.error,
-                                text: 'Terjadi kesalahan: ${e.toString()}',
+                                text:
+                                    'Terjadi kesalahan Silahkan Coba lagi nanti',
                               );
                             }
                           }
@@ -326,10 +326,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         "Sudah punya akun? ",
-                        style: TextStyle(
-                            fontFamily: "Inter", color: Color(0xff939393)),
+                        style:
+                            GoogleFonts.figtree(color: const Color(0xff939393)),
                       ),
                       GestureDetector(
                         onTap: () {
@@ -341,11 +341,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             (route) => false,
                           );
                         },
-                        child: const Text(
+                        child: Text(
                           "Masuk",
-                          style: TextStyle(
-                            fontFamily: "Inter",
-                            color: Color(0xff0088D1),
+                          style: GoogleFonts.figtree(
+                            color: const Color(0xff0088D1),
                             fontWeight: FontWeight.bold,
                           ),
                         ),

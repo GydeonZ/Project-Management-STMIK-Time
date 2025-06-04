@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/screen/view/onboarding/onboarding.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
 import 'package:projectmanagementstmiktime/screen/widget/button.dart';
@@ -26,11 +27,10 @@ class GantiPasswordScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'Kata Sandi Baru',
-          style: TextStyle(
+          style: GoogleFonts.figtree(
             color: Colors.black,
-            fontFamily: 'Helvetica',
             fontSize: 18,
             fontWeight: FontWeight.w700,
           ),
@@ -172,7 +172,8 @@ class GantiPasswordScreen extends StatelessWidget {
                                 Navigator.pop(context);
                                 customAlert(
                                   alertType: QuickAlertType.error,
-                                  text: 'Terjadi kesalahan: ${e.toString()}',
+                                  text:
+                                      'Terjadi kesalahan Silahkan Coba lagi nanti',
                                 );
                               }
                             }

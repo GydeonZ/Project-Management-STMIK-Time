@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/main.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
 import 'package:projectmanagementstmiktime/screen/widget/settings/text_field_setting.dart';
@@ -40,11 +41,10 @@ class _ProfileEditState extends State<ProfileEdit> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'Ubah Profile',
-          style: TextStyle(
-            color: Color(0xff293066),
-            fontFamily: 'Helvetica',
+          style: GoogleFonts.figtree(
+            color: const Color(0xff293066),
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -81,7 +81,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                       backgroundColor: const Color(0xff293066),
                       child: Text(
                         initials,
-                        style: const TextStyle(
+                        style: GoogleFonts.figtree(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 35),
@@ -178,7 +178,8 @@ class _ProfileEditState extends State<ProfileEdit> {
                               } catch (e) {
                                 customAlert(
                                   alertType: QuickAlertType.error,
-                                  text: 'Terjadi kesalahan: ${e.toString()}',
+                                  text:
+                                      'Terjadi kesalahan Silahkan Coba lagi nanti',
                                 );
                               }
                             }

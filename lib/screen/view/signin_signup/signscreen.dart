@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/main.dart';
 import 'package:projectmanagementstmiktime/screen/view/forgotpassword/forgot_password_screen.dart';
 import 'package:projectmanagementstmiktime/screen/view/navigation/navigation_screen.dart';
@@ -61,21 +62,21 @@ class _SignInScreenState extends State<SignInScreen> {
                     children: [
                       SvgPicture.asset("assets/logostmik2.svg"),
                       SizedBox(height: size.height * 0.02),
-                      const Text(
+                      Text(
                         "Selamat datang kembali",
-                        style: TextStyle(
+                        style: GoogleFonts.figtree(
                           fontSize: 28,
                           fontWeight: FontWeight.w700,
-                          fontFamily: "Inter",
+                          
                         ),
                       ),
                       SizedBox(height: size.height * 0.015),
-                      const Text(
+                      Text(
                         "Masuk untuk melanjutkan",
-                        style: TextStyle(
+                        style: GoogleFonts.figtree(
                           fontSize: 16,
-                          color: Color(0xff939393),
-                          fontFamily: "Inter",
+                          color: const Color(0xff939393),
+                          
                         ),
                       ),
                       SizedBox(height: size.height * 0.05),
@@ -134,10 +135,10 @@ class _SignInScreenState extends State<SignInScreen> {
                                           );
                                         },
                                       ),
-                                      const Text(
+                                      Text(
                                         "Ingat saya",
-                                        style:
-                                            TextStyle(fontFamily: 'Helvetica'),
+                                        style: GoogleFonts.figtree(
+                                            ),
                                       ),
                                     ],
                                   ),
@@ -148,10 +149,10 @@ class _SignInScreenState extends State<SignInScreen> {
                                         children: [
                                           TextSpan(
                                             text: 'Lupa Password?',
-                                            style: const TextStyle(
-                                              color: Color(0xff0088D1),
+                                            style: GoogleFonts.figtree(
+                                              color: const Color(0xff0088D1),
                                               fontWeight: FontWeight.w600,
-                                              fontFamily: "Inter",
+                                              
                                             ),
                                             recognizer: TapGestureRecognizer()
                                               ..onTap = () {
@@ -253,11 +254,11 @@ class _SignInScreenState extends State<SignInScreen> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Text(
+                                  Text(
                                     "Tidak punya akun? ",
-                                    style: TextStyle(
-                                      fontFamily: "Inter",
-                                      color: Color(0xff939393),
+                                    style: GoogleFonts.figtree(
+                                      
+                                      color: const Color(0xff939393),
                                     ),
                                   ),
                                   GestureDetector(
@@ -271,11 +272,11 @@ class _SignInScreenState extends State<SignInScreen> {
                                         (Route<dynamic> route) => false,
                                       );
                                     },
-                                    child: const Text(
+                                    child: Text(
                                       "Daftar",
-                                      style: TextStyle(
-                                        fontFamily: "Inter",
-                                        color: Color(0xff0088D1),
+                                      style: GoogleFonts.figtree(
+                                        
+                                        color: const Color(0xff0088D1),
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),

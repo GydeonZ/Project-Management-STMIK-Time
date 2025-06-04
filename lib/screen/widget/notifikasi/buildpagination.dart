@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 Widget buildPaginationButton({
   String? text,
@@ -24,7 +25,7 @@ Widget buildPaginationButton({
           child: text != null
               ? Text(
                   text,
-                  style: TextStyle(
+                  style: GoogleFonts.figtree(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: isSelected ? Colors.white : const Color(0xFF293066),

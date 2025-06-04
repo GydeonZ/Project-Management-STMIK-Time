@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/main.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
 import 'package:projectmanagementstmiktime/screen/widget/botsheetaddbutton.dart';
@@ -24,6 +25,8 @@ class CardTugasScreen extends StatefulWidget {
 class _CardTugasScreenState extends State<CardTugasScreen> {
   late CardTugasViewModel cardTugasViewModel;
   late SignInViewModel sp;
+  String _lastFetchedBoardId = "";
+  bool _isInitialized = false;
 
   @override
   void initState() {
@@ -31,21 +34,46 @@ class _CardTugasScreenState extends State<CardTugasScreen> {
     cardTugasViewModel =
         Provider.of<CardTugasViewModel>(context, listen: false);
     sp = Provider.of<SignInViewModel>(context, listen: false);
-    final token = sp.tokenSharedPreference;
+
+    // Pastikan initState hanya melakukan fetch jika perlu
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      cardTugasViewModel.getCardTugasList(token: token);
+      // Set boardId untuk viewModel
+      final String boardIdString = widget.boardId.toString();
+      cardTugasViewModel.setBoardId(boardIdString);
+      // Cek apakah data sudah di-fetch atau perlu di-fetch ulang
+      if (cardTugasViewModel.modelFetchCardTugas == null ||
+          _lastFetchedBoardId != boardIdString ||
+          !_isInitialized) {
+        final token = sp.tokenSharedPreference;
+        _fetchCardData(token, boardIdString);
+      }
+    });
+  }
+
+  // Pindahkan logika fetch ke fungsi terpisah
+  void _fetchCardData(String token, String boardIdString) {
+    cardTugasViewModel.getCardTugasList(token: token).then((_) {
+      // Setelah fetch berhasil, simpan boardId terakhir & set flag
+      _lastFetchedBoardId = boardIdString;
+      _isInitialized = true;
     });
   }
 
   bool _checkUserCanEdit() {
-    // Mendapatkan user ID dari SharedPreferences
+    // Get the current user ID from SharedPreferences
     final currentUserId = sp.idSharedPreference;
 
-    // Mendapatkan board view model
+    // Check if user is a Super Admin (they can edit anything)
+    if (sp.roleSharedPreference.toLowerCase() == "super admin") {
+      return true;
+    }
+
+    // Get the board view model
     final boardVm = Provider.of<BoardViewModel>(context, listen: false);
 
-    // Menggunakan fungsi yang baru dibuat
-    return boardVm.checkUserCanEditBoardById(widget.boardId, currentUserId);
+    // Check user permissions for this specific board
+    return boardVm.canUserEditBoardById(widget.boardId, currentUserId,
+        userRole: sp.roleSharedPreference);
   }
 
   @override
@@ -55,11 +83,10 @@ class _CardTugasScreenState extends State<CardTugasScreen> {
         appBar: AppBar(
           automaticallyImplyLeading: false,
           centerTitle: true,
-          title: const Text(
+          title: Text(
             'Card',
-            style: TextStyle(
-              color: Color(0xFF293066),
-              fontFamily: 'Helvetica',
+            style: GoogleFonts.figtree(
+              color: const Color(0xFF293066),
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -100,7 +127,7 @@ class _CardTugasScreenState extends State<CardTugasScreen> {
           }
           return bottomSheetAddCard(
             context: context,
-            judulBtn: "Tugas",
+            judulBtn: "Card",
             onTap: () {
               final token = sp.tokenSharedPreference;
               customShowDialog(

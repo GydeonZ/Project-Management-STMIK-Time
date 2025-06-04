@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/main.dart';
 import 'package:projectmanagementstmiktime/screen/view/forgotpassword/verifikasi_otp_screen.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
@@ -82,9 +83,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 'Lupa Kata Sandi',
-                                style: TextStyle(
+                                style: GoogleFonts.figtree(
                                   color: Colors.white,
                                   fontSize: 26,
                                   fontWeight: FontWeight.bold,
@@ -96,9 +97,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               Padding(
                                 padding:
                                     EdgeInsets.only(right: size.width * 0.2),
-                                child: const Text(
+                                child: Text(
                                   'Masukkan email Anda dan kami akan mengirimkan kode OTP ke email Anda.',
-                                  style: TextStyle(
+                                  style: GoogleFonts.figtree(
                                     color: Colors.white,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w400,
@@ -152,8 +153,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                     text: "Kirim",
                                     bgColor: const Color(0xFF484F88),
                                     onPressed: () async {
-                                      if (formKeyUbahPassword
-                                          .currentState!
+                                      if (formKeyUbahPassword.currentState!
                                           .validate()) {
                                         customAlert(
                                           alertType: QuickAlertType.loading,
@@ -162,13 +162,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                         );
 
                                         try {
-                                          final statusCode = await viewModel
-                                              .sendReqOtp();
-                                              
+                                          final statusCode =
+                                              await viewModel.sendReqOtp();
+
                                           navigatorKey.currentState?.pop();
                                           if (statusCode == 200) {
                                             customAlert(
-                                              autoClose: false,
+                                                autoClose: false,
                                                 alertType:
                                                     QuickAlertType.success,
                                                 title: "Kode OTP Dikirim!",
@@ -194,7 +194,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                           } else if (statusCode == 429) {
                                             customAlert(
                                               alertType: QuickAlertType.warning,
-                                              title: "Terlalu Banyak Permintaan!\n",
+                                              title:
+                                                  "Terlalu Banyak Permintaan!\n",
                                               text: viewModel.errorMessages ??
                                                   "Terlalu banyak permintaan OTP. Coba lagi dalam beberapa menit.",
                                             );
@@ -218,7 +219,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                           customAlert(
                                             alertType: QuickAlertType.error,
                                             text:
-                                                'Terjadi kesalahan: ${e.toString()}',
+                                                'Terjadi kesalahan Silahkan Coba lagi nanti',
                                           );
                                         }
                                       }

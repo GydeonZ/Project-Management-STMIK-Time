@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:projectmanagementstmiktime/screen/view/signin_signup/signscreen.dart';
 import 'package:projectmanagementstmiktime/screen/widget/alert.dart';
 import 'package:projectmanagementstmiktime/screen/widget/button.dart';
@@ -70,14 +71,14 @@ class _UbahPasswordScreenState extends State<UbahPasswordScreen> {
                             fit: BoxFit.fill,
                           ),
                         ),
-                        const Padding(
-                          padding: EdgeInsets.all(20),
+                        Padding(
+                          padding: const EdgeInsets.all(20),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 'Kata Sandi Baru',
-                                style: TextStyle(
+                                style: GoogleFonts.figtree(
                                   color: Colors.white,
                                   fontSize: 26,
                                   fontWeight: FontWeight.bold,
@@ -85,7 +86,7 @@ class _UbahPasswordScreenState extends State<UbahPasswordScreen> {
                               ),
                               Text(
                                 'Kata Sandi Baru harus berbeda dari kata sandi sebelumnya.',
-                                style: TextStyle(
+                                style: GoogleFonts.figtree(
                                   color: Colors.white,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w400,
@@ -221,12 +222,11 @@ class _UbahPasswordScreenState extends State<UbahPasswordScreen> {
                                           text:
                                               'Tidak ada koneksi internet. Periksa jaringan Anda.',
                                         );
-                                      } 
-                                      catch (e) {
+                                      } catch (e) {
                                         customAlert(
                                           alertType: QuickAlertType.error,
                                           text:
-                                              'Terjadi kesalahan: ${e.toString()}',
+                                              'Terjadi kesalahan Silahkan Coba lagi nanti',
                                         );
                                       }
                                     }
