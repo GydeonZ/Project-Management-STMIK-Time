@@ -100,6 +100,7 @@ class _BoardAnggotaTaskScreenState extends State<BoardAnggotaTaskScreen> {
             color: Color(0xff293066),
           ),
           onPressed: () {
+            boardAnggotaListViewModel.clearSearch();
             Navigator.pop(context);
           },
         ),

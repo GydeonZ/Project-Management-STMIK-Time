@@ -76,6 +76,7 @@ class _AddAnggotaBoardScreenState extends State<AddAnggotaBoardScreen> {
             color: Color(0xff293066),
           ),
           onPressed: () {
+            boardAnggotaListViewModel.clearSearch();
             Navigator.pop(context);
           },
         ),

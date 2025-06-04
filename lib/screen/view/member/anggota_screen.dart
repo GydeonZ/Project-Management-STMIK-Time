@@ -96,6 +96,7 @@ class _AnggotaTaskScreenState extends State<AnggotaTaskScreen> {
             color: Color(0xff293066),
           ),
           onPressed: () {
+            anggotaListViewModel.clearSearch();
             Navigator.pop(context);
           },
         ),
