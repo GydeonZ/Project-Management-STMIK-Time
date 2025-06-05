@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 Widget customTextFormField({
   required TextEditingController controller,
+  // Tambahkan parameter FocusNode
+  FocusNode? focusNode,
   bool? status,
   bool? editDeskripsi = false,
   bool? formTambahTugas = false,
@@ -23,8 +25,10 @@ Widget customTextFormField({
   TextInputType? keyboardType,
   List<TextInputFormatter>? inputFormatters,
   String? Function(String?)? validator,
-  Function(String)? onChanged, // Tambahkan parameter onChanged
+  Function(String)? onChanged,
   TextCapitalization textCapitalization = TextCapitalization.none,
+  // Tambahkan parameter autofocus dengan nilai default false
+  bool autofocus = false,
 }) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,7 +39,6 @@ Widget customTextFormField({
               child: Text(
                 titleText ?? "",
                 style: GoogleFonts.figtree(
-                  
                   fontSize: 14,
                 ),
               ),
@@ -49,9 +52,12 @@ Widget customTextFormField({
                 enabled: status ?? true,
                 textCapitalization: textCapitalization,
                 keyboardType: keyboardType,
-                onChanged: onChanged, // Tambahkan ini
+                onChanged: onChanged,
                 inputFormatters: inputFormatters,
                 controller: controller,
+                // Tambahkan focusNode dan autofocus
+                focusNode: focusNode,
+                autofocus: autofocus,
                 obscureText: obscureText ?? false,
                 decoration: InputDecoration(
                   contentPadding:
@@ -60,13 +66,11 @@ Widget customTextFormField({
                   fillColor: const Color(0xFFECECEC),
                   hintText: labelText,
                   hintStyle: GoogleFonts.figtree(
-                    
                     fontSize: 14,
                     color: const Color(0xFFB0B0B0),
                   ),
                   labelStyle: GoogleFonts.figtree(
                     color: const Color(0xffBFBFBF),
-                    
                   ),
                   prefixIcon: prefixIcon,
                   suffixIcon: suffixIcon,
@@ -103,25 +107,24 @@ Widget customTextFormField({
                     keyboardType: keyboardType,
                     inputFormatters: inputFormatters,
                     controller: controller,
+                    // Tambahkan focusNode dan autofocus
+                    focusNode: focusNode,
+                    autofocus: autofocus,
                     obscureText: obscureText ?? false,
+                    onChanged: onChanged,
                     decoration: InputDecoration(
                       hintText: labelText,
                       hintStyle: GoogleFonts.figtree(
-                        
                         fontSize: 14,
                         color: const Color(0xFFB0B0B0),
                       ),
                       labelStyle: GoogleFonts.figtree(
                         color: const Color(0xffBFBFBF),
-                        
                       ),
-                      // Tambahkan prefixIconConstraints untuk mengontrol ukuran area icon
                       prefixIconConstraints: BoxConstraints(
                         minWidth: widthIcon != null ? widthIcon + 30 : 60,
                       ),
-                      // Ubah padding pada prefixIcon
                       prefixIcon: Padding(
-                        // Tambahkan padding kanan untuk memberi jarak dengan text
                         padding: const EdgeInsets.only(left: 8, right: 15),
                         child: SvgPicture.asset(
                           iconPath ?? "",
@@ -211,7 +214,6 @@ Widget customFormDetailTugas({
                             child: Text(
                               labelText ?? "",
                               style: GoogleFonts.figtree(
-                                
                                 fontSize: 14,
                                 color: colorText ?? const Color(0xFFB0B0B0),
                                 fontWeight: textBold == true
@@ -305,7 +307,6 @@ Widget customFormDetailTugas({
                                 Text(
                                   "Tidak ada data",
                                   style: GoogleFonts.figtree(
-                                    
                                     fontSize: 14,
                                     color: const Color(0xFFB0B0B0),
                                   ),
