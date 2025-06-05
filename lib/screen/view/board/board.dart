@@ -213,12 +213,15 @@ class _BoardScreenState extends State<BoardScreen> with WidgetsBindingObserver {
                                 ),
                                 itemCount: 7, // +1 for "Add Board"
                                 itemBuilder: (context, index) {
+                                  // Untuk Skeletonizer
                                   return customCardBoard(
                                     context: context,
                                     title: 'Skipsi aaaa',
                                     subtitle: 'Subtitle here',
                                     color: Colors.grey,
                                     nickname: 'AA',
+                                    visibility:
+                                        "Public", // Tambahkan default visibility
                                   );
                                 },
                               ));
@@ -331,6 +334,8 @@ class _BoardScreenState extends State<BoardScreen> with WidgetsBindingObserver {
                                   context: context,
                                   boardId: board.id,
                                   canEdit: checkUserCanEditBoard(board.user.id),
+                                  // Tambahkan parameter visibilitas dari data board
+                                  visibility: board.visibility, // Asumsi ada field visibility di model Board
                                   onTap: (value) async {
                                     if (value == 'edit') {
                                       // Edit board name
@@ -635,6 +640,7 @@ class _BoardScreenState extends State<BoardScreen> with WidgetsBindingObserver {
     );
   }
 
+  // Untuk Add Board Card
   Widget _buildAddBoardCard() {
     if (sp == null ||
         sp!.roleSharedPreference != "Dosen" &&

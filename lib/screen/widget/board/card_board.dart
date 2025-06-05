@@ -11,6 +11,8 @@ Widget customCardBoard({
   required String? nickname,
   PopupMenuItemSelected<String>? onTap,
   bool canEdit = true,
+  // Tambahkan parameter untuk visibilitas
+  String visibility = "Public", // Default-nya public
 }) {
   Size size = MediaQuery.of(context).size;
   return Stack(
@@ -49,13 +51,37 @@ Widget customCardBoard({
           ),
         ),
       ),
-      // Always show the dropdown, but content will differ based on canEdit
+      // Dropdown menu
       Positioned(
         right: size.width * 0.006,
         child: _buildBoardDropdown(context, boardId ?? 0, size, onTap, canEdit),
       ),
+      // Tambahkan ikon visibilitas di kanan bawah
+      Positioned(
+        right: size.width * 0.02,
+        bottom: size.width * 0.02,
+        child: _buildVisibilityIcon(visibility),
+      ),
     ],
   );
+}
+
+// Tambahkan fungsi untuk membangun ikon visibilitas
+Widget _buildVisibilityIcon(String visibility) {
+  // Gunakan SvgPicture jika menggunakan SVG, atau Icon jika menggunakan Material Icons
+  if (visibility.toLowerCase() == "private") {
+    return const Icon(
+      Icons.lock_outline,
+      color: Colors.grey,
+      size: 16,
+    );
+  } else {
+    return const Icon(
+      Icons.public,
+      color: Colors.grey,
+      size: 16,
+    );
+  }
 }
 
 Widget _buildBoardDropdown(
